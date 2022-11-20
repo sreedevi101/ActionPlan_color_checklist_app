@@ -5,10 +5,8 @@
  ## Development Stage 1
  
  Room Database with RecyclerView to display. 
+ Open an activity from the FloatingButton to add a task
  
- ![image](https://user-images.githubusercontent.com/15008191/202901537-98a48b2d-bfc4-4b09-ab93-f641d13ffdac.png)
+ ![image](https://user-images.githubusercontent.com/15008191/202901854-53b45b7a-f823-47e1-ab8b-9628521b71c9.png)
 
-Open an activity from the FloatingButton to add a task
-
-![image](https://user-images.githubusercontent.com/15008191/202901683-25405b60-3485-4524-8b0e-c7b4913c2ae9.png)
 
