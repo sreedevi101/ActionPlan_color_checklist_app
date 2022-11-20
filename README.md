@@ -2,7 +2,7 @@
  A Checklist app with lot of options to customoze. Color and format each task item and checklist. Multiple theme options.
  
  
- ## Development Stage 1
+ ## Development Version 1
  
  Room Database with RecyclerView to display. 
  Open an activity from the FloatingButton to add a task
