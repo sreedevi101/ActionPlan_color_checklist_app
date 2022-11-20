@@ -10,4 +10,5 @@
 
 Open an activity from the FloatingButton to add a task
 
-![image](https://user-images.githubusercontent.com/15008191/202901632-a831d3b0-7ee7-4a93-9b1e-9ad3ff9eb09d.png)
+![image](https://user-images.githubusercontent.com/15008191/202901683-25405b60-3485-4524-8b0e-c7b4913c2ae9.png)
+
