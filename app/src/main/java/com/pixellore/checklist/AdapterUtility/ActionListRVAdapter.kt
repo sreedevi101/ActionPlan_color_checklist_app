@@ -24,16 +24,24 @@ class ActionListRVAdapter:
 
     override fun onBindViewHolder(holder: ActionListRVViewHolder, position: Int) {
         val current = getItem(position)
-        holder.bind(current.title)
+        holder.bind(current)
     }
 
 
     class ActionListRVViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         private val taskTitleView: TextView = itemView.findViewById(R.id.actionItemTitle)
+        private val taskDueDate: TextView = itemView.findViewById(R.id.dueDate)
 
-        fun bind(text: String?) {
-            taskTitleView.text = text
+        fun bind(currentTask: Task) {
+            taskTitleView.text = currentTask.title
+            if (currentTask.details_note.isNotEmpty()){
+                taskDueDate.visibility = View.VISIBLE
+                taskDueDate.text = currentTask.details_note
+            } else {
+                taskDueDate.visibility = View.GONE
+            }
         }
+
 
         companion object {
             fun create(parent: ViewGroup): ActionListRVViewHolder {
