@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Checklist</string>
 
-    <string name="hint_word">Add a task…</string>
+    <string name="hint_task">Add a task…</string>
+    <string name="hint_task_details">Add task details…</string>
     <string name="button_save">Save</string>
     <string name="empty_not_saved">Task not saved because it is empty.</string>
     <string name="add_word">Add Task</string>

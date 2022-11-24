@@ -19,7 +19,7 @@ import com.pixellore.checklist.DatabaseUtility.ActionPlanViewModelFactory
 
 class MainActivity : AppCompatActivity() {
 
-    private val actionItemEditorActivityRequestCode = 1
+    private val TAG = "Debug"
     private val actionPlanViewModel: ActionPlanViewModel by viewModels {
         ActionPlanViewModelFactory((application as TaskApplication).repository)
     }
@@ -27,17 +27,20 @@ class MainActivity : AppCompatActivity() {
     // Receiver
     private val getResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if(it.resultCode == Activity.RESULT_OK){
-                val value = it.data?.getStringExtra(TaskEditorActivity.EXTRA_REPLY)?.let { reply ->
-                    val actionListSize: Int = getListSize()
-                    val taskTitle = Task(title = reply, id = actionListSize)
-                    //val taskTitle = ActionItem(title = reply)
-                    actionPlanViewModel.insert(taskTitle)
-                }
-            }
-        else {
+            val taskId = getListSize()
+            var newTaskTitle = ""
+            var newTaskDetails = ""
+            it.data?.getStringExtra(TaskEditorActivity.TASK_TITLE)?.let { reply -> newTaskTitle=reply }
+            it.data?.getStringExtra(TaskEditorActivity.TASK_DETAILS)?.let { reply -> newTaskDetails=reply }
+            Log.v(TAG, "Title: $newTaskTitle\nDetails: $newTaskDetails")
+
+            val task = Task(title = newTaskTitle, id = taskId, details_note = newTaskDetails)
+            actionPlanViewModel.insert(task)
+
+        } else {
             Toast.makeText(applicationContext, R.string.empty_not_saved, Toast.LENGTH_LONG).show()
         }
-        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
