@@ -18,6 +18,8 @@ class TaskRepository(private val actionItemDao: TaskDao) {
 
     val allChecklistItems: Flow<List<Task>> = actionItemDao.getItems()
 
+    val allTasksWithSubtasks: Flow<List<TaskWithSubtasks>> = actionItemDao.getTasksWithSubtasks()
+
     // By default Room runs suspend queries off the main thread, therefore, we don't need to
     // implement anything else to ensure we're not doing long running database work
     // off the main thread.
@@ -26,5 +28,9 @@ class TaskRepository(private val actionItemDao: TaskDao) {
 
     suspend fun insert(task: Task){
         actionItemDao.insert(task)
+    }
+
+    suspend fun insertSubtask(subtask: Subtask){
+        actionItemDao.insertSubtask(subtask)
     }
 }

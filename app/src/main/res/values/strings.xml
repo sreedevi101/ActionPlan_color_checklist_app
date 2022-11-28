@@ -6,4 +6,7 @@
     <string name="button_save">Save</string>
     <string name="empty_not_saved">Task not saved because it is empty.</string>
     <string name="add_word">Add Task</string>
+    <string name="priority">Priority</string>
+    <string name="due_date">Enter due date</string>
+    <string name="add_subtask">Add Subtask</string>
 </resources>

@@ -3,9 +3,12 @@ package com.pixellore.checklist.DatabaseUtility
 import androidx.room.*
 
 
-@Entity(tableName = "action_item_table")
+@Entity(tableName = "task_table")
 data class Task(
-    @PrimaryKey val id:Int,
-    @ColumnInfo(name = "title") var title:String,
-    @ColumnInfo(name = "details_note") var details_note:String = "",
-    @ColumnInfo(name = "priority") var priority:String = "None")
+    @PrimaryKey val task_id:Int,
+    var task_title:String,
+    var details_note:String = "",
+    var due_date:String = "",
+    var priority:String = "None",
+    var isExpanded: Boolean = false
+)
