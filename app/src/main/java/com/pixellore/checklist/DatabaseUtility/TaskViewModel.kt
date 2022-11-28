@@ -1,6 +1,7 @@
 package com.pixellore.checklist.DatabaseUtility
 
 import androidx.lifecycle.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 
@@ -12,11 +13,17 @@ class ActionPlanViewModel(private val repository: TaskRepository): ViewModel() {
     // - Repository is completely separated from the UI through the ViewModel.
     val allChecklistItems: LiveData<List<Task>> = repository.allChecklistItems.asLiveData()
 
+    val allTasksWithSubtasks: LiveData<List<TaskWithSubtasks>> = repository.allTasksWithSubtasks.asLiveData()
+
     /**
      * Launching a new coroutine to insert the data in a non-blocking way
      */
     fun insert(task: Task) = viewModelScope.launch(){
         repository.insert(task)
+    }
+
+    fun insertSubtask(subtask: Subtask) = viewModelScope.launch {
+        repository.insertSubtask(subtask)
     }
 
 

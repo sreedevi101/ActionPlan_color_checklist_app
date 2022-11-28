@@ -11,11 +11,8 @@ import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.pixellore.checklist.AdapterUtility.ActionListRVAdapter
-import com.pixellore.checklist.DatabaseUtility.Task
-import com.pixellore.checklist.DatabaseUtility.TaskApplication
-import com.pixellore.checklist.DatabaseUtility.ActionPlanViewModel
-import com.pixellore.checklist.DatabaseUtility.ActionPlanViewModelFactory
+import com.pixellore.checklist.AdapterUtility.TaskRecycleAdapter
+import com.pixellore.checklist.DatabaseUtility.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,12 +27,35 @@ class MainActivity : AppCompatActivity() {
             val taskId = getListSize()
             var newTaskTitle = ""
             var newTaskDetails = ""
+            var newTaskDueDate = ""
+            var newTaskSubtaskList: Array<String>? = null
             it.data?.getStringExtra(TaskEditorActivity.TASK_TITLE)?.let { reply -> newTaskTitle=reply }
             it.data?.getStringExtra(TaskEditorActivity.TASK_DETAILS)?.let { reply -> newTaskDetails=reply }
-            Log.v(TAG, "Title: $newTaskTitle\nDetails: $newTaskDetails")
+            it.data?.getStringExtra(TaskEditorActivity.DUE_DATE)?.let { reply -> newTaskDueDate=reply }
+            it.data?.getStringArrayExtra(TaskEditorActivity.SUBTASK_LIST)?.let { reply -> newTaskSubtaskList=reply }
 
-            val task = Task(title = newTaskTitle, id = taskId, details_note = newTaskDetails)
+            Log.v(TAG, "Title: $newTaskTitle\nDetails: $newTaskDetails\nDueDate: $newTaskDueDate")
+
+            newTaskSubtaskList?.forEach { Log.v(TAG, "MainActivity Subtasks : " + it) }
+
+
+            // insert corresponding subtasks
+            //var subtasksToTaskList:MutableList<Subtask> = mutableListOf()
+            var subtask:Subtask
+            var i:Int = 1
+            newTaskSubtaskList?.forEach {
+                subtask = Subtask(parent_task_id = taskId,
+                    subtask_title = it, subtask_id = i)
+                actionPlanViewModel.insertSubtask(subtask)
+                //subtasksToTaskList.add(subtask)
+                i++
+            }
+
+            // Insert new task
+            val task = Task(task_title = newTaskTitle, task_id = taskId,
+                details_note = newTaskDetails, due_date = newTaskDueDate)
             actionPlanViewModel.insert(task)
+
 
         } else {
             Toast.makeText(applicationContext, R.string.empty_not_saved, Toast.LENGTH_LONG).show()
@@ -47,14 +67,21 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val actionListRecyclerView = findViewById<RecyclerView>(R.id.actionListRecyclerView)
-        val adapter = ActionListRVAdapter()
+        val adapter = TaskRecycleAdapter()
         actionListRecyclerView.adapter = adapter
         actionListRecyclerView.layoutManager = LinearLayoutManager(this)
 
         // Add an observer on the LiveData returned by ActionItem.getItem()
         // The onChanged() method fires when the observed data changes and the activity is
         // in the foreground.
-        actionPlanViewModel.allChecklistItems.observe(this) { tasks ->
+        /*actionPlanViewModel.allChecklistItems.observe(this) { tasks ->
+            // Update the cached copy of the tasks in the adapter.
+            tasks.let {
+                Log.v("ViewModel", it.size.toString())
+                adapter.submitList(it) }
+        }*/
+
+        actionPlanViewModel.allTasksWithSubtasks.observe(this){ tasks ->
             // Update the cached copy of the tasks in the adapter.
             tasks.let {
                 Log.v("ViewModel", it.size.toString())
