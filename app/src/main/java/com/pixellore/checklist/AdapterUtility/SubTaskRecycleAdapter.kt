@@ -13,7 +13,8 @@ import com.pixellore.checklist.DatabaseUtility.Subtask
 import com.pixellore.checklist.DatabaseUtility.Task
 import com.pixellore.checklist.R
 
-class SubTaskRecycleAdapter: ListAdapter<Subtask, SubTaskRecycleAdapter.SubtaskViewHolder>(SubItemComparator()) {
+class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit):
+    ListAdapter<Subtask, SubTaskRecycleAdapter.SubtaskViewHolder>(SubItemComparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubtaskViewHolder {
         return SubtaskViewHolder.create(parent)
@@ -21,20 +22,28 @@ class SubTaskRecycleAdapter: ListAdapter<Subtask, SubTaskRecycleAdapter.SubtaskV
 
     override fun onBindViewHolder(holder: SubtaskViewHolder, position: Int) {
         val current = getItem(position)
-        holder.bind(current)
+        holder.bind(current, clickListenerSubtask)
     }
 
     class SubtaskViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
         private val subtaskTitleView: TextView = itemView.findViewById(R.id.subtaskTitle)
         private val completedCheckBox: CheckBox = itemView.findViewById(R.id.subtaskCompletedCheck)
 
-        fun bind(currentSubtask: Subtask){
+        fun bind(currentSubtask: Subtask,
+                 clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit)
+        {
             subtaskTitleView.text = currentSubtask.subtask_title
 
-            completedCheckBox.setOnCheckedChangeListener { _, isChecked ->
+
+            toggleStrikeThrough(textViewToStrike = subtaskTitleView, currentSubtask.subtask_isCompleted)
+            completedCheckBox.isChecked = currentSubtask.subtask_isCompleted
+
+            completedCheckBox.setOnClickListener {
+                val isChecked  = completedCheckBox.isChecked
+                currentSubtask.subtask_isCompleted = isChecked
                 toggleStrikeThrough(textViewToStrike = subtaskTitleView, isChecked)
-                currentSubtask.subtask_isCompleted = !currentSubtask.subtask_isCompleted
-                // TODO: Update in database
+                clickListenerSubtask(adapterPosition, currentSubtask)
+
             }
         }
 
@@ -44,6 +53,7 @@ class SubTaskRecycleAdapter: ListAdapter<Subtask, SubTaskRecycleAdapter.SubtaskV
             } else{
                 textViewToStrike.paintFlags = textViewToStrike.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
             }
+
         }
 
         companion object {

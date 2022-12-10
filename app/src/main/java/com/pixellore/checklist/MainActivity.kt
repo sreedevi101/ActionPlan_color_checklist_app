@@ -77,17 +77,17 @@ class MainActivity : AppCompatActivity() {
 
         val actionListRecyclerView = findViewById<RecyclerView>(R.id.actionListRecyclerView)
 
-        //(actionListRecyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
-        //(actionListRecyclerView.itemAnimator as? SimpleItemAnimator)?.changeDuration = 0
-
         /*
         * This is to remove the flickering of items in the recycler view when the item is updated
         * */
         actionListRecyclerView.itemAnimator?.changeDuration = 0
 
-        val adapter = TaskRecycleAdapter{position, task ->
-            onListItemClick(position, task)
-        }
+
+        val adapter = TaskRecycleAdapter(
+            {position, task ->  onListItemClick(position, task)},
+            {position, subtask ->  onListSubtaskClick(position, subtask)})
+
+
         actionListRecyclerView.adapter = adapter
         actionListRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -115,6 +115,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
     /**
      * This functions contains the logic that will be implemented when an item
      * (or any view in the item) is clicked
@@ -125,6 +126,11 @@ class MainActivity : AppCompatActivity() {
         //Toast.makeText(applicationContext, position.toString(), Toast.LENGTH_SHORT).show()
 
         actionPlanViewModel.update(task)
+    }
+
+
+    private fun onListSubtaskClick(position: Int, subtask: Subtask) {
+        actionPlanViewModel.updateSubtask(subtask)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -224,6 +230,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+
 
 
         }
