@@ -16,7 +16,9 @@ class TaskRepository(private val actionItemDao: TaskDao) {
     // Room executes all queries on a separate thread.
     // Observed Flow will notify the observer when the data has changed.
 
-    val allChecklistItems: Flow<List<Task>> = actionItemDao.getItems()
+    val allChecklistTasks: Flow<List<Task>> = actionItemDao.getTasks()
+
+    val allChecklistSubtasks: Flow<List<Subtask>> = actionItemDao.getSubtasks()
 
     val allTasksWithSubtasks: Flow<List<TaskWithSubtasks>> = actionItemDao.getTasksWithSubtasks()
 
@@ -26,11 +28,39 @@ class TaskRepository(private val actionItemDao: TaskDao) {
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
 
+    // Insert
     suspend fun insert(task: Task){
         actionItemDao.insert(task)
     }
 
     suspend fun insertSubtask(subtask: Subtask){
         actionItemDao.insertSubtask(subtask)
+    }
+
+    // Update
+    suspend fun update(task: Task){
+        actionItemDao.update(task)
+    }
+
+    suspend fun updateSubtask(subtask: Subtask){
+        actionItemDao.updateSubtask(subtask)
+    }
+
+    // Delete
+    suspend fun delete(task: Task){
+        actionItemDao.delete(task)
+    }
+
+    suspend fun deleteSubtask(subtask: Subtask){
+        actionItemDao.deleteSubtask(subtask)
+    }
+
+    // Delete all
+    suspend fun deleteAll(){
+        actionItemDao.deleteAll()
+    }
+
+    suspend fun deleteAllSubtasks(){
+        actionItemDao.deleteAllSubtasks()
     }
 }

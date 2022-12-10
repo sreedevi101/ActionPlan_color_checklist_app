@@ -7,8 +7,8 @@
     android:layout_marginStart="48dp"
     android:padding="4dp">
 
-    <RadioButton
-        android:id="@+id/radioButton"
+    <CheckBox
+        android:id="@+id/subtaskCompletedCheck"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -22,7 +22,7 @@
         android:textAppearance="@android:style/TextAppearance.Small"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/radioButton"
+        app:layout_constraintStart_toEndOf="@+id/subtaskCompletedCheck"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="subtask 1" />
 

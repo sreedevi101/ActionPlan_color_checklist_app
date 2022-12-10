@@ -2,14 +2,20 @@ package com.pixellore.checklist
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pixellore.checklist.AdapterUtility.TaskRecycleAdapter
 import com.pixellore.checklist.DatabaseUtility.*
@@ -24,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     // Receiver
     private val getResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if(it.resultCode == Activity.RESULT_OK){
-            val taskId = getListSize()
+            val taskId = getTaskListSize() + 1
             var newTaskTitle = ""
             var newTaskDetails = ""
             var newTaskDueDate = ""
@@ -40,15 +46,13 @@ class MainActivity : AppCompatActivity() {
 
 
             // insert corresponding subtasks
-            //var subtasksToTaskList:MutableList<Subtask> = mutableListOf()
             var subtask:Subtask
-            var i:Int = 1
+            var subtaskId:Int = getSubtaskListSize() + 1
             newTaskSubtaskList?.forEach {
                 subtask = Subtask(parent_task_id = taskId,
-                    subtask_title = it, subtask_id = i)
+                    subtask_title = it, subtask_id = subtaskId)
                 actionPlanViewModel.insertSubtask(subtask)
-                //subtasksToTaskList.add(subtask)
-                i++
+                subtaskId++
             }
 
             // Insert new task
@@ -66,24 +70,24 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val actionListRecyclerView = findViewById<RecyclerView>(R.id.actionListRecyclerView)
-<<<<<<< Updated upstream
-        val adapter = TaskRecycleAdapter()
-=======
+        // set up Toolbar as action bar for the activity
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        toolbar.setTitleTextColor(Color.WHITE)
+        setSupportActionBar(toolbar)
 
-        //(actionListRecyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
-        //(actionListRecyclerView.itemAnimator as? SimpleItemAnimator)?.changeDuration = 0
+        val actionListRecyclerView = findViewById<RecyclerView>(R.id.actionListRecyclerView)
 
         /*
         * This is to remove the flickering of items in the recycler view when the item is updated
         * */
         actionListRecyclerView.itemAnimator?.changeDuration = 0
 
+
         val adapter = TaskRecycleAdapter(
             {position, task ->  onListItemClick(position, task)},
             {position, subtask ->  onListSubtaskClick(position, subtask)})
 
->>>>>>> Stashed changes
+
         actionListRecyclerView.adapter = adapter
         actionListRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -100,7 +104,6 @@ class MainActivity : AppCompatActivity() {
         actionPlanViewModel.allTasksWithSubtasks.observe(this){ tasks ->
             // Update the cached copy of the tasks in the adapter.
             tasks.let {
-                Log.v("ViewModel", it.size.toString())
                 adapter.submitList(it) }
         }
 
@@ -112,8 +115,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-<<<<<<< Updated upstream
-=======
+
     /**
      * This functions contains the logic that will be implemented when an item
      * (or any view in the item) is clicked
@@ -125,6 +127,7 @@ class MainActivity : AppCompatActivity() {
 
         actionPlanViewModel.update(task)
     }
+
 
     private fun onListSubtaskClick(position: Int, subtask: Subtask) {
         actionPlanViewModel.updateSubtask(subtask)
@@ -228,11 +231,15 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
->>>>>>> Stashed changes
 
-    private fun getListSize(): Int {
+
+        }
+
+    }
+
+    private fun getTaskListSize(): Int {
         var listSize: Int = 0
-        actionPlanViewModel.allChecklistItems.observe(this) { tasks ->
+        actionPlanViewModel.allChecklistTasks.observe(this) { tasks ->
             // Update the cached copy of the tasks in the adapter.
             tasks.let {
                 Log.v("ViewModel", it.size.toString())
@@ -241,6 +248,17 @@ class MainActivity : AppCompatActivity() {
         }
         return listSize
     }
+
+    private fun getSubtaskListSize(): Int{
+        var listSize:Int = 0
+        actionPlanViewModel.allChecklistSubtasks.observe(this) { subtasks ->
+            subtasks.let {
+                listSize = it.size
+            }
+        }
+        return listSize
+    }
+
 
 
 }

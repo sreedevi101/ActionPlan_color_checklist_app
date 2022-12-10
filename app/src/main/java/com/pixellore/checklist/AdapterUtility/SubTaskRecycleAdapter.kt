@@ -1,8 +1,10 @@
 package com.pixellore.checklist.AdapterUtility
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -25,13 +27,13 @@ class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, su
 
     class SubtaskViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
         private val subtaskTitleView: TextView = itemView.findViewById(R.id.subtaskTitle)
+        private val completedCheckBox: CheckBox = itemView.findViewById(R.id.subtaskCompletedCheck)
 
         fun bind(currentSubtask: Subtask,
                  clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit)
         {
             subtaskTitleView.text = currentSubtask.subtask_title
-<<<<<<< Updated upstream
-=======
+
 
             toggleStrikeThrough(textViewToStrike = subtaskTitleView, currentSubtask.subtask_isCompleted)
             completedCheckBox.isChecked = currentSubtask.subtask_isCompleted
@@ -41,6 +43,7 @@ class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, su
                 currentSubtask.subtask_isCompleted = isChecked
                 toggleStrikeThrough(textViewToStrike = subtaskTitleView, isChecked)
                 clickListenerSubtask(adapterPosition, currentSubtask)
+
             }
         }
 
@@ -50,7 +53,7 @@ class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, su
             } else{
                 textViewToStrike.paintFlags = textViewToStrike.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
             }
->>>>>>> Stashed changes
+
         }
 
         companion object {

@@ -1,7 +1,6 @@
 package com.pixellore.checklist.DatabaseUtility
 
 import androidx.lifecycle.*
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 
@@ -11,7 +10,9 @@ class ActionPlanViewModel(private val repository: TaskRepository): ViewModel() {
     // - We can put an observer on the data (instead of polling for changes) and only update the
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
-    val allChecklistItems: LiveData<List<Task>> = repository.allChecklistItems.asLiveData()
+    val allChecklistTasks: LiveData<List<Task>> = repository.allChecklistTasks.asLiveData()
+
+    val allChecklistSubtasks: LiveData<List<Subtask>> = repository.allChecklistSubtasks.asLiveData()
 
     val allTasksWithSubtasks: LiveData<List<TaskWithSubtasks>> = repository.allTasksWithSubtasks.asLiveData()
 
@@ -26,7 +27,32 @@ class ActionPlanViewModel(private val repository: TaskRepository): ViewModel() {
         repository.insertSubtask(subtask)
     }
 
+    // Update
+    fun update(task: Task) = viewModelScope.launch() {
+        repository.update(task)
+    }
 
+    fun updateSubtask(subtask: Subtask) = viewModelScope.launch() {
+        repository.updateSubtask(subtask)
+    }
+
+    // Delete
+    fun delete(task: Task) = viewModelScope.launch() {
+        repository.delete(task)
+    }
+
+    fun deleteSubtask(subtask: Subtask) = viewModelScope.launch() {
+        repository.deleteSubtask(subtask)
+    }
+
+    // Delete All
+    fun deleteAll() = viewModelScope.launch() {
+        repository.deleteAll()
+    }
+
+    fun deleteAllSubtasks() = viewModelScope.launch() {
+        repository.deleteAllSubtasks()
+    }
 }
 
 class ActionPlanViewModelFactory(private val repository: TaskRepository): ViewModelProvider.Factory {

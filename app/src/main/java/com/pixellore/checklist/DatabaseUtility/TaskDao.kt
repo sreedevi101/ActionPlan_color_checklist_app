@@ -7,7 +7,10 @@ import kotlinx.coroutines.flow.Flow
 interface TaskDao {
 
     @Query("SELECT * FROM task_table ORDER BY task_id ASC")
-    fun getItems(): Flow<List<Task>>
+    fun getTasks(): Flow<List<Task>>
+
+    @Query("SELECT * FROM subtask_table ORDER BY subtask_id ASC")
+    fun getSubtasks(): Flow<List<Subtask>>
 
     @Transaction
     @Query("SELECT * FROM task_table")
@@ -37,4 +40,7 @@ interface TaskDao {
 
     @Delete
     suspend fun deleteSubtask(subtask: Subtask)
+
+    @Query("DELETE FROM subtask_table")
+    suspend fun deleteAllSubtasks()
 }
