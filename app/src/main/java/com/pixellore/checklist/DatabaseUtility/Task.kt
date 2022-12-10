@@ -10,5 +10,6 @@ data class Task(
     var details_note:String = "",
     var due_date:String = "",
     var priority:String = "None",
-    var isExpanded: Boolean = false
+    var isExpanded: Boolean = false,
+    var task_isCompleted: Boolean = false
 )
