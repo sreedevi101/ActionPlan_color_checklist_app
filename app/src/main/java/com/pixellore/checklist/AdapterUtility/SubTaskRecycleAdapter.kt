@@ -1,8 +1,10 @@
 package com.pixellore.checklist.AdapterUtility
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -24,9 +26,24 @@ class SubTaskRecycleAdapter: ListAdapter<Subtask, SubTaskRecycleAdapter.SubtaskV
 
     class SubtaskViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
         private val subtaskTitleView: TextView = itemView.findViewById(R.id.subtaskTitle)
+        private val completedCheckBox: CheckBox = itemView.findViewById(R.id.subtaskCompletedCheck)
 
         fun bind(currentSubtask: Subtask){
             subtaskTitleView.text = currentSubtask.subtask_title
+
+            completedCheckBox.setOnCheckedChangeListener { _, isChecked ->
+                toggleStrikeThrough(textViewToStrike = subtaskTitleView, isChecked)
+                currentSubtask.subtask_isCompleted = !currentSubtask.subtask_isCompleted
+                // TODO: Update in database
+            }
+        }
+
+        private fun toggleStrikeThrough(textViewToStrike:TextView, isChecked:Boolean){
+            if (isChecked){
+                textViewToStrike.paintFlags = textViewToStrike.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            } else{
+                textViewToStrike.paintFlags = textViewToStrike.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            }
         }
 
         companion object {
