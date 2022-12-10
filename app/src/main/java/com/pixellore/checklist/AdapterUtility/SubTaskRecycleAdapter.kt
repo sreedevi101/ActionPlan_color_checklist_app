@@ -19,14 +19,37 @@ class SubTaskRecycleAdapter: ListAdapter<Subtask, SubTaskRecycleAdapter.SubtaskV
 
     override fun onBindViewHolder(holder: SubtaskViewHolder, position: Int) {
         val current = getItem(position)
-        holder.bind(current)
+        holder.bind(current, clickListenerSubtask)
     }
 
     class SubtaskViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
         private val subtaskTitleView: TextView = itemView.findViewById(R.id.subtaskTitle)
 
-        fun bind(currentSubtask: Subtask){
+        fun bind(currentSubtask: Subtask,
+                 clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit)
+        {
             subtaskTitleView.text = currentSubtask.subtask_title
+<<<<<<< Updated upstream
+=======
+
+            toggleStrikeThrough(textViewToStrike = subtaskTitleView, currentSubtask.subtask_isCompleted)
+            completedCheckBox.isChecked = currentSubtask.subtask_isCompleted
+
+            completedCheckBox.setOnClickListener {
+                val isChecked  = completedCheckBox.isChecked
+                currentSubtask.subtask_isCompleted = isChecked
+                toggleStrikeThrough(textViewToStrike = subtaskTitleView, isChecked)
+                clickListenerSubtask(adapterPosition, currentSubtask)
+            }
+        }
+
+        private fun toggleStrikeThrough(textViewToStrike:TextView, isChecked:Boolean){
+            if (isChecked){
+                textViewToStrike.paintFlags = textViewToStrike.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            } else{
+                textViewToStrike.paintFlags = textViewToStrike.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            }
+>>>>>>> Stashed changes
         }
 
         companion object {

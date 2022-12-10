@@ -22,7 +22,12 @@ import com.pixellore.checklist.utils.SpaceDecorator
 * Adapter for the RecyclerView to display task items (in database) as a list
  *
 * */
+<<<<<<< Updated upstream
 class TaskRecycleAdapter:
+=======
+class TaskRecycleAdapter(private val clickListener: (position: Int, task:Task) -> Unit,
+                         private val clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit):
+>>>>>>> Stashed changes
     ListAdapter<TaskWithSubtasks, TaskRecycleAdapter.TaskRecycleViewHolder>(ActionItemComparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskRecycleViewHolder {
@@ -30,8 +35,13 @@ class TaskRecycleAdapter:
     }
 
     override fun onBindViewHolder(holder: TaskRecycleViewHolder, position: Int) {
+<<<<<<< Updated upstream
         val current = getItem(position)
         holder.bind2(current, holder.itemView.context)
+=======
+        val currentTask = getItem(position)
+        holder.bind(currentTask, holder.itemView.context, clickListener, clickListenerSubtask)
+>>>>>>> Stashed changes
     }
 
 
@@ -39,8 +49,23 @@ class TaskRecycleAdapter:
 
         private val TAG = "Debug"
 
+<<<<<<< Updated upstream
         private val subtaskRecyclerView: RecyclerView = itemView.findViewById(R.id.subTaskRecycler)
         private var subtaskRecyclerAdapter = SubTaskRecycleAdapter()
+=======
+        fun bind(currentTask: TaskWithSubtasks, context: Context,
+                 clickListener: (position: Int, task: Task) -> Unit,
+                 clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit)
+        {
+
+            with(itemView){
+                val subtaskRecyclerView: RecyclerView = findViewById(R.id.subTaskRecycler)
+                var subtaskRecyclerAdapter = SubTaskRecycleAdapter(clickListenerSubtask)
+
+                val taskTitleView: TextView = findViewById(R.id.actionItemTitle)
+                val detailsNote:TextView = findViewById(R.id.detailsNote)
+                val taskDueDate: TextView = findViewById(R.id.dueDate)
+>>>>>>> Stashed changes
 
         private val taskTitleView: TextView = itemView.findViewById(R.id.actionItemTitle)
         private val detailsNote:TextView = itemView.findViewById(R.id.detailsNote)
@@ -77,6 +102,18 @@ class TaskRecycleAdapter:
             }
         }
 
+<<<<<<< Updated upstream
+=======
+
+
+        private fun toggleStrikeThrough(textViewToStrike:TextView, isChecked:Boolean){
+            if (isChecked){
+                textViewToStrike.paintFlags = textViewToStrike.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            } else{
+                textViewToStrike.paintFlags = textViewToStrike.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+            }
+        }
+>>>>>>> Stashed changes
 
         private fun toggleSubtasksDisplay(currentTask: TaskWithSubtasks) {
             //Debug
