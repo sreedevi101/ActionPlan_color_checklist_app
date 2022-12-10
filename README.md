@@ -9,8 +9,9 @@
  
  ![image](https://user-images.githubusercontent.com/15008191/202901854-53b45b7a-f823-47e1-ab8b-9628521b71c9.png)
  
- ### Development version 1.3
+ ## Development version 2
  
+ - Nested and expandable recycler view
  - Toggle the visibility of subtasks when  the item card view is clicked
  - Toggle the checkbox status (checked/ not checked) when it is clicked
  - Update the checkbox status and the subtasks visibility (is the card view expanded or not) in the DB so the status persists when the app is closed and opened again.
