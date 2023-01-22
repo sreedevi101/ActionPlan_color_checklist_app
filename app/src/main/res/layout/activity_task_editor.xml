@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/editor_activity_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_margin="16dp">
 
     <EditText
         android:id="@+id/edit_task_title"
@@ -11,9 +15,7 @@
         android:minHeight="@dimen/min_height"
         android:fontFamily="sans-serif-light"
         android:hint="@string/hint_task"
-        android:inputType="textAutoComplete"
-        android:layout_margin="@dimen/big_padding"
-        android:textSize="18sp" />
+        style="@style/edittext_task_editor" />
 
     <EditText
         android:id="@+id/edit_task_details"
@@ -22,9 +24,7 @@
         android:minHeight="@dimen/min_height"
         android:fontFamily="sans-serif-light"
         android:hint="@string/hint_task_details"
-        android:inputType="textAutoComplete"
-        android:layout_margin="@dimen/big_padding"
-        android:textSize="18sp" />
+        style="@style/edittext_task_editor"/>
 
     <EditText
         android:id="@+id/add_due_date"
@@ -33,55 +33,45 @@
         android:minHeight="@dimen/min_height"
         android:fontFamily="sans-serif-light"
         android:hint="@string/due_date"
-        android:inputType="textAutoComplete"
-        android:layout_margin="@dimen/big_padding"
-        android:textSize="18sp" />
+        style="@style/edittext_task_editor"/>
 
-    <EditText
-        android:id="@+id/subtask1"
+    <androidx.constraintlayout.widget.ConstraintLayout
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="@dimen/min_height"
-        android:fontFamily="sans-serif-light"
-        android:hint="@string/add_subtask"
-        android:inputType="textAutoComplete"
-        android:layout_margin="@dimen/big_padding"
-        android:textSize="18sp" />
+        android:layout_margin="16dp">
 
-    <EditText
-        android:id="@+id/subtask2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="@dimen/min_height"
-        android:fontFamily="sans-serif-light"
-        android:hint="@string/add_subtask"
-        android:inputType="textAutoComplete"
-        android:layout_margin="@dimen/big_padding"
-        android:textSize="18sp" />
+        <LinearLayout
+            android:id="@+id/subtask_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" >
 
-    <EditText
-        android:id="@+id/subtask3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="@dimen/min_height"
-        android:fontFamily="sans-serif-light"
-        android:hint="@string/add_subtask"
-        android:inputType="textAutoComplete"
-        android:layout_margin="@dimen/big_padding"
-        android:textSize="18sp" />
-
-    <EditText
-        android:id="@+id/subtask4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="@dimen/min_height"
-        android:fontFamily="sans-serif-light"
-        android:hint="@string/add_subtask"
-        android:inputType="textAutoComplete"
-        android:layout_margin="@dimen/big_padding"
-        android:textSize="18sp" />
+            <EditText
+                android:id="@+id/subtask1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/add_subtask"
+                style="@style/edittext_task_editor"/>
 
 
+        </LinearLayout>
+
+
+        <ImageButton
+            android:id="@+id/add_subtask_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/add_subtask"
+            android:src="@drawable/ic_baseline_add_24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/subtask_layout"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <Button
