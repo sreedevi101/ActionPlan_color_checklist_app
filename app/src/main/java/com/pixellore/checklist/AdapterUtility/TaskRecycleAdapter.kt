@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -47,6 +48,7 @@ class TaskRecycleAdapter(private val clickListener: (position: Int, task:Task) -
         private val TAG = "Debug"
 
 
+
         fun bind(currentTask: TaskWithSubtasks, context: Context,
                  clickListener: (position: Int, task: Task) -> Unit,
                  clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit)
@@ -63,7 +65,8 @@ class TaskRecycleAdapter(private val clickListener: (position: Int, task:Task) -
 
                 val subLayout: ConstraintLayout = findViewById(R.id.subLayout)
                 val taskCardLayout: ConstraintLayout = findViewById(R.id.taskCardLayout)
-                val mainLayout: ConstraintLayout = findViewById(R.id.mainLayout)
+
+                val expandCollapseBtn: ImageButton = findViewById(R.id.expandCollapseSubLayoutButton)
 
                 val completedCheckBox: CheckBox = findViewById(R.id.taskCompletedCheck)
 
@@ -85,7 +88,10 @@ class TaskRecycleAdapter(private val clickListener: (position: Int, task:Task) -
                 subtaskRecyclerView.adapter = subtaskRecyclerAdapter
                 subtaskRecyclerView.layoutManager = LinearLayoutManager(context)
 
-                taskCardLayout.setOnClickListener {
+                /*
+                * Expand and Collapse (Toggle) the subLayout on pressing the down/up arrow button
+                * */
+                expandCollapseBtn.setOnClickListener {
                     //currentTask.subtaskList.forEach { Log.v(TAG, it.subtask_title) }
 
                     currentTask.task.isExpanded = !currentTask.task.isExpanded
@@ -95,6 +101,9 @@ class TaskRecycleAdapter(private val clickListener: (position: Int, task:Task) -
                 }
 
 
+                /*
+                * Check the checkbox and strike through the text on pressing the checkbox
+                * */
                 completedCheckBox.setOnClickListener {
                     val isChecked  = completedCheckBox.isChecked
                     currentTask.task.task_isCompleted = isChecked
