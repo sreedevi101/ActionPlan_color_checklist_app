@@ -100,46 +100,6 @@ class TaskEditorActivity : AppCompatActivity() {
             // todo: fill subtasks
         }
 
-        /**
-         * Already existing Task and Subtasks passed to this Intent to edit
-         * */
-        val taskToEdit: Task?
-
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) { // TIRAMISU onwards
-            taskToEdit = intent.getParcelableExtra("Task", Task::class.java)
-        } else {
-            taskToEdit =intent.getParcelableExtra("Task")
-        }
-
-
-        val subtaskListSizeToEdit = intent.getIntExtra("NoOfSubtasks", 0)
-
-        val subtaskListToEdit = mutableListOf<Subtask?>()
-        var eachSubtask: Subtask?
-        for (count in 0..subtaskListSizeToEdit) {
-
-
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) { // TIRAMISU onwards
-                eachSubtask = intent.getParcelableExtra("Subtask_$count", Subtask::class.java)
-            } else {
-                eachSubtask = intent.getParcelableExtra("Subtask_$count")
-            }
-
-            subtaskListToEdit.add(eachSubtask)
-        }
-
-        /**
-         * In edit mode, Set the current Task and Subtask details to text views
-         * */
-        if (taskToEdit != null) {
-            editTaskTitleView.setText(taskToEdit.task_title)
-            editTaskDetailsView.setText(taskToEdit.details_note)
-            addDueDateView.setText(taskToEdit.due_date)
-        }
-        if (subtaskListToEdit.isNotEmpty()) {
-            // todo: fill subtasks
-        }
-
 
         val button = findViewById<Button>(R.id.button_save)
         button.setOnClickListener {
