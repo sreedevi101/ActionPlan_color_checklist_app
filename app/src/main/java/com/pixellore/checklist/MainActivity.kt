@@ -26,11 +26,15 @@ class MainActivity : AppCompatActivity() {
     private val actionPlanViewModel: ActionPlanViewModel by viewModels {
         ActionPlanViewModelFactory((application as TaskApplication).repository)
     }
+    private var taskListSize: Int = 0
+    private var subtaskListSize:Int = 0
+
+
 
     // Receiver
     private val getResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if(it.resultCode == Activity.RESULT_OK){
-            val taskId = getTaskListSize() + 1
+            val taskId = taskListSize + 1
             var newTaskTitle = ""
             var newTaskDetails = ""
             var newTaskDueDate = ""
@@ -40,6 +44,7 @@ class MainActivity : AppCompatActivity() {
             it.data?.getStringExtra(TaskEditorActivity.DUE_DATE)?.let { reply -> newTaskDueDate=reply }
             it.data?.getStringArrayExtra(TaskEditorActivity.SUBTASK_LIST)?.let { reply -> newTaskSubtaskList=reply }
 
+            Log.v(TAG, "Task ID: $taskId")
             Log.v(TAG, "Title: $newTaskTitle\nDetails: $newTaskDetails\nDueDate: $newTaskDueDate")
 
             newTaskSubtaskList?.forEach { Log.v(TAG, "MainActivity Subtasks : " + it) }
@@ -47,16 +52,18 @@ class MainActivity : AppCompatActivity() {
 
             // insert corresponding subtasks
             var subtask:Subtask
-            var subtaskId:Int = getSubtaskListSize() + 1
+            var subtaskId:Int = subtaskListSize + 1
             newTaskSubtaskList?.forEach {
-                subtask = Subtask(parent_task_id = taskId,
+                subtask = Subtask(
+                    parent_task_id = taskId,
                     subtask_title = it, subtask_id = subtaskId)
                 actionPlanViewModel.insertSubtask(subtask)
                 subtaskId++
             }
 
             // Insert new task
-            val task = Task(task_title = newTaskTitle, task_id = taskId,
+            val task = Task(
+                task_title = newTaskTitle, task_id = taskId,
                 details_note = newTaskDetails, due_date = newTaskDueDate)
             actionPlanViewModel.insert(task)
 
@@ -106,6 +113,25 @@ class MainActivity : AppCompatActivity() {
             tasks.let {
                 adapter.submitList(it) }
         }
+
+
+        actionPlanViewModel.allChecklistTasks.observe(this) { tasks ->
+            // Update the cached copy of the tasks in the adapter.
+            tasks.let {
+                Log.v("ViewModel", it.size.toString())
+                taskListSize = it.size
+            }
+        }
+
+
+
+        actionPlanViewModel.allChecklistSubtasks.observe(this) { subtasks ->
+            subtasks.let {
+                subtaskListSize = it.size
+            }
+        }
+
+
 
         val fab = findViewById<FloatingActionButton>(R.id.addItemFab)
         fab.setOnClickListener {
@@ -169,7 +195,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun printDbTables() {
         val tag = "Print Database Tables"
-        val tasksTableSize = getTaskListSize()
+        val tasksTableSize = taskListSize
         var count:Int
 
         Log.v(tag, "There are $tasksTableSize tasks")
@@ -193,7 +219,7 @@ class MainActivity : AppCompatActivity() {
             }
 
 
-            val subtasksTableSize = getSubtaskListSize()
+            val subtasksTableSize = subtaskListSize
             Log.v(tag, "There are $subtasksTableSize subtasks")
             actionPlanViewModel.allChecklistSubtasks.observe(this){ tasks ->
                 tasks.let {
@@ -231,34 +257,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-
-
         }
 
     }
-
-    private fun getTaskListSize(): Int {
-        var listSize: Int = 0
-        actionPlanViewModel.allChecklistTasks.observe(this) { tasks ->
-            // Update the cached copy of the tasks in the adapter.
-            tasks.let {
-                Log.v("ViewModel", it.size.toString())
-                listSize = it.size
-            }
-        }
-        return listSize
-    }
-
-    private fun getSubtaskListSize(): Int{
-        var listSize:Int = 0
-        actionPlanViewModel.allChecklistSubtasks.observe(this) { subtasks ->
-            subtasks.let {
-                listSize = it.size
-            }
-        }
-        return listSize
-    }
-
-
 
 }
