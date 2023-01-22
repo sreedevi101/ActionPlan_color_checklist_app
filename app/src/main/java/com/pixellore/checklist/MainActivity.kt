@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.SyncStateContract
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pixellore.checklist.AdapterUtility.TaskRecycleAdapter
 import com.pixellore.checklist.DatabaseUtility.*
+import com.pixellore.checklist.utils.Constants
 
 class MainActivity : AppCompatActivity() {
 
@@ -91,7 +93,7 @@ class MainActivity : AppCompatActivity() {
 
 
         val adapter = TaskRecycleAdapter(
-            {position, task ->  onListItemClick(position, task)},
+            {position, taskWithSubtasks, actionRequested ->  onListItemClick(position, taskWithSubtasks, actionRequested)},
             {position, subtask ->  onListSubtaskClick(position, subtask)})
 
 
@@ -148,10 +150,16 @@ class MainActivity : AppCompatActivity() {
      *
      * This function is passed as an argument to the recycler view adapter
      * */
-    private fun onListItemClick(position: Int, task:Task) {
+    private fun onListItemClick(position: Int, taskWithSubtasks:TaskWithSubtasks, actionRequested: Int ) {
         //Toast.makeText(applicationContext, position.toString(), Toast.LENGTH_SHORT).show()
 
-        actionPlanViewModel.update(task)
+        if (actionRequested == Constants.UPDATE_DB){
+            actionPlanViewModel.update(taskWithSubtasks.task)
+        } else if (actionRequested == Constants.OPEN_EDITOR){
+            // todo
+        }
+
+
     }
 
 

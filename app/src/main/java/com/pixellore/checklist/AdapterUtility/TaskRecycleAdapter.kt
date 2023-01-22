@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.pixellore.checklist.DatabaseUtility.*
 import com.pixellore.checklist.MainActivity
 import com.pixellore.checklist.R
+import com.pixellore.checklist.utils.Constants
 import com.pixellore.checklist.utils.SpaceDecorator
 
 /**
@@ -26,7 +27,7 @@ import com.pixellore.checklist.utils.SpaceDecorator
  *
 * */
 
-class TaskRecycleAdapter(private val clickListener: (position: Int, task:Task) -> Unit,
+class TaskRecycleAdapter(private val clickListener: (position: Int, taskWithSubtasks:TaskWithSubtasks, actionRequested:Int) -> Unit,
                          private val clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit):
     ListAdapter<TaskWithSubtasks, TaskRecycleAdapter.TaskRecycleViewHolder>(ActionItemComparator()) {
 
@@ -50,7 +51,7 @@ class TaskRecycleAdapter(private val clickListener: (position: Int, task:Task) -
 
 
         fun bind(currentTask: TaskWithSubtasks, context: Context,
-                 clickListener: (position: Int, task: Task) -> Unit,
+                 clickListener: (position: Int, taskWithSubtasks: TaskWithSubtasks, actionRequested:Int) -> Unit,
                  clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit)
         {
 
@@ -97,7 +98,7 @@ class TaskRecycleAdapter(private val clickListener: (position: Int, task:Task) -
                     currentTask.task.isExpanded = !currentTask.task.isExpanded
                     toggleSubtasksDisplay(currentTask, subLayout)
                     // Update in database
-                    clickListener(adapterPosition, currentTask.task)
+                    clickListener(adapterPosition, currentTask, Constants.UPDATE_DB)
                 }
 
 
@@ -109,7 +110,14 @@ class TaskRecycleAdapter(private val clickListener: (position: Int, task:Task) -
                     currentTask.task.task_isCompleted = isChecked
                     toggleStrikeThrough(textViewToStrike = taskTitleView, isChecked)
                     // Update in database
-                    clickListener(adapterPosition, currentTask.task)
+                    clickListener(adapterPosition, currentTask, Constants.UPDATE_DB)
+                }
+
+                /**
+                 * Open the item for editing
+                 * */
+                taskCardLayout.setOnClickListener {
+                    clickListener(adapterPosition, currentTask, Constants.OPEN_EDITOR)
                 }
 
             }
