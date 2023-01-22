@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 
 
     // Receiver
-    private val getResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+    private val getItemAddActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if(it.resultCode == Activity.RESULT_OK){
             val taskId = taskListSize + 1
             var newTaskTitle = ""
@@ -74,6 +74,16 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(applicationContext, R.string.empty_not_saved, Toast.LENGTH_LONG).show()
         }
     }
+
+    private val getItemEditActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+        if(it.resultCode == Activity.RESULT_OK){
+            // ToDo
+            Toast.makeText(applicationContext, "Update task DEBUG", Toast.LENGTH_LONG).show()
+        } else{
+            Toast.makeText(applicationContext, "Could not update", Toast.LENGTH_LONG).show()
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,8 +147,8 @@ class MainActivity : AppCompatActivity() {
 
         val fab = findViewById<FloatingActionButton>(R.id.addItemFab)
         fab.setOnClickListener {
-            val intent = Intent(this@MainActivity, TaskEditorActivity::class.java)
-            getResult.launch(intent)
+                val intent = Intent(this@MainActivity, TaskEditorActivity::class.java)
+                getItemAddActivityResult.launch(intent)
         }
 
     }
@@ -156,7 +166,20 @@ class MainActivity : AppCompatActivity() {
         if (actionRequested == Constants.UPDATE_DB){
             actionPlanViewModel.update(taskWithSubtasks.task)
         } else if (actionRequested == Constants.OPEN_EDITOR){
-            // todo
+            val intent = Intent(this@MainActivity, TaskEditorActivity::class.java)
+
+            // Pass Task and Subtasks to intent to edit
+            intent.putExtra("Task", taskWithSubtasks.task)
+
+            var count = 0
+            for (subtask in taskWithSubtasks.subtaskList) {
+                intent.putExtra("Subtask_$count", subtask)
+                count++
+            }
+
+            intent.putExtra("NoOfSubtasks", taskWithSubtasks.subtaskList.size)
+
+            getItemEditActivityResult.launch(intent)
         }
 
 
