@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.Button
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,6 +42,10 @@ class ThemePickerDialogFragment : DialogFragment() {
 
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
+        // todo initialize this for current theme
+        var themeSelectedIndex: Int = -1
+        var themeSelectedName:String = ""
+
         // initialize and setup RecyclerView
         themesRecyclerViewList = view.findViewById(R.id.themes_recycler_view)
         themesRecyclerViewList.setHasFixedSize(true)
@@ -52,37 +57,37 @@ class ThemePickerDialogFragment : DialogFragment() {
 
         // Theme 1
         themesList.add(
-            Theme("Professional",R.integer.app_theme_set1,
+            Theme("Professional",resources.getInteger(R.integer.app_theme_set1),
                 is_current_theme = true
             )
         )
         // Theme 2
         themesList.add(
-            Theme("Shrine pink",R.integer.app_theme_set2,
+            Theme("Shrine pink",resources.getInteger(R.integer.app_theme_set2),
                 is_current_theme = false
             )
         )
         // Theme 3
         themesList.add(
-            Theme("Blue Orange",R.integer.app_theme_set3,
+            Theme("Blue Orange",resources.getInteger(R.integer.app_theme_set3),
                 is_current_theme = false
             )
         )
         // Theme 4
         themesList.add(
-            Theme("Classy",R.integer.app_theme_set4,
+            Theme("Classy",resources.getInteger(R.integer.app_theme_set4),
                 is_current_theme = false
             )
         )
         // Theme 5
         themesList.add(
-            Theme("Blue Teal",R.integer.app_theme_set5,
+            Theme("Blue Teal",resources.getInteger(R.integer.app_theme_set5),
                 is_current_theme = false
             )
         )
         // Theme 6
         themesList.add(
-            Theme("Green Orange",R.integer.app_theme_set6,
+            Theme("Green Orange",resources.getInteger(R.integer.app_theme_set6),
                 is_current_theme = false
             )
         )
@@ -92,6 +97,9 @@ class ThemePickerDialogFragment : DialogFragment() {
             override fun itemClicked(theme: Theme, position: Int) {
                 // Todo set theme
                 Log.v(Constants.TAG, "Theme: " + theme.theme_name  + theme.theme_index_num)
+                // Save the selected theme index number
+                themeSelectedIndex = theme.theme_index_num
+                themeSelectedName = theme.theme_name
             }
         }
 
@@ -100,6 +108,23 @@ class ThemePickerDialogFragment : DialogFragment() {
         // create AgeGroupAdapter and pass as parameters the agelist and the AgeItemSelectListener
         val  adapter: ThemesRecycleAdapter = ThemesRecycleAdapter(themesList, listenerTheme)
         themesRecyclerViewList.adapter = adapter
+
+
+
+        // Setup Buttons
+        val cancelBtn = view.findViewById<Button>(R.id.cancel_button)
+        val okBtn = view.findViewById<Button>(R.id.ok_button)
+
+        cancelBtn.setOnClickListener {
+            dismiss()
+        }
+
+        okBtn.setOnClickListener {
+            // set theme
+            Log.v(Constants.TAG, "User selected theme " + themeSelectedName + " Apply changes")
+
+            dismiss()
+        }
 
     }
 }
