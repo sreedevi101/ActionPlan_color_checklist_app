@@ -12,4 +12,11 @@
     <string name="delete_all">Delete all</string>
     <string name="settings">Settings</string>
     <string name="expand_item">Expand Item</string>
+
+    <integer name="app_theme_set1">100</integer>
+    <integer name="app_theme_set2">110</integer>
+    <integer name="app_theme_set3">120</integer>
+    <integer name="app_theme_set4">130</integer>
+    <integer name="app_theme_set5">140</integer>
+    <integer name="app_theme_set6">150</integer>
 </resources>
