@@ -18,9 +18,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pixellore.checklist.AdapterUtility.TaskRecycleAdapter
 import com.pixellore.checklist.DatabaseUtility.*
+import com.pixellore.checklist.utils.BaseActivity
 import com.pixellore.checklist.utils.Constants
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private val TAG = "Debug"
     private val actionPlanViewModel: ActionPlanViewModel by viewModels {
@@ -85,6 +86,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme() // to set theme to the theme aved in shared preferences
         setContentView(R.layout.activity_main)
 
         // set up Toolbar as action bar for the activity

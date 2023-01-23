@@ -4,17 +4,21 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.Button
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat.recreate
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pixellore.checklist.AdapterUtility.ThemesRecycleAdapter
 import com.pixellore.checklist.DataClass.Theme
+import com.pixellore.checklist.utils.BaseActivity
 import com.pixellore.checklist.utils.Constants
 import java.util.*
 
@@ -22,6 +26,12 @@ class ThemePickerDialogFragment : DialogFragment() {
 
     // RecyclerView for listing age groups
     private lateinit var  themesRecyclerViewList: RecyclerView
+
+    private lateinit var listener: ThemeSelectedListener
+
+    fun setListener(listener: ThemeSelectedListener) {
+        this.listener = listener
+    }
 
     // dialog view is created
     override fun onCreateView(
@@ -33,6 +43,7 @@ class ThemePickerDialogFragment : DialogFragment() {
 
         // Show status bar
         requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+
         return inflater.inflate(R.layout.fragment_theme_picker_dialog,null,false)
     }
 
@@ -41,9 +52,19 @@ class ThemePickerDialogFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+/*
+        val typedValue = TypedValue()
+        val theme = this.theme
+        val attr = R.attr.colorPrimary
+        context?.theme?.resolveAttribute(attr, typedValue, true)
+        val color = typedValue.data
+        Log.v(Constants.TAG, "" + color)*/
+
+        val layout = view.findViewById<ConstraintLayout>(R.id.dialog_layout)
+        layout.setBackgroundColor(resources.getColor(R.color.white))
 
         // todo initialize this for current theme
-        var themeSelectedIndex: Int = -1
+        var themeSelectedResID: Int = -1
         var themeSelectedName:String = ""
 
         // initialize and setup RecyclerView
@@ -58,36 +79,42 @@ class ThemePickerDialogFragment : DialogFragment() {
         // Theme 1
         themesList.add(
             Theme("Professional",resources.getInteger(R.integer.app_theme_set1),
+                R.style.Theme_Checklist_Professional,
                 is_current_theme = true
             )
         )
         // Theme 2
         themesList.add(
             Theme("Shrine pink",resources.getInteger(R.integer.app_theme_set2),
+                R.style.Theme_Checklist_ShrinePink,
                 is_current_theme = false
             )
         )
         // Theme 3
         themesList.add(
             Theme("Blue Orange",resources.getInteger(R.integer.app_theme_set3),
+                R.style.Theme_Checklist_BlueOrange,
                 is_current_theme = false
             )
         )
         // Theme 4
         themesList.add(
             Theme("Classy",resources.getInteger(R.integer.app_theme_set4),
+                R.style.Theme_Checklist_Classy,
                 is_current_theme = false
             )
         )
         // Theme 5
         themesList.add(
             Theme("Blue Teal",resources.getInteger(R.integer.app_theme_set5),
+                R.style.Theme_Checklist_BlueTeal,
                 is_current_theme = false
             )
         )
         // Theme 6
         themesList.add(
             Theme("Green Orange",resources.getInteger(R.integer.app_theme_set6),
+                R.style.Theme_Checklist_GreenOrange,
                 is_current_theme = false
             )
         )
@@ -98,7 +125,7 @@ class ThemePickerDialogFragment : DialogFragment() {
                 // Todo set theme
                 Log.v(Constants.TAG, "Theme: " + theme.theme_name  + theme.theme_index_num)
                 // Save the selected theme index number
-                themeSelectedIndex = theme.theme_index_num
+                themeSelectedResID = theme.theme_resource_id
                 themeSelectedName = theme.theme_name
             }
         }
@@ -122,9 +149,14 @@ class ThemePickerDialogFragment : DialogFragment() {
         okBtn.setOnClickListener {
             // set theme
             Log.v(Constants.TAG, "User selected theme " + themeSelectedName + " Apply changes")
-
+            listener.switchToNewTheme(themeSelectedResID)
             dismiss()
         }
 
+    }
+
+    // interface to call the switchTheme method in base activity
+    interface ThemeSelectedListener {
+        fun switchToNewTheme(selectedTheme:Int)
     }
 }
