@@ -6,40 +6,40 @@
     android:layout_height="match_parent"
     tools:context=".ThemePickerDialogFragment">
 
+    <!--android:background="?attr/colorOnPrimary"-->
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/dialog_layout"
         android:layout_width="300dp"
         android:layout_height="500dp"
-        android:layout_gravity="center"
-        android:background="?attr/colorOnPrimary">
+        android:layout_gravity="center">
 
+        <!--android:background="?attr/colorPrimaryVariant"-->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/mock_status_bar"
             android:layout_width="match_parent"
             android:layout_height="32dp"
             android:orientation="vertical"
-            android:background="?attr/colorPrimaryVariant"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
+        <!--android:background="?attr/colorPrimary"-->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/mock_toolbar"
             android:layout_width="match_parent"
-            android:background="?attr/colorPrimary"
             android:layout_height="80dp"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/mock_status_bar">
 
+            <!--android:textColor="?attr/colorOnPrimary"-->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Themes"
-                android:textColor="?attr/colorOnPrimary"
                 android:textSize="28sp"
                 android:paddingStart="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"

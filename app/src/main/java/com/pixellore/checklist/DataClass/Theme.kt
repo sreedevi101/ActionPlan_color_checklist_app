@@ -12,6 +12,7 @@ package com.pixellore.checklist.DataClass
 data class Theme(
     val theme_name: String,
     val theme_index_num: Int, // number assigned to a theme; this number will be saved in Shared Preferences file
+    val theme_resource_id:Int,
     var is_current_theme: Boolean // if this is the current theme stored in Shared preferences
 ) {
 }
