@@ -5,11 +5,76 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
+
+
+    <color name="primaryColorNight">#f3e5f5</color>
+    <color name="primaryLightColorNight">#ffffff</color>
+    <color name="primaryDarkColorNight">#c0b3c2</color>
+    <color name="primaryTextColorNight">#000000</color>
+
+    <!--Color Set 1 - Blue - Orange-->
+    <color name="primaryColorSet1">#344955</color>
+    <color name="primaryLightColorSet1">#5f7481</color>
+    <color name="primaryDarkColorSet1">#0b222c</color>
+    <color name="secondaryColorSet1">#f9aa33</color>
+    <color name="secondaryLightColorSet1">#ffdc65</color>
+    <color name="secondaryDarkColorSet1">#c17b00</color>
+    <color name="primaryTextColorSet1">#ffffff</color>
+    <color name="secondaryTextColorSet1">#000000</color>
+
+    <!-- Color Set 2 - Pink - Brown -->
+    <color name="primaryColorSet2">#fedbd0</color>
+    <color name="primaryLightColorSet2">#ffffff</color>
+    <color name="primaryDarkColorSet2">#caa99f</color>
+    <color name="secondaryColorSet2">#442c2e</color>
+    <color name="secondaryLightColorSet2">#705557</color>
+    <color name="secondaryDarkColorSet2">#1f0103</color>
+    <color name="primaryTextColorSet2">#000000</color>
+    <color name="secondaryTextColorSet2">#ffffff</color>
+
+    <!-- Color Set 3: Bright Blue- Yellow -->
+    <color name="primaryColorSet3">#0336ff</color>
+    <color name="primaryLightColorSet3">#6f63ff</color>
+    <color name="primaryDarkColorSet3">#0008ca</color>
+    <color name="secondaryColorSet3">#ffde03</color>
+    <color name="secondaryLightColorSet3">#ffff54</color>
+    <color name="secondaryDarkColorSet3">#c7ad00</color>
+    <color name="primaryTextColorSet3">#ffffff</color>
+    <color name="secondaryTextColorSet3">#000000</color>
+
+    <!-- Color Set 4: Purple Red-->
+    <color name="primaryColorSet4">#5d1049</color>
+    <color name="primaryLightColorSet4">#8d3f75</color>
+    <color name="primaryDarkColorSet4">#310021</color>
+    <color name="secondaryColorSet4">#e30425</color>
+    <color name="secondaryLightColorSet4">#ff554f</color>
+    <color name="secondaryDarkColorSet4">#a80000</color>
+    <color name="primaryTextColorSet4">#ffffff</color>
+    <color name="secondaryTextColorSet4">#ffffff</color>
+
+    <!-- Color Set 5 - Purple Teal-->
+    <color name="primaryColorSet5">#6200ee</color>
+    <color name="primaryLightColorSet5">#9e47ff</color>
+    <color name="primaryDarkColorSet5">#0400ba</color>
+    <color name="secondaryColorSet5">#03dac5</color>
+    <color name="secondaryLightColorSet5">#66fff8</color>
+    <color name="secondaryDarkColorSet5">#00a895</color>
+    <color name="primaryTextColorSet5">#ffffff</color>
+    <color name="secondaryTextColorSet5">#000000</color>
+
+    <!-- Color Set 6 - Green Orange -->
+    <color name="primaryColorSet6">#356859</color>
+    <color name="primaryLightColorSet6">#629686</color>
+    <color name="primaryDarkColorSet6">#043d30</color>
+    <color name="secondaryColorSet6">#fd5523</color>
+    <color name="secondaryLightColorSet6">#ff8851</color>
+    <color name="secondaryDarkColorSet6">#c21900</color>
+    <color name="primaryTextColorSet6">#ffffff</color>
+    <color name="secondaryTextColorSet6">#000000</color>
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
     <color name="buttonLabel">#FFFFFF</color>
 
-    <color name="colorPrimary">#FFBB86FC</color>
-    <color name="colorSecondary">#FF03DAC5</color>
 </resources>

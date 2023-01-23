@@ -13,4 +13,134 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="Theme.Checklist.Professional" parent="Theme.Checklist">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primaryColorSet1</item>
+        <item name="colorPrimaryVariant">@color/primaryDarkColorSet1</item>
+        <item name="colorOnPrimary">@color/primaryTextColorSet1</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/secondaryColorSet1</item>
+        <item name="colorSecondaryVariant">@color/secondaryLightColorSet1</item>
+        <item name="colorOnSecondary">@color/secondaryTextColorSet1</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="android:editTextColor">@color/primaryDarkColorSet1</item>
+        <item name="android:textColorPrimary">@color/primaryDarkColorSet1</item>
+        <item name="android:textColorSecondary">@color/secondaryColorSet1</item>
+        <item name="android:textColorTertiary">@color/secondaryColorSet1</item>
+        <item name="android:textColorPrimaryInverse">@color/primaryDarkColorSet1</item>
+        <item name="android:textColorSecondaryInverse">@color/secondaryColorSet1</item>
+        <item name="android:textColorTertiaryInverse">@color/secondaryColorSet1</item>
+    </style>
+
+    <style name="Theme.Checklist.ShrinePink" parent="Theme.Checklist">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primaryColorSet2</item>
+        <item name="colorPrimaryVariant">@color/primaryDarkColorSet2</item>
+        <item name="colorOnPrimary">@color/primaryTextColorSet2</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/secondaryColorSet2</item>
+        <item name="colorSecondaryVariant">@color/secondaryLightColorSet2</item>
+        <item name="colorOnSecondary">@color/secondaryTextColorSet2</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="android:editTextColor">@color/primaryDarkColorSet2</item>
+        <item name="android:textColorPrimary">@color/primaryDarkColorSet2</item>
+        <item name="android:textColorSecondary">@color/secondaryColorSet2</item>
+        <item name="android:textColorTertiary">@color/secondaryColorSet2</item>
+        <item name="android:textColorPrimaryInverse">@color/primaryDarkColorSet2</item>
+        <item name="android:textColorSecondaryInverse">@color/secondaryColorSet2</item>
+        <item name="android:textColorTertiaryInverse">@color/secondaryColorSet2</item>
+    </style>
+
+
+    <style name="Theme.Checklist.BlueOrange" parent="Theme.Checklist">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primaryColorSet3</item>
+        <item name="colorPrimaryVariant">@color/primaryDarkColorSet3</item>
+        <item name="colorOnPrimary">@color/primaryTextColorSet3</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/secondaryColorSet3</item>
+        <item name="colorSecondaryVariant">@color/secondaryLightColorSet3</item>
+        <item name="colorOnSecondary">@color/secondaryTextColorSet3</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="android:editTextColor">@color/primaryDarkColorSet3</item>
+        <item name="android:textColorPrimary">@color/primaryDarkColorSet3</item>
+        <item name="android:textColorSecondary">@color/secondaryColorSet3</item>
+        <item name="android:textColorTertiary">@color/secondaryColorSet3</item>
+        <item name="android:textColorPrimaryInverse">@color/primaryDarkColorSet3</item>
+        <item name="android:textColorSecondaryInverse">@color/secondaryColorSet3</item>
+        <item name="android:textColorTertiaryInverse">@color/secondaryColorSet3</item>
+    </style>
+
+
+    <style name="Theme.Checklist.Classy" parent="Theme.Checklist">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primaryColorSet4</item>
+        <item name="colorPrimaryVariant">@color/primaryDarkColorSet4</item>
+        <item name="colorOnPrimary">@color/primaryTextColorSet4</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/secondaryColorSet4</item>
+        <item name="colorSecondaryVariant">@color/secondaryLightColorSet4</item>
+        <item name="colorOnSecondary">@color/secondaryTextColorSet4</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="android:editTextColor">@color/primaryDarkColorSet4</item>
+        <item name="android:textColorPrimary">@color/primaryDarkColorSet4</item>
+        <item name="android:textColorSecondary">@color/secondaryColorSet4</item>
+        <item name="android:textColorTertiary">@color/secondaryColorSet4</item>
+        <item name="android:textColorPrimaryInverse">@color/primaryDarkColorSet4</item>
+        <item name="android:textColorSecondaryInverse">@color/secondaryColorSet4</item>
+        <item name="android:textColorTertiaryInverse">@color/secondaryColorSet4</item>
+    </style>
+
+
+    <style name="Theme.Checklist.BlueTeal" parent="Theme.Checklist">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primaryColorSet5</item>
+        <item name="colorPrimaryVariant">@color/primaryDarkColorSet5</item>
+        <item name="colorOnPrimary">@color/primaryTextColorSet5</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/secondaryColorSet5</item>
+        <item name="colorSecondaryVariant">@color/secondaryLightColorSet5</item>
+        <item name="colorOnSecondary">@color/secondaryTextColorSet5</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="android:editTextColor">@color/primaryDarkColorSet5</item>
+        <item name="android:textColorPrimary">@color/primaryDarkColorSet5</item>
+        <item name="android:textColorSecondary">@color/secondaryColorSet5</item>
+        <item name="android:textColorTertiary">@color/secondaryColorSet5</item>
+        <item name="android:textColorPrimaryInverse">@color/primaryDarkColorSet5</item>
+        <item name="android:textColorSecondaryInverse">@color/secondaryColorSet5</item>
+        <item name="android:textColorTertiaryInverse">@color/secondaryColorSet5</item>
+    </style>
+
+    <style name="Theme.Checklist.GreenOrange" parent="Theme.Checklist">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primaryColorSet6</item>
+        <item name="colorPrimaryVariant">@color/primaryDarkColorSet6</item>
+        <item name="colorOnPrimary">@color/primaryTextColorSet6</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/secondaryColorSet6</item>
+        <item name="colorSecondaryVariant">@color/secondaryLightColorSet6</item>
+        <item name="colorOnSecondary">@color/secondaryTextColorSet6</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="android:editTextColor">@color/primaryDarkColorSet6</item>
+        <item name="android:textColorPrimary">@color/primaryDarkColorSet6</item>
+        <item name="android:textColorSecondary">@color/secondaryColorSet6</item>
+        <item name="android:textColorTertiary">@color/secondaryColorSet6</item>
+        <item name="android:textColorPrimaryInverse">@color/primaryDarkColorSet6</item>
+        <item name="android:textColorSecondaryInverse">@color/secondaryColorSet6</item>
+        <item name="android:textColorTertiaryInverse">@color/secondaryColorSet6</item>
+    </style>
+
 </resources>

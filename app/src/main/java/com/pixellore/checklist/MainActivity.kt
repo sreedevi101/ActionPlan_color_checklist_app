@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.SyncStateContract
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
@@ -16,7 +15,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pixellore.checklist.AdapterUtility.TaskRecycleAdapter
 import com.pixellore.checklist.DatabaseUtility.*
@@ -207,6 +205,9 @@ class MainActivity : AppCompatActivity() {
 
         R.id.action_settings -> {
             // User chose the "Settings" item, show the settings UI for the checklist
+
+            val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+            startActivity(intent)
             true
         }
 

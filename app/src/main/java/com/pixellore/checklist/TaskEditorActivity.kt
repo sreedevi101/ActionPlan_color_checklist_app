@@ -128,7 +128,7 @@ class TaskEditorActivity : AppCompatActivity() {
                 //TODO print all subtasks
                 Log.v(TAG, "Subtitle: $subtaskTitle1")
 
-                // TODO get all subtasks
+                // TODO get all subtasks - also the ones added by the 'add subtask ' button
                 if (subtaskTitle1.isNotEmpty()){
                     subtaskList += subtaskTitle1
                 }
