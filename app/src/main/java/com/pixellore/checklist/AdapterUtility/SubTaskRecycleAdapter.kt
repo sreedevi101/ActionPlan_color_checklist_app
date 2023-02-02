@@ -10,10 +10,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.pixellore.checklist.DatabaseUtility.Subtask
-import com.pixellore.checklist.DatabaseUtility.Task
 import com.pixellore.checklist.R
 
-class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit):
+class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit) :
     ListAdapter<Subtask, SubTaskRecycleAdapter.SubtaskViewHolder>(SubItemComparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubtaskViewHolder {
@@ -25,21 +24,25 @@ class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, su
         holder.bind(current, clickListenerSubtask)
     }
 
-    class SubtaskViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
+    class SubtaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val subtaskTitleView: TextView = itemView.findViewById(R.id.subtaskTitle)
         private val completedCheckBox: CheckBox = itemView.findViewById(R.id.subtaskCompletedCheck)
 
-        fun bind(currentSubtask: Subtask,
-                 clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit)
-        {
+        fun bind(
+            currentSubtask: Subtask,
+            clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit
+        ) {
             subtaskTitleView.text = currentSubtask.subtask_title
 
 
-            toggleStrikeThrough(textViewToStrike = subtaskTitleView, currentSubtask.subtask_isCompleted)
+            toggleStrikeThrough(
+                textViewToStrike = subtaskTitleView,
+                currentSubtask.subtask_isCompleted
+            )
             completedCheckBox.isChecked = currentSubtask.subtask_isCompleted
 
             completedCheckBox.setOnClickListener {
-                val isChecked  = completedCheckBox.isChecked
+                val isChecked = completedCheckBox.isChecked
                 currentSubtask.subtask_isCompleted = isChecked
                 toggleStrikeThrough(textViewToStrike = subtaskTitleView, isChecked)
                 clickListenerSubtask(adapterPosition, currentSubtask)
@@ -47,11 +50,13 @@ class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, su
             }
         }
 
-        private fun toggleStrikeThrough(textViewToStrike:TextView, isChecked:Boolean){
-            if (isChecked){
-                textViewToStrike.paintFlags = textViewToStrike.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-            } else{
-                textViewToStrike.paintFlags = textViewToStrike.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+        private fun toggleStrikeThrough(textViewToStrike: TextView, isChecked: Boolean) {
+            if (isChecked) {
+                textViewToStrike.paintFlags =
+                    textViewToStrike.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            } else {
+                textViewToStrike.paintFlags =
+                    textViewToStrike.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
             }
 
         }
@@ -70,7 +75,7 @@ class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, su
     * Callback for calculating the diff between two non-null items in a list.
     * The WordsComparator defines how to compute if two words are the same or if the contents are the same.
     * */
-    class SubItemComparator: DiffUtil.ItemCallback<Subtask>() {
+    class SubItemComparator : DiffUtil.ItemCallback<Subtask>() {
         override fun areItemsTheSame(oldItem: Subtask, newItem: Subtask): Boolean {
             return oldItem == newItem
         }

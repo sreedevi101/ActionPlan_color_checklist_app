@@ -8,20 +8,20 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 
 @Database(entities = [Task::class, Subtask::class], version = 1, exportSchema = false)
-abstract class TaskDatabase: RoomDatabase(){
+abstract class TaskDatabase : RoomDatabase() {
 
     abstract fun actionItemDao(): TaskDao
 
-    companion object{
+    companion object {
         // Singleton prevents multiple instances of database opening at the
         // same time.
         @Volatile
         private var INSTANCE: TaskDatabase? = null
 
-        fun getDatabase(context: Context, scope: CoroutineScope): TaskDatabase{
+        fun getDatabase(context: Context, scope: CoroutineScope): TaskDatabase {
             // if the INSTANCE is not null, then return it,
             // if it is, then create the database
-            return INSTANCE ?: synchronized(this){
+            return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     TaskDatabase::class.java,
@@ -38,8 +38,8 @@ abstract class TaskDatabase: RoomDatabase(){
     }
 
 
-    private class  ActionListDatabaseCallback(private val scope: CoroutineScope)
-        : RoomDatabase.Callback(){
+    private class ActionListDatabaseCallback(private val scope: CoroutineScope) :
+        RoomDatabase.Callback() {
 
         /**
          * Override the onCreate method to populate the database.

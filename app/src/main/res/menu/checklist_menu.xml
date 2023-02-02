@@ -8,15 +8,17 @@
         android:id="@+id/action_delete_all"
         android:icon="@drawable/ic_baseline_delete_sweep_24"
         android:title="@string/delete_all"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 
     <!-- Settings, should always be in the overflow -->
-    <item android:id="@+id/action_settings"
+    <item
+        android:id="@+id/action_settings"
         android:title="@string/settings"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
     <!-- [DEBUG] Print the database tables in the Log -->
-    <item android:id="@+id/action_print_database"
+    <item
+        android:id="@+id/action_print_database"
         android:title="[DEBUG] Print Database"
         app:showAsAction="never"
         tools:ignore="HardcodedText" />

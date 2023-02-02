@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/editor_activity_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -24,7 +23,7 @@
         android:minHeight="@dimen/min_height"
         android:fontFamily="sans-serif-light"
         android:hint="@string/hint_task_details"
-        style="@style/edittext_task_editor"/>
+        style="@style/edittext_task_editor" />
 
     <EditText
         android:id="@+id/add_due_date"
@@ -33,7 +32,7 @@
         android:minHeight="@dimen/min_height"
         android:fontFamily="sans-serif-light"
         android:hint="@string/due_date"
-        style="@style/edittext_task_editor"/>
+        style="@style/edittext_task_editor" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
 
@@ -48,14 +47,14 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" >
+            app:layout_constraintTop_toTopOf="parent">
 
             <EditText
                 android:id="@+id/subtask1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/add_subtask"
-                style="@style/edittext_task_editor"/>
+                style="@style/edittext_task_editor" />
 
 
         </LinearLayout>
@@ -69,7 +68,7 @@
             android:src="@drawable/ic_baseline_add_24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/subtask_layout"/>
+            app:layout_constraintTop_toBottomOf="@id/subtask_layout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
