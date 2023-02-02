@@ -1,5 +1,7 @@
 package com.pixellore.checklist.AdapterUtility
 
+import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,20 +11,26 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.pixellore.checklist.DataClass.Theme
 import com.pixellore.checklist.R
+import com.pixellore.checklist.utils.Constants
+import kotlin.properties.Delegates
 
 /*
 * This adapter class is part of the feature "Theme Selection by User"
 *
 * Recycler View Adapter to display the list of Themes (from data class Themes) to the DialogFragment
 * */
-class ThemesRecycleAdapter(private val themesList: ArrayList<Theme>, private val listenerTheme: ThemeItemSelectListener):
+class ThemesRecycleAdapter(
+    private val themesList: ArrayList<Theme>,
+    private val listenerTheme: ThemeItemSelectListener
+) :
     RecyclerView.Adapter<ThemesRecycleAdapter.ThemesViewHolder>() {
 
 
     private var selectedPosition = -1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThemesViewHolder {
-        val itemView: View = LayoutInflater.from(parent.context).inflate(R.layout.theme_item,parent,false)
+        val itemView: View =
+            LayoutInflater.from(parent.context).inflate(R.layout.theme_item, parent, false)
         return ThemesViewHolder(itemView)
     }
 
@@ -37,13 +45,13 @@ class ThemesRecycleAdapter(private val themesList: ArrayList<Theme>, private val
 
 
     //ViewHolder class for handling interactions with corresponding item
-    inner class ThemesViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
+    inner class ThemesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val themeLayout = itemView.findViewById<ConstraintLayout>(R.id.theme_layout)
         val themeName = itemView.findViewById<TextView>(R.id.theme_name)
         val currentTheme = itemView.findViewById<TextView>(R.id.current_theme_indication)
         val selectionCheckMark = itemView.findViewById<ImageView>(R.id.selection_check_mark)
-        var itemPosition:Int = 0
+        var itemPosition: Int = 0
 
 
 
@@ -51,7 +59,7 @@ class ThemesRecycleAdapter(private val themesList: ArrayList<Theme>, private val
         fun bind() {
 
             val themeAtPos = themesList[itemPosition]
-            if (itemPosition == selectedPosition){
+            if (itemPosition == selectedPosition) {
                 selectionCheckMark.visibility = View.VISIBLE
                 //themeLayout.setSelected(true)
             } else {
@@ -60,14 +68,38 @@ class ThemesRecycleAdapter(private val themesList: ArrayList<Theme>, private val
             }
 
 
+            val font = themeAtPos.font
+            if (font != null){
+                if (font.textColorResId != null){
+                    themeName.setTextColor(font.textColorResId!!)
+                    currentTheme.setTextColor(font.textColorResId!!)
+                } else if (font.textColorString != null){
+                    themeName.setTextColor(Color.parseColor(font.textColorString))
+                    currentTheme.setTextColor(Color.parseColor(font.textColorString))
+                }
+            }
+
+
+            if (themeAtPos.is_current_theme){
+                currentTheme.visibility = View.VISIBLE
+            } else{
+                currentTheme.visibility = View.GONE
+            }
+
+
+
             // when the item is clicked, pass the details to activity through the interface
-            itemView.setOnClickListener{
+            itemView.setOnClickListener {
+                // manage to select only one item
                 listenerTheme.itemClicked(themeAtPos, itemPosition)
                 val prevSelectedPosition = selectedPosition
                 selectedPosition = itemPosition
                 notifyItemChanged(prevSelectedPosition)
                 notifyItemChanged(selectedPosition)
 
+                // All the themes in input data are updated with the primary color of the selected theme as text color
+                // notifyDataSetChanged() to reload the recycler view with this new input data
+                notifyDataSetChanged()
             }
 
             themeName.text = themeAtPos.theme_name
@@ -75,10 +107,12 @@ class ThemesRecycleAdapter(private val themesList: ArrayList<Theme>, private val
             // todo mark current theme in the list
         }
 
+
+
     }
 
     interface ThemeItemSelectListener {
-        fun itemClicked(theme: Theme, position:Int)
+        fun itemClicked(theme: Theme, position: Int)
     }
 
 }

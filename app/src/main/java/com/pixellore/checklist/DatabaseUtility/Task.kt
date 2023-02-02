@@ -2,19 +2,20 @@ package com.pixellore.checklist.DatabaseUtility
 
 import android.os.Parcel
 import android.os.Parcelable
-import androidx.room.*
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 
 @Entity(tableName = "task_table")
 data class Task(
-    @PrimaryKey val task_id:Int,
+    @PrimaryKey val task_id: Int,
     var task_title: String?,
     var details_note: String? = "",
     var due_date: String? = "",
     var priority: String? = "None",
     var isExpanded: Boolean = false,
     var task_isCompleted: Boolean = false
-): Parcelable {
+) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
         parcel.readString(),

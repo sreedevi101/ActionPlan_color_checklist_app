@@ -32,9 +32,16 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
-        <item name="android:editTextColor">@color/primaryDarkColorSet1</item>
-        <item name="android:textColorPrimary">@color/primaryDarkColorSet1</item>
+
+        <item name="android:textColorPrimary">@color/primaryColorSet1</item>
         <item name="android:textColorSecondary">@color/secondaryColorSet1</item>
+        <item name="android:titleTextColor">@color/primaryTextColorSet1</item>
+        <item name="android:actionMenuTextColor">@color/primaryTextColorSet1</item>
+
+        <!-- THIS is where you can color the arrow and the overflow button! -->
+        <item name="actionOverflowButtonStyle">@style/actionOverflowButtonStyle</item> <!-- sets the style for the overflow button -->
+
+        <item name="android:editTextColor">@color/primaryDarkColorSet1</item>
         <item name="android:textColorTertiary">@color/secondaryColorSet1</item>
         <item name="android:textColorPrimaryInverse">@color/primaryDarkColorSet1</item>
         <item name="android:textColorSecondaryInverse">@color/secondaryColorSet1</item>
@@ -53,9 +60,16 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
-        <item name="android:editTextColor">@color/primaryDarkColorSet2</item>
-        <item name="android:textColorPrimary">@color/primaryDarkColorSet2</item>
+
+        <item name="android:textColorPrimary">@color/primaryColorSet2</item>
         <item name="android:textColorSecondary">@color/secondaryColorSet2</item>
+        <item name="android:titleTextColor">@color/primaryTextColorSet2</item>
+        <item name="android:actionMenuTextColor">@color/primaryTextColorSet2</item>
+
+        <!-- THIS is where you can color the arrow and the overflow button! -->
+        <item name="actionOverflowButtonStyle">@style/actionOverflowButtonStyle</item> <!-- sets the style for the overflow button -->
+
+        <item name="android:editTextColor">@color/primaryDarkColorSet2</item>
         <item name="android:textColorTertiary">@color/secondaryColorSet2</item>
         <item name="android:textColorPrimaryInverse">@color/primaryDarkColorSet2</item>
         <item name="android:textColorSecondaryInverse">@color/secondaryColorSet2</item>
@@ -75,9 +89,16 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
-        <item name="android:editTextColor">@color/primaryDarkColorSet3</item>
-        <item name="android:textColorPrimary">@color/primaryDarkColorSet3</item>
+
+        <item name="android:textColorPrimary">@color/primaryColorSet3</item>
         <item name="android:textColorSecondary">@color/secondaryColorSet3</item>
+        <item name="android:titleTextColor">@color/primaryTextColorSet3</item>
+        <item name="android:actionMenuTextColor">@color/primaryTextColorSet3</item>
+
+        <!-- THIS is where you can color the arrow and the overflow button! -->
+        <item name="actionOverflowButtonStyle">@style/actionOverflowButtonStyle</item> <!-- sets the style for the overflow button -->
+
+        <item name="android:editTextColor">@color/primaryDarkColorSet3</item>
         <item name="android:textColorTertiary">@color/secondaryColorSet3</item>
         <item name="android:textColorPrimaryInverse">@color/primaryDarkColorSet3</item>
         <item name="android:textColorSecondaryInverse">@color/secondaryColorSet3</item>
@@ -97,9 +118,17 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
-        <item name="android:editTextColor">@color/primaryDarkColorSet4</item>
-        <item name="android:textColorPrimary">@color/primaryDarkColorSet4</item>
+
+
+        <item name="android:textColorPrimary">@color/primaryColorSet4</item>
         <item name="android:textColorSecondary">@color/secondaryColorSet4</item>
+        <item name="android:titleTextColor">@color/primaryTextColorSet4</item>
+        <item name="android:actionMenuTextColor">@color/primaryTextColorSet4</item>
+
+        <!-- THIS is where you can color the arrow and the overflow button! -->
+        <item name="actionOverflowButtonStyle">@style/actionOverflowButtonStyle</item> <!-- sets the style for the overflow button -->
+
+        <item name="android:editTextColor">@color/primaryDarkColorSet4</item>
         <item name="android:textColorTertiary">@color/secondaryColorSet4</item>
         <item name="android:textColorPrimaryInverse">@color/primaryDarkColorSet4</item>
         <item name="android:textColorSecondaryInverse">@color/secondaryColorSet4</item>
@@ -119,9 +148,17 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
-        <item name="android:editTextColor">@color/primaryDarkColorSet5</item>
-        <item name="android:textColorPrimary">@color/primaryDarkColorSet5</item>
+
+        <item name="android:textColorPrimary">@color/primaryColorSet5</item>
         <item name="android:textColorSecondary">@color/secondaryColorSet5</item>
+        <item name="android:titleTextColor">@color/primaryTextColorSet5</item>
+        <item name="android:actionMenuTextColor">@color/primaryTextColorSet5</item>
+
+        <!-- THIS is where you can color the arrow and the overflow button! -->
+        <item name="actionOverflowButtonStyle">@style/actionOverflowButtonStyle</item> <!-- sets the style for the overflow button -->
+
+
+        <item name="android:editTextColor">@color/primaryDarkColorSet5</item>
         <item name="android:textColorTertiary">@color/secondaryColorSet5</item>
         <item name="android:textColorPrimaryInverse">@color/primaryDarkColorSet5</item>
         <item name="android:textColorSecondaryInverse">@color/secondaryColorSet5</item>
@@ -140,9 +177,16 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
-        <item name="android:editTextColor">@color/primaryDarkColorSet6</item>
-        <item name="android:textColorPrimary">@color/primaryDarkColorSet6</item>
+
+        <item name="android:textColorPrimary">@color/primaryColorSet6</item>
         <item name="android:textColorSecondary">@color/secondaryColorSet6</item>
+        <item name="android:titleTextColor">@color/primaryTextColorSet6</item>
+        <item name="android:actionMenuTextColor">@color/primaryTextColorSet6</item>
+
+        <!-- THIS is where you can color the arrow and the overflow button! -->
+        <item name="actionOverflowButtonStyle">@style/actionOverflowButtonStyle</item> <!-- sets the style for the overflow button -->
+
+        <item name="android:editTextColor">@color/primaryDarkColorSet6</item>
         <item name="android:textColorTertiary">@color/secondaryColorSet6</item>
         <item name="android:textColorPrimaryInverse">@color/primaryDarkColorSet6</item>
         <item name="android:textColorSecondaryInverse">@color/secondaryColorSet6</item>

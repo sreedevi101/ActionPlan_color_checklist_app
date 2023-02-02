@@ -3,7 +3,6 @@ package com.pixellore.checklist
 import android.app.Activity
 import android.content.Intent
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -11,14 +10,13 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.pixellore.checklist.DatabaseUtility.Subtask
 import com.pixellore.checklist.DatabaseUtility.Task
+import com.pixellore.checklist.DatabaseUtility.TaskApplication
+import com.pixellore.checklist.utils.BaseActivity
 
 
-class TaskEditorActivity : AppCompatActivity() {
+class TaskEditorActivity : BaseActivity() {
 
     private val TAG = "Debug"
 
@@ -36,6 +34,7 @@ class TaskEditorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme() // to set theme to the theme saved in SharedPreference
         setContentView(R.layout.activity_task_editor)
 
         editTaskTitleView = findViewById(R.id.edit_task_title)
@@ -50,13 +49,19 @@ class TaskEditorActivity : AppCompatActivity() {
         subtaskLayout = findViewById(R.id.subtask_layout)
         addSubtaskButton = findViewById(R.id.add_subtask_btn)
 
-        addSubtaskButton.setOnClickListener{
+        addSubtaskButton.setOnClickListener {
             val subtaskEditText = EditText(this)
             subtaskEditText.hint = getString(R.string.add_subtask)
             subtaskEditText.setTextAppearance(R.style.edittext_task_editor)
-            subtaskEditText.setBackgroundColor(resources.getColor(android.R.color.transparent, theme))
+            subtaskEditText.setBackgroundColor(
+                resources.getColor(
+                    android.R.color.transparent,
+                    theme
+                )
+            )
             subtaskEditText.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            )
             subtaskLayout.addView(subtaskEditText, subtaskLayout.childCount)
         }
 
@@ -68,7 +73,7 @@ class TaskEditorActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) { // TIRAMISU onwards
             taskToEdit = intent.getParcelableExtra("Task", Task::class.java)
         } else {
-            taskToEdit =intent.getParcelableExtra("Task")
+            taskToEdit = intent.getParcelableExtra("Task")
         }
 
 
@@ -114,10 +119,10 @@ class TaskEditorActivity : AppCompatActivity() {
                 val dueDate = addDueDateView.text.toString()
 
                 replyIntent.putExtra(TASK_TITLE, title)
-                if (details.isNotEmpty()){
+                if (details.isNotEmpty()) {
                     replyIntent.putExtra(TASK_DETAILS, details)
                 }
-                if (dueDate.isNotEmpty()){
+                if (dueDate.isNotEmpty()) {
                     replyIntent.putExtra(DUE_DATE, dueDate)
                 }
 
@@ -129,14 +134,14 @@ class TaskEditorActivity : AppCompatActivity() {
                 Log.v(TAG, "Subtitle: $subtaskTitle1")
 
                 // TODO get all subtasks - also the ones added by the 'add subtask ' button
-                if (subtaskTitle1.isNotEmpty()){
+                if (subtaskTitle1.isNotEmpty()) {
                     subtaskList += subtaskTitle1
                 }
 
-                subtaskList.forEach { Log.v(TAG, "Subtitle Loop: $it")}
+                subtaskList.forEach { Log.v(TAG, "Subtitle Loop: $it") }
 
 
-                if (subtaskList.isNotEmpty()){
+                if (subtaskList.isNotEmpty()) {
                     replyIntent.putExtra(SUBTASK_LIST, subtaskList)
                 }
 
@@ -145,10 +150,30 @@ class TaskEditorActivity : AppCompatActivity() {
             finish()
         }
     }
+
     companion object {
         const val TASK_TITLE = "com.pixellore.checklist.TASK_TITLE"
         const val TASK_DETAILS = "com.pixellore.checklist.TASK_DETAILS"
         const val DUE_DATE = "com.pixellore.checklist.DUE_DATE"
         const val SUBTASK_LIST = "com.pixellore.checklist.SUBTASK_LIST"
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        setTheme()
+        if (TaskApplication.recreateTaskEditor){
+            recreate()
+            TaskApplication.recreateTaskEditor = false
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        setTheme()
+        if (TaskApplication.recreateTaskEditor){
+            recreate()
+            TaskApplication.recreateTaskEditor = false
+        }
     }
 }

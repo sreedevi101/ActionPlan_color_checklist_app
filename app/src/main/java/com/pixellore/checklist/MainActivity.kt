@@ -1,11 +1,13 @@
 package com.pixellore.checklist
 
+import android.R.string
+import android.R.layout
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
+import android.content.res.TypedArray
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -21,6 +23,7 @@ import com.pixellore.checklist.DatabaseUtility.*
 import com.pixellore.checklist.utils.BaseActivity
 import com.pixellore.checklist.utils.Constants
 
+
 class MainActivity : BaseActivity() {
 
     private val TAG = "Debug"
@@ -28,70 +31,81 @@ class MainActivity : BaseActivity() {
         ActionPlanViewModelFactory((application as TaskApplication).repository)
     }
     private var taskListSize: Int = 0
-    private var subtaskListSize:Int = 0
-
+    private var subtaskListSize: Int = 0
 
 
     // Receiver
-    private val getItemAddActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if(it.resultCode == Activity.RESULT_OK){
-            val taskId = taskListSize + 1
-            var newTaskTitle = ""
-            var newTaskDetails = ""
-            var newTaskDueDate = ""
-            var newTaskSubtaskList: Array<String>? = null
-            it.data?.getStringExtra(TaskEditorActivity.TASK_TITLE)?.let { reply -> newTaskTitle=reply }
-            it.data?.getStringExtra(TaskEditorActivity.TASK_DETAILS)?.let { reply -> newTaskDetails=reply }
-            it.data?.getStringExtra(TaskEditorActivity.DUE_DATE)?.let { reply -> newTaskDueDate=reply }
-            it.data?.getStringArrayExtra(TaskEditorActivity.SUBTASK_LIST)?.let { reply -> newTaskSubtaskList=reply }
+    private val getItemAddActivityResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                val taskId = taskListSize + 1
+                var newTaskTitle = ""
+                var newTaskDetails = ""
+                var newTaskDueDate = ""
+                var newTaskSubtaskList: Array<String>? = null
+                it.data?.getStringExtra(TaskEditorActivity.TASK_TITLE)
+                    ?.let { reply -> newTaskTitle = reply }
+                it.data?.getStringExtra(TaskEditorActivity.TASK_DETAILS)
+                    ?.let { reply -> newTaskDetails = reply }
+                it.data?.getStringExtra(TaskEditorActivity.DUE_DATE)
+                    ?.let { reply -> newTaskDueDate = reply }
+                it.data?.getStringArrayExtra(TaskEditorActivity.SUBTASK_LIST)
+                    ?.let { reply -> newTaskSubtaskList = reply }
 
-            Log.v(TAG, "Task ID: $taskId")
-            Log.v(TAG, "Title: $newTaskTitle\nDetails: $newTaskDetails\nDueDate: $newTaskDueDate")
+                Log.v(TAG, "Task ID: $taskId")
+                Log.v(
+                    TAG,
+                    "Title: $newTaskTitle\nDetails: $newTaskDetails\nDueDate: $newTaskDueDate"
+                )
 
-            newTaskSubtaskList?.forEach { Log.v(TAG, "MainActivity Subtasks : " + it) }
+                newTaskSubtaskList?.forEach { Log.v(TAG, "MainActivity Subtasks : " + it) }
 
 
-            // insert corresponding subtasks
-            var subtask:Subtask
-            var subtaskId:Int = subtaskListSize + 1
-            newTaskSubtaskList?.forEach {
-                subtask = Subtask(
-                    parent_task_id = taskId,
-                    subtask_title = it, subtask_id = subtaskId)
-                actionPlanViewModel.insertSubtask(subtask)
-                subtaskId++
+                // insert corresponding subtasks
+                var subtask: Subtask
+                var subtaskId: Int = subtaskListSize + 1
+                newTaskSubtaskList?.forEach {
+                    subtask = Subtask(
+                        parent_task_id = taskId,
+                        subtask_title = it, subtask_id = subtaskId
+                    )
+                    actionPlanViewModel.insertSubtask(subtask)
+                    subtaskId++
+                }
+
+                // Insert new task
+                val task = Task(
+                    task_title = newTaskTitle, task_id = taskId,
+                    details_note = newTaskDetails, due_date = newTaskDueDate
+                )
+                actionPlanViewModel.insert(task)
+
+
+            } else {
+                Toast.makeText(applicationContext, R.string.empty_not_saved, Toast.LENGTH_LONG)
+                    .show()
             }
-
-            // Insert new task
-            val task = Task(
-                task_title = newTaskTitle, task_id = taskId,
-                details_note = newTaskDetails, due_date = newTaskDueDate)
-            actionPlanViewModel.insert(task)
-
-
-        } else {
-            Toast.makeText(applicationContext, R.string.empty_not_saved, Toast.LENGTH_LONG).show()
         }
-    }
 
-    private val getItemEditActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-        if(it.resultCode == Activity.RESULT_OK){
-            // ToDo
-            Toast.makeText(applicationContext, "Update task DEBUG", Toast.LENGTH_LONG).show()
-        } else{
-            Toast.makeText(applicationContext, "Could not update", Toast.LENGTH_LONG).show()
+    private val getItemEditActivityResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                // ToDo
+                Toast.makeText(applicationContext, "Update task DEBUG", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(applicationContext, "Could not update", Toast.LENGTH_LONG).show()
+            }
         }
-    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setTheme() // to set theme to the theme aved in shared preferences
+        Log.v(Constants.TAG, "onCreate")
+        setTheme() // to set theme to the theme saved in SharedPreference
         setContentView(R.layout.activity_main)
 
         // set up Toolbar as action bar for the activity
         val toolbar: Toolbar = findViewById(R.id.toolbar)
-        toolbar.setTitleTextColor(Color.WHITE)
         setSupportActionBar(toolbar)
 
         val actionListRecyclerView = findViewById<RecyclerView>(R.id.actionListRecyclerView)
@@ -103,8 +117,14 @@ class MainActivity : BaseActivity() {
 
 
         val adapter = TaskRecycleAdapter(
-            {position, taskWithSubtasks, actionRequested ->  onListItemClick(position, taskWithSubtasks, actionRequested)},
-            {position, subtask ->  onListSubtaskClick(position, subtask)})
+            { position, taskWithSubtasks, actionRequested ->
+                onListItemClick(
+                    position,
+                    taskWithSubtasks,
+                    actionRequested
+                )
+            },
+            { position, subtask -> onListSubtaskClick(position, subtask) })
 
 
         actionListRecyclerView.adapter = adapter
@@ -120,10 +140,11 @@ class MainActivity : BaseActivity() {
                 adapter.submitList(it) }
         }*/
 
-        actionPlanViewModel.allTasksWithSubtasks.observe(this){ tasks ->
+        actionPlanViewModel.allTasksWithSubtasks.observe(this) { tasks ->
             // Update the cached copy of the tasks in the adapter.
             tasks.let {
-                adapter.submitList(it) }
+                adapter.submitList(it)
+            }
         }
 
 
@@ -144,15 +165,33 @@ class MainActivity : BaseActivity() {
         }
 
 
-
         val fab = findViewById<FloatingActionButton>(R.id.addItemFab)
         fab.setOnClickListener {
-                val intent = Intent(this@MainActivity, TaskEditorActivity::class.java)
-                getItemAddActivityResult.launch(intent)
+            val intent = Intent(this@MainActivity, TaskEditorActivity::class.java)
+            getItemAddActivityResult.launch(intent)
         }
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.v(Constants.TAG, "onResume")
+        setTheme()
+        if (TaskApplication.recreateMainActivity){
+            recreate()
+            TaskApplication.recreateMainActivity = false
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.v(Constants.TAG, "onStart")
+        setTheme()
+        if (TaskApplication.recreateMainActivity){
+            recreate()
+            TaskApplication.recreateMainActivity = false
+        }
+    }
 
     /**
      * This functions contains the logic that will be implemented when an item
@@ -160,12 +199,16 @@ class MainActivity : BaseActivity() {
      *
      * This function is passed as an argument to the recycler view adapter
      * */
-    private fun onListItemClick(position: Int, taskWithSubtasks:TaskWithSubtasks, actionRequested: Int ) {
+    private fun onListItemClick(
+        position: Int,
+        taskWithSubtasks: TaskWithSubtasks,
+        actionRequested: Int
+    ) {
         //Toast.makeText(applicationContext, position.toString(), Toast.LENGTH_SHORT).show()
 
-        if (actionRequested == Constants.UPDATE_DB){
+        if (actionRequested == Constants.UPDATE_DB) {
             actionPlanViewModel.update(taskWithSubtasks.task)
-        } else if (actionRequested == Constants.OPEN_EDITOR){
+        } else if (actionRequested == Constants.OPEN_EDITOR) {
             val intent = Intent(this@MainActivity, TaskEditorActivity::class.java)
 
             // Pass Task and Subtasks to intent to edit
@@ -196,7 +239,7 @@ class MainActivity : BaseActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean = when(item.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
 
         R.id.action_delete_all -> {
             // User chose "Delete all", delete all the tasks and subtasks in the checklist
@@ -230,23 +273,29 @@ class MainActivity : BaseActivity() {
     private fun printDbTables() {
         val tag = "Print Database Tables"
         val tasksTableSize = taskListSize
-        var count:Int
+        var count: Int
 
         Log.v(tag, "There are $tasksTableSize tasks")
         if (tasksTableSize > 0) {
-            actionPlanViewModel.allChecklistTasks.observe(this){ tasks ->
+            actionPlanViewModel.allChecklistTasks.observe(this) { tasks ->
                 tasks.let {
                     count = 1
                     it.forEach {
-                        if (count == 1){
-                            Log.v(tag, "\n\n-----------------------------------------------------------------------")
+                        if (count == 1) {
+                            Log.v(
+                                tag,
+                                "\n\n-----------------------------------------------------------------------"
+                            )
                         }
                         Log.v(tag, "${it.task_id} - ${it.task_title}")
                         Log.v(tag, "Due Date: ${it.due_date}")
                         Log.v(tag, "Details: ${it.details_note}")
                         Log.v(tag, "Priority: ${it.priority}")
                         Log.v(tag, "Expanded: ${it.isExpanded}, Completed: ${it.task_isCompleted}")
-                        Log.v(tag, "-----------------------------------------------------------------------")
+                        Log.v(
+                            tag,
+                            "-----------------------------------------------------------------------"
+                        )
                         count++
                     }
                 }
@@ -255,29 +304,38 @@ class MainActivity : BaseActivity() {
 
             val subtasksTableSize = subtaskListSize
             Log.v(tag, "There are $subtasksTableSize subtasks")
-            actionPlanViewModel.allChecklistSubtasks.observe(this){ tasks ->
+            actionPlanViewModel.allChecklistSubtasks.observe(this) { tasks ->
                 tasks.let {
                     count = 1
                     it.forEach {
-                        if (count == 1){
-                            Log.v(tag, "\n\n-----------------------------------------------------------------------")
+                        if (count == 1) {
+                            Log.v(
+                                tag,
+                                "\n\n-----------------------------------------------------------------------"
+                            )
                         }
                         Log.v(tag, "${it.subtask_id} - ${it.subtask_title}")
                         Log.v(tag, "Parent ID: ${it.parent_task_id}")
                         Log.v(tag, "Completed: ${it.subtask_isCompleted}")
-                        Log.v(tag, "-----------------------------------------------------------------------")
+                        Log.v(
+                            tag,
+                            "-----------------------------------------------------------------------"
+                        )
                         count++
                     }
                 }
             }
 
 
-            actionPlanViewModel.allTasksWithSubtasks.observe(this){ tasks ->
+            actionPlanViewModel.allTasksWithSubtasks.observe(this) { tasks ->
                 tasks.let {
                     count = 1
                     it.forEach {
-                        if (count == 1){
-                            Log.v(tag, "\n\n-----------------------------------------------------------------------")
+                        if (count == 1) {
+                            Log.v(
+                                tag,
+                                "\n\n-----------------------------------------------------------------------"
+                            )
                         }
                         Log.v(tag, "${it.task.task_id} - ${it.task.task_title}")
                         Log.v(tag, "Number of subtasks: ${it.subtaskList.size}")
@@ -285,7 +343,10 @@ class MainActivity : BaseActivity() {
                             Log.v(tag, "${it.subtask_id} - ${it.subtask_title}")
                         }
 
-                        Log.v(tag, "-----------------------------------------------------------------------")
+                        Log.v(
+                            tag,
+                            "-----------------------------------------------------------------------"
+                        )
                         count++
                     }
                 }
@@ -294,5 +355,6 @@ class MainActivity : BaseActivity() {
         }
 
     }
+
 
 }

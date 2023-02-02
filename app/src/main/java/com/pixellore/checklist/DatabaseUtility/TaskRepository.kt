@@ -29,38 +29,38 @@ class TaskRepository(private val actionItemDao: TaskDao) {
     @WorkerThread
 
     // Insert
-    suspend fun insert(task: Task){
+    suspend fun insert(task: Task) {
         actionItemDao.insert(task)
     }
 
-    suspend fun insertSubtask(subtask: Subtask){
+    suspend fun insertSubtask(subtask: Subtask) {
         actionItemDao.insertSubtask(subtask)
     }
 
     // Update
-    suspend fun update(task: Task){
+    suspend fun update(task: Task) {
         actionItemDao.update(task)
     }
 
-    suspend fun updateSubtask(subtask: Subtask){
+    suspend fun updateSubtask(subtask: Subtask) {
         actionItemDao.updateSubtask(subtask)
     }
 
     // Delete
-    suspend fun delete(task: Task){
+    suspend fun delete(task: Task) {
         actionItemDao.delete(task)
     }
 
-    suspend fun deleteSubtask(subtask: Subtask){
+    suspend fun deleteSubtask(subtask: Subtask) {
         actionItemDao.deleteSubtask(subtask)
     }
 
     // Delete all
-    suspend fun deleteAll(){
+    suspend fun deleteAll() {
         actionItemDao.deleteAll()
     }
 
-    suspend fun deleteAllSubtasks(){
+    suspend fun deleteAllSubtasks() {
         actionItemDao.deleteAllSubtasks()
     }
 }

@@ -14,14 +14,7 @@
     <string name="expand_item">Expand Item</string>
 
     <!--Share Preference-->
-    <string name="shared_preference_file">com.pixellore.checklist.PREFERENCE_FILE_KEY</string>
+    <string name="shared_preference_file">com.pixellore.checklist.PREFERENCE_FILE</string>
     <string name="shared_pref_app_theme_key">KEY_THEME</string>
 
-    <!--App theme index numbers-->
-    <integer name="app_theme_set1">100</integer>
-    <integer name="app_theme_set2">110</integer>
-    <integer name="app_theme_set3">120</integer>
-    <integer name="app_theme_set4">130</integer>
-    <integer name="app_theme_set5">140</integer>
-    <integer name="app_theme_set6">150</integer>
 </resources>

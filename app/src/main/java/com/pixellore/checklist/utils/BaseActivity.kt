@@ -3,9 +3,10 @@ package com.pixellore.checklist.utils
 import android.content.Context
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.preference.PreferenceManager
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.pixellore.checklist.DataClass.Theme
+import com.pixellore.checklist.DatabaseUtility.TaskApplication
 import com.pixellore.checklist.R
 
 /*
@@ -19,58 +20,152 @@ import com.pixellore.checklist.R
 * */
 abstract class BaseActivity : AppCompatActivity() {
 
-    // Default Theme
-    private var defaultTheme: Int? = null
-    // Set current Theme to default theme to initialize
-    private var currentTheme: Int? = null
+
+    private var themesList: ArrayList<Theme> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
 
-        defaultTheme = R.style.Theme_Checklist_Professional
-        currentTheme = defaultTheme
-
-        val sharedPref = this.getSharedPreferences(getString(R.string.shared_preference_file), Context.MODE_PRIVATE)
-        currentTheme = sharedPref.getInt(resources.getString(R.string.shared_pref_app_theme_key),
-            defaultTheme!!
-        )
-
-        Log.v(Constants.TAG, "Current ID to from Shared Preferences: $currentTheme")
 
         super.onCreate(savedInstanceState, persistentState)
     }
 
+
     // this method is to be called just before setContentView() of the MainActivity is called,
     // otherwise the Activity will fall onto using the default App Style
     protected fun setTheme() {
-        if (currentTheme == null){
-            currentTheme = R.style.Theme_Checklist_Professional
-        }
-        currentTheme?.let { setTheme(it) }
+
+        // set the theme to ResId stored in appTheme
+        setTheme(TaskApplication.appTheme)
+
+        val currentThemeName = getThemeName(TaskApplication.appTheme)
+        Log.v(
+            Constants.TAG, "Setting theme to - ID: " +
+                    TaskApplication.appTheme + " Name: " + currentThemeName
+        )
+
     }
 
-    // Todo is switchTheme required here since the Themes data class holds this information already
-    protected fun switchTheme(newTheme:Int) {
+
+    protected fun switchTheme(newTheme: Int) {
+
+        // DEBUG
+        val newThemeName = getThemeName(newTheme)
+        Log.v(Constants.TAG, "New Theme - ID: $newTheme, Name: $newThemeName")
 
         // Do this only if new theme is different from current theme
-        if (newTheme!=currentTheme){
-            currentTheme = newTheme
-            Log.v(Constants.TAG, "New ID to write to Shared Preferences: $currentTheme")
-            // Write New theme to Shared Preferences file
-            val sharedPrefToWrite = this.getPreferences(Context.MODE_PRIVATE)
-            with (sharedPrefToWrite.edit()) {
-                currentTheme?.let { putInt(getString(R.string.shared_pref_app_theme_key), it) }
-                apply()
-            }
+        if (newTheme != TaskApplication.appTheme) {
+            TaskApplication.appTheme = newTheme
+
+            writeToSharedPref()
+
+        } else {
+            Log.v(Constants.TAG, "New theme selected is same as current theme")
         }
-        recreate()
     }
 
-    companion object {
-        private const val BLUE_TEAL = R.style.Theme_Checklist_BlueTeal
-        private const val BLUE_ORANGE = R.style.Theme_Checklist_BlueOrange
-        private const val PROFESSIONAL = R.style.Theme_Checklist_Professional
-        private const val CLASSY = R.style.Theme_Checklist_Classy
-        private const val SHRINE_PINK = R.style.Theme_Checklist_ShrinePink
-        private const val GREEN_ORANGE = R.style.Theme_Checklist_GreenOrange
+    fun writeToSharedPref() {
+        // Write New theme to Shared Preferences file
+        val sharedPrefToWrite = this.getSharedPreferences(
+            resources.getString(R.string.shared_preference_file),
+            Context.MODE_PRIVATE
+        )
+        with(sharedPrefToWrite.edit()) {
+            putInt(getString(R.string.shared_pref_app_theme_key), TaskApplication.appTheme)
+            apply()
+        }
+        Log.v(Constants.TAG, "wrote to shared pref")
     }
+
+    // Following methods only for DEBUGGING
+    /*
+    * THIS METHOD ID FOR DEBUGGING PURPOSE ONLY
+    * Get the name of the theme from the resource ID
+    * */
+    fun getThemeName(id: Int): String {
+
+        themesList = getThemesData()
+
+        for (theme in themesList) {
+            if (theme.theme_resource_id == id) {
+                return theme.theme_name
+            }
+        }
+
+        return ""
+    }
+
+
+    fun getThemesData(): ArrayList<Theme> {
+        // create Arraylist of Themes data class to be displayed in RecyclerView
+        val themesList: ArrayList<Theme> = ArrayList()
+
+        // Theme 1
+        themesList.add(
+            Theme(
+                "Professional",
+                R.style.Theme_Checklist_Professional,
+                is_current_theme = isCurrentTheme(R.style.Theme_Checklist_Professional),
+                null
+            )
+        )
+        // Theme 2
+        themesList.add(
+            Theme(
+                "Shrine pink",
+                R.style.Theme_Checklist_ShrinePink,
+                is_current_theme = isCurrentTheme(R.style.Theme_Checklist_ShrinePink),
+                null
+            )
+        )
+        // Theme 3
+        themesList.add(
+            Theme(
+                "Blue Orange",
+                R.style.Theme_Checklist_BlueOrange,
+                is_current_theme = isCurrentTheme(R.style.Theme_Checklist_BlueOrange),
+                null
+            )
+        )
+        // Theme 4
+        themesList.add(
+            Theme(
+                "Classy",
+                R.style.Theme_Checklist_Classy,
+                is_current_theme = isCurrentTheme(R.style.Theme_Checklist_Classy),
+                null
+            )
+        )
+        // Theme 5
+        themesList.add(
+            Theme(
+                "Blue Teal",
+                R.style.Theme_Checklist_BlueTeal,
+                is_current_theme = isCurrentTheme(R.style.Theme_Checklist_BlueTeal),
+                null
+            )
+        )
+        // Theme 6
+        themesList.add(
+            Theme(
+                "Green Orange",
+                R.style.Theme_Checklist_GreenOrange,
+                is_current_theme = isCurrentTheme(R.style.Theme_Checklist_GreenOrange),
+                null
+            )
+        )
+
+        return themesList
+
+    }
+
+    private fun isCurrentTheme(inputThemeResId: Int): Boolean{
+
+        if (inputThemeResId == TaskApplication.appTheme){
+            return true
+        }
+
+        return false
+    }
+
+
 }
