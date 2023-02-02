@@ -29,3 +29,8 @@
 
 
 [dev_ver_2_recording.webm](https://user-images.githubusercontent.com/15008191/206841708-0a3e50dc-6db0-4349-b705-717569eb725d.webm)
+
+
+ ## Development version 3 - Dynamically change theme on user selection
+ 
+ [dev_ver_3_theme_changing.webm](https://user-images.githubusercontent.com/15008191/216466622-198acfdd-1ac1-4270-941e-df24e7d7bc51.webm)
