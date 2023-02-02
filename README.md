@@ -35,7 +35,8 @@
  
  In Settings, there is an option to change the theme of the app. User can select one of the themes from a DialogFragment window that has a recycler view with the available Themes. On selecting a theme, a sample of the theme is displayed on the dialog fragment window by changing the various views like a sample status bar, tool bar and a margin to the colors of the theme.
  
- ![image](https://user-images.githubusercontent.com/15008191/216467463-1a34c77c-c891-4e76-b995-7453f98efc61.png)
+ ![image](https://user-images.githubusercontent.com/15008191/216469129-c556a164-795c-41b0-a332-8ad22547e4f1.png)
+
 
  
  [dev_ver_3_theme_changing.webm](https://user-images.githubusercontent.com/15008191/216466622-198acfdd-1ac1-4270-941e-df24e7d7bc51.webm)
