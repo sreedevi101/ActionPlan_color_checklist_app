@@ -1,6 +1,7 @@
 package com.pixellore.checklist.utils
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
@@ -8,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.pixellore.checklist.DataClass.Theme
 import com.pixellore.checklist.DatabaseUtility.TaskApplication
 import com.pixellore.checklist.R
+import java.util.HashMap
 
 /*
 * This activity class is part of the feature "Theme Selection by User"
@@ -18,7 +20,7 @@ import com.pixellore.checklist.R
 *  - function to switch to the theme selected by user
 *  - write selected theme to Shared Preference
 * */
-abstract class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity(), BaseActivityListener {
 
 
     private var themesList: ArrayList<Theme> = ArrayList()
@@ -76,12 +78,74 @@ abstract class BaseActivity : AppCompatActivity() {
         Log.v(Constants.TAG, "wrote to shared pref")
     }
 
-    // Following methods only for DEBUGGING
+
+    override fun getColorsFromTheme(themeResId:Int): HashMap<String, Int> {
+        val colors: HashMap<String, Int> = HashMap<String, Int>()
+
+
+        // The attributes you want retrieved
+        val attrs = intArrayOf(
+            com.google.android.material.R.attr.colorPrimary,
+            com.google.android.material.R.attr.colorPrimaryVariant,
+            android.R.attr.titleTextColor,
+            com.google.android.material.R.attr.colorSecondary,
+            com.google.android.material.R.attr.colorSecondaryVariant,
+            com.google.android.material.R.attr.colorOnSecondary
+        )
+
+        attrs.let {
+            val typedArray = obtainStyledAttributes(themeResId, attrs)
+
+            val colorPrimaryIndex = 0
+            val colorPrimaryVariantIndex = 1
+            val colorOnPrimaryIndex = 2
+            val colorSecondaryIndex = 3
+            val colorSecondaryVariantIndex = 4
+            val colorOnSecondaryIndex = 5
+            // Fetching the colors defined in your style
+            //Primary Colors
+            val colorPrimary = typedArray?.getColor(colorPrimaryIndex, Color.BLACK)
+            val colorPrimaryVariant = typedArray?.getColor(colorPrimaryVariantIndex, Color.BLACK)
+            val colorOnPrimary = typedArray?.getColor(colorOnPrimaryIndex, Color.BLACK)
+
+            // Secondary Colors
+            val colorSecondary = typedArray?.getColor(colorSecondaryIndex, Color.BLACK)
+            val colorSecondaryVariant =
+                typedArray?.getColor(colorSecondaryVariantIndex, Color.BLACK)
+            val colorOnSecondary = typedArray?.getColor(colorOnSecondaryIndex, Color.BLACK)
+
+            typedArray?.recycle()
+
+            if (colorPrimary != null) {
+                colors["colorPrimary"] = colorPrimary
+            }
+            if (colorPrimaryVariant != null) {
+                colors["colorPrimaryVariant"] = colorPrimaryVariant
+            }
+            if (colorOnPrimary != null) {
+                colors["colorOnPrimary"] = colorOnPrimary
+            }
+
+            if (colorSecondary != null) {
+                colors["colorSecondary"] = colorSecondary
+            }
+            if (colorSecondaryVariant != null) {
+                colors["colorSecondaryVariant"] = colorSecondaryVariant
+            }
+            if (colorOnSecondary != null) {
+                colors["colorOnSecondary"] = colorOnSecondary
+            }
+
+            return colors
+        }
+    }
+
+
     /*
     * THIS METHOD ID FOR DEBUGGING PURPOSE ONLY
     * Get the name of the theme from the resource ID
     * */
-    fun getThemeName(id: Int): String {
+    private fun getThemeName(id: Int): String {
 
         themesList = getThemesData()
 
@@ -95,7 +159,10 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
 
-    fun getThemesData(): ArrayList<Theme> {
+    /*
+    * This method provide theme data to be displayed in the theme selection dialog fragment
+    * */
+    override fun getThemesData(): ArrayList<Theme> {
         // create Arraylist of Themes data class to be displayed in RecyclerView
         val themesList: ArrayList<Theme> = ArrayList()
 
