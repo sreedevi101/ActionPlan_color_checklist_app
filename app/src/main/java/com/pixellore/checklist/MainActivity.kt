@@ -1,19 +1,19 @@
 package com.pixellore.checklist
 
-import android.R.string
-import android.R.layout
 import android.app.Activity
 import android.content.Intent
 import android.content.res.TypedArray
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.SpannableString
+import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -258,19 +258,6 @@ class MainActivity : BaseActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
         inflater.inflate(R.menu.checklist_menu, menu)
-
-        /*val positionOfMenuItem = 0
-        val menuItem = menu?.getItem(positionOfMenuItem)
-        val menuStyle = SpannableString("menu style")
-
-        if (currentThemeColors.containsKey("colorPrimary")) {
-
-
-            menuStyle.setSpan(ForegroundColorSpan(resources.getColor(currentThemeColors["colorPrimary"]!!, theme)),
-                0, menuStyle.length, 0)
-        }*/
-
-
         return true
     }
 
