@@ -27,4 +27,9 @@
     <style name="actionOverflowButtonStyle" parent="@style/Widget.AppCompat.ActionButton.Overflow">
         <item name="android:tint">?attr/colorOnPrimary</item>
     </style>
+
+    <style name="toolbarPopupMenu" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:itemBackground">?attr/colorPrimary</item>
+    </style>
 </resources>
