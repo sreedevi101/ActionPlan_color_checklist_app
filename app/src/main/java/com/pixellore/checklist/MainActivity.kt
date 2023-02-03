@@ -5,7 +5,10 @@ import android.R.layout
 import android.app.Activity
 import android.content.Intent
 import android.content.res.TypedArray
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.util.TypedValue
 import android.view.Menu
@@ -15,6 +18,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -22,6 +26,7 @@ import com.pixellore.checklist.AdapterUtility.TaskRecycleAdapter
 import com.pixellore.checklist.DatabaseUtility.*
 import com.pixellore.checklist.utils.BaseActivity
 import com.pixellore.checklist.utils.Constants
+import java.util.HashMap
 
 
 class MainActivity : BaseActivity() {
@@ -32,6 +37,10 @@ class MainActivity : BaseActivity() {
     }
     private var taskListSize: Int = 0
     private var subtaskListSize: Int = 0
+
+
+    // colors from current theme
+    private lateinit var currentThemeColors: HashMap<String, Int>
 
 
     // Receiver
@@ -104,9 +113,22 @@ class MainActivity : BaseActivity() {
         setTheme() // to set theme to the theme saved in SharedPreference
         setContentView(R.layout.activity_main)
 
+
+        // get colors from current theme, so it can applied to the toolbar and popup menu
+        currentThemeColors = getColorsFromTheme(TaskApplication.appTheme)
+
         // set up Toolbar as action bar for the activity
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        // set toolbar background color to colorPrimary of the current theme
+        if (currentThemeColors.containsKey("colorPrimary")) {
+            currentThemeColors["colorPrimary"]?.let { toolbar.setBackgroundColor(it) }
+        }
+        // set toolbar title text color to colorOnPrimary of the current theme
+        if (currentThemeColors.containsKey("colorOnPrimary")) {
+            currentThemeColors["colorOnPrimary"]?.let { toolbar.setTitleTextColor(it) }
+        }
 
         val actionListRecyclerView = findViewById<RecyclerView>(R.id.actionListRecyclerView)
 
@@ -236,6 +258,19 @@ class MainActivity : BaseActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
         inflater.inflate(R.menu.checklist_menu, menu)
+
+        /*val positionOfMenuItem = 0
+        val menuItem = menu?.getItem(positionOfMenuItem)
+        val menuStyle = SpannableString("menu style")
+
+        if (currentThemeColors.containsKey("colorPrimary")) {
+
+
+            menuStyle.setSpan(ForegroundColorSpan(resources.getColor(currentThemeColors["colorPrimary"]!!, theme)),
+                0, menuStyle.length, 0)
+        }*/
+
+
         return true
     }
 

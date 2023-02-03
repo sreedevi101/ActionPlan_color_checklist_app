@@ -1,6 +1,5 @@
 package com.pixellore.checklist
 
-import android.content.res.TypedArray
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -20,6 +19,7 @@ import com.pixellore.checklist.AdapterUtility.ThemesRecycleAdapter
 import com.pixellore.checklist.DataClass.Font
 import com.pixellore.checklist.DataClass.Theme
 import com.pixellore.checklist.DatabaseUtility.TaskApplication
+import com.pixellore.checklist.utils.BaseActivityListener
 import com.pixellore.checklist.utils.Constants
 import java.util.*
 import kotlin.collections.ArrayList
@@ -30,12 +30,17 @@ class ThemePickerDialogFragment : DialogFragment() {
     // RecyclerView for listing age groups
     private lateinit var themesRecyclerViewList: RecyclerView
 
-    private lateinit var listener: ThemeSelectedListener
+    private lateinit var themeSelectedListener: ThemeSelectedListener
+    private lateinit var baseActivityListener: BaseActivityListener
 
     var themesList: ArrayList<Theme> = ArrayList()
 
-    fun setListener(listener: ThemeSelectedListener) {
-        this.listener = listener
+    fun setThemeSelectedListener(listener: ThemeSelectedListener) {
+        this.themeSelectedListener = listener
+    }
+
+    fun setBaseActivityListener(listener: BaseActivityListener) {
+        this.baseActivityListener = listener
     }
 
     // dialog view is created
@@ -62,7 +67,7 @@ class ThemePickerDialogFragment : DialogFragment() {
         layout.setBackgroundColor(resources.getColor(R.color.white))
 
         // Data input to Recycler View Adapter
-        themesList = getThemesData()
+        themesList = baseActivityListener.getThemesData()
 
         // initialize this for current theme
         var themeSelectedResID: Int = TaskApplication.appTheme
@@ -76,7 +81,7 @@ class ThemePickerDialogFragment : DialogFragment() {
         val okBtn = view.findViewById<Button>(R.id.ok_button)
 
         // Initialize the views in the dialog with current app theme colors
-        val currentThemeColors = getColorsFromTheme(TaskApplication.appTheme)
+        val currentThemeColors = baseActivityListener.getColorsFromTheme(TaskApplication.appTheme)
 
         // change colors of the fragment views to the selected theme colors
         if (currentThemeColors.containsKey("colorPrimaryVariant")) {
@@ -121,7 +126,7 @@ class ThemePickerDialogFragment : DialogFragment() {
                     themeSelectedName = theme.theme_name
 
 
-                    val themeColors = getColorsFromTheme(themeSelectedResID)
+                    val themeColors = baseActivityListener.getColorsFromTheme(themeSelectedResID)
 
                     // change colors of the fragment views to the selected theme colors
                     if (themeColors.containsKey("colorPrimaryVariant")) {
@@ -165,145 +170,13 @@ class ThemePickerDialogFragment : DialogFragment() {
         okBtn.setOnClickListener {
             // set theme
             Log.v(Constants.TAG, "User selected theme " + themeSelectedName + " Apply changes")
-            listener.switchToNewTheme(themeSelectedResID)
+            themeSelectedListener.switchToNewTheme(themeSelectedResID)
             dismiss()
         }
 
     }
 
 
-    fun getThemesData(): ArrayList<Theme> {
-        // create Arraylist of Themes data class to be displayed in RecyclerView
-        val themesList: ArrayList<Theme> = ArrayList()
-
-        // Theme 1
-        themesList.add(
-            Theme(
-                "Professional",
-                R.style.Theme_Checklist_Professional,
-                is_current_theme = isCurrentTheme(R.style.Theme_Checklist_Professional),
-                null
-            )
-        )
-        // Theme 2
-        themesList.add(
-            Theme(
-                "Shrine pink",
-                R.style.Theme_Checklist_ShrinePink,
-                is_current_theme = isCurrentTheme(R.style.Theme_Checklist_ShrinePink),
-                null
-            )
-        )
-        // Theme 3
-        themesList.add(
-            Theme(
-                "Blue Orange",
-                R.style.Theme_Checklist_BlueOrange,
-                is_current_theme = isCurrentTheme(R.style.Theme_Checklist_BlueOrange),
-                null
-            )
-        )
-        // Theme 4
-        themesList.add(
-            Theme(
-                "Classy",
-                R.style.Theme_Checklist_Classy,
-                is_current_theme = isCurrentTheme(R.style.Theme_Checklist_Classy),
-                null
-            )
-        )
-        // Theme 5
-        themesList.add(
-            Theme(
-                "Blue Teal",
-                R.style.Theme_Checklist_BlueTeal,
-                is_current_theme = isCurrentTheme(R.style.Theme_Checklist_BlueTeal),
-                null
-            )
-        )
-        // Theme 6
-        themesList.add(
-            Theme(
-                "Green Orange",
-                R.style.Theme_Checklist_GreenOrange,
-                is_current_theme = isCurrentTheme(R.style.Theme_Checklist_GreenOrange),
-                null
-            )
-        )
-
-        return themesList
-
-    }
-
-    private fun isCurrentTheme(inputThemeResId: Int): Boolean{
-
-        if (inputThemeResId == TaskApplication.appTheme){
-            return true
-        }
-
-        return false
-    }
-
-    fun getColorsFromTheme(themeResId:Int): HashMap<String, Int> {
-        val colors: HashMap<String, Int> = HashMap<String, Int>()
-
-
-        // The attributes you want retrieved
-        val attrs = intArrayOf(
-            com.google.android.material.R.attr.colorPrimary,
-            com.google.android.material.R.attr.colorPrimaryVariant,
-            android.R.attr.titleTextColor,
-            com.google.android.material.R.attr.colorSecondary,
-            com.google.android.material.R.attr.colorSecondaryVariant,
-            com.google.android.material.R.attr.colorOnSecondary
-        )
-
-        attrs.let {
-            val typedArray = activity?.obtainStyledAttributes(themeResId, attrs)
-
-            val colorPrimaryIndex = 0
-            val colorPrimaryVariantIndex = 1
-            val colorOnPrimaryIndex = 2
-            val colorSecondaryIndex = 3
-            val colorSecondaryVariantIndex = 4
-            val colorOnSecondaryIndex = 5
-            // Fetching the colors defined in your style
-            //Primary Colors
-            val colorPrimary = typedArray?.getColor(colorPrimaryIndex, Color.BLACK)
-            val colorPrimaryVariant = typedArray?.getColor(colorPrimaryVariantIndex, Color.BLACK)
-            val colorOnPrimary = typedArray?.getColor(colorOnPrimaryIndex, Color.BLACK)
-
-            // Secondary Colors
-            val colorSecondary = typedArray?.getColor(colorSecondaryIndex, Color.BLACK)
-            val colorSecondaryVariant =
-                typedArray?.getColor(colorSecondaryVariantIndex, Color.BLACK)
-            val colorOnSecondary = typedArray?.getColor(colorOnSecondaryIndex, Color.BLACK)
-
-            typedArray?.recycle()
-
-            if (colorPrimary != null) {
-                colors["colorPrimary"] = colorPrimary
-            }
-            if (colorPrimaryVariant != null) {
-                colors["colorPrimaryVariant"] = colorPrimaryVariant
-            }
-            if (colorOnPrimary != null) {
-                colors["colorOnPrimary"] = colorOnPrimary
-            }
-
-            if (colorSecondary != null) {
-                colors["colorSecondary"] = colorSecondary
-            }
-            if (colorSecondaryVariant != null) {
-                colors["colorSecondaryVariant"] = colorSecondaryVariant
-            }
-            if (colorOnSecondary != null) {
-                colors["colorOnSecondary"] = colorOnSecondary
-            }
-
-            return colors
-        }
-    }
 
 
     // interface to call the switchTheme method in base activity
