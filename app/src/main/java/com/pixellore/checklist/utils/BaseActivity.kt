@@ -40,10 +40,10 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityListener {
         setTheme(TaskApplication.appTheme)
 
         val currentThemeName = getThemeName(TaskApplication.appTheme)
-        Log.v(
+        /*Log.v(
             Constants.TAG, "Setting theme to - ID: " +
                     TaskApplication.appTheme + " Name: " + currentThemeName
-        )
+        )*/
 
     }
 

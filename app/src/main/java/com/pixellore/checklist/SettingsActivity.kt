@@ -63,6 +63,7 @@ class SettingsActivity : BaseActivity(), ThemePickerDialogFragment.ThemeSelected
 
         // Set flag to recreate other activities
         TaskApplication.recreateMainActivity = true
+        TaskApplication.recreateChecklistActivity = true
         TaskApplication.recreateTaskEditor = true
     }
 }

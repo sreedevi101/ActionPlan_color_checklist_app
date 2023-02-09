@@ -21,7 +21,8 @@ import com.pixellore.checklist.utils.Constants
 import com.pixellore.checklist.utils.SpaceDecorator
 
 /**
- * Adapter for the RecyclerView to display task items (in database) as a list
+ * Adapter for the RecyclerView in ChecklistActivity
+ * to display task items (in database) as a list
  *
  * */
 

@@ -16,8 +16,15 @@ interface TaskDao {
     @Query("SELECT * FROM task_table")
     fun getTasksWithSubtasks(): Flow<List<TaskWithSubtasks>>
 
+    @Transaction
+    @Query("SELECT * FROM task_table WHERE parent_checklist_id = :checklistId ORDER BY task_id ASC")
+    fun getTasksWithSubtasksByChecklistId(checklistId: Int): Flow<List<TaskWithSubtasks>>
+
     /*@Query("SELECT * FROM action_item_table WHERE rowid IN (:itemIds)")
     fun getItemByIds(itemIds: IntArray): List<ActionItem>*/
+
+    @Query("SELECT * FROM checklist_table ORDER BY checklist_id ASC")
+    fun getChecklists(): Flow<List<Checklist>>
 
     @Insert
     suspend fun insert(task: Task)
@@ -43,4 +50,18 @@ interface TaskDao {
 
     @Query("DELETE FROM subtask_table")
     suspend fun deleteAllSubtasks()
+
+
+
+    @Insert
+    suspend fun insertChecklist(checklist: Checklist)
+
+    @Update
+    suspend fun updateChecklist(checklist: Checklist)
+
+    @Delete
+    suspend fun deleteChecklist(checklist: Checklist)
+
+    @Query("DELETE FROM checklist_table")
+    suspend fun deleteAllChecklists()
 }
