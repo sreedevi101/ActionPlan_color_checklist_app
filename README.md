@@ -40,3 +40,20 @@
 
  
  [dev_ver_3_theme_changing.webm](https://user-images.githubusercontent.com/15008191/216466622-198acfdd-1ac1-4270-941e-df24e7d7bc51.webm)
+
+## Development version 4 - Checklists
+
+From the previous versions where MainActivity was displaying Tasks, in this version MainActivity is modified to display checklists. Tasks belong inside checklists. When a checklist is clicked, the tasks in that checklist will be displayed. Following are the important changes made:
+
+- Task database table modified to have a "parent_checklist_id" column/variable
+- Created Checklist database table and wrote methods for query, insert, update and delete for it
+- Added TasksWithSubtasks query to return only entries matching an input "parent_checklist_id"
+- Created ChecklistActivity and layout to display tasks in each checklist, fill them with the contents of MainActivity and its layout
+- Modify MainActivity to display RecyclerView of Checklists and edit text to create new checklist
+- Add click listenerr to open Checklist Activity when a checklist item is clicked. Query DB & display tasks belonging to the selected checklist
+
+![image](https://user-images.githubusercontent.com/15008191/217927309-ded8ba2e-5670-4c34-933e-327019ac0ab8.png)
+
+Tasks under checklists
+
+![image](https://user-images.githubusercontent.com/15008191/217931159-dec492d4-800a-40a5-9da0-6de1c647d67e.png)
