@@ -1,6 +1,7 @@
 package com.pixellore.checklist.DatabaseUtility
 
 import androidx.lifecycle.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class ActionPlanViewModel(private val repository: TaskRepository) : ViewModel() {
@@ -16,6 +17,12 @@ class ActionPlanViewModel(private val repository: TaskRepository) : ViewModel() 
     val allTasksWithSubtasks: LiveData<List<TaskWithSubtasks>> =
         repository.allTasksWithSubtasks.asLiveData()
 
+    fun allTasksWithSubtasksByChecklistId(checklistId: Int): LiveData<List<TaskWithSubtasks>> {
+        return repository.allTasksWithSubtasksByChecklistId(checklistId).asLiveData()
+    }
+
+    val allChecklists: LiveData<List<Checklist>> = repository.allChecklists.asLiveData()
+
     /**
      * Launching a new coroutine to insert the data in a non-blocking way
      */
@@ -27,6 +34,10 @@ class ActionPlanViewModel(private val repository: TaskRepository) : ViewModel() 
         repository.insertSubtask(subtask)
     }
 
+    fun insertChecklist(checklist: Checklist) = viewModelScope.launch {
+        repository.insertChecklist(checklist)
+    }
+
     // Update
     fun update(task: Task) = viewModelScope.launch() {
         repository.update(task)
@@ -34,6 +45,10 @@ class ActionPlanViewModel(private val repository: TaskRepository) : ViewModel() 
 
     fun updateSubtask(subtask: Subtask) = viewModelScope.launch() {
         repository.updateSubtask(subtask)
+    }
+
+    fun updateChecklist(checklist: Checklist) = viewModelScope.launch() {
+        repository.updateChecklist(checklist)
     }
 
     // Delete
@@ -45,6 +60,10 @@ class ActionPlanViewModel(private val repository: TaskRepository) : ViewModel() 
         repository.deleteSubtask(subtask)
     }
 
+    fun deleteChecklist(checklist: Checklist) = viewModelScope.launch() {
+        repository.deleteChecklist(checklist)
+    }
+
     // Delete All
     fun deleteAll() = viewModelScope.launch() {
         repository.deleteAll()
@@ -52,6 +71,10 @@ class ActionPlanViewModel(private val repository: TaskRepository) : ViewModel() 
 
     fun deleteAllSubtasks() = viewModelScope.launch() {
         repository.deleteAllSubtasks()
+    }
+
+    fun deleteAllChecklists() = viewModelScope.launch() {
+        repository.deleteAllChecklists()
     }
 }
 

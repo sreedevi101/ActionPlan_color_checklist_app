@@ -22,6 +22,12 @@ class TaskRepository(private val actionItemDao: TaskDao) {
 
     val allTasksWithSubtasks: Flow<List<TaskWithSubtasks>> = actionItemDao.getTasksWithSubtasks()
 
+    fun allTasksWithSubtasksByChecklistId(checklistId: Int): Flow<List<TaskWithSubtasks>>{
+        return actionItemDao.getTasksWithSubtasksByChecklistId(checklistId)
+    }
+
+    val allChecklists: Flow<List<Checklist>> = actionItemDao.getChecklists()
+
     // By default Room runs suspend queries off the main thread, therefore, we don't need to
     // implement anything else to ensure we're not doing long running database work
     // off the main thread.
@@ -37,6 +43,10 @@ class TaskRepository(private val actionItemDao: TaskDao) {
         actionItemDao.insertSubtask(subtask)
     }
 
+    suspend fun insertChecklist(checklist: Checklist) {
+        actionItemDao.insertChecklist(checklist)
+    }
+
     // Update
     suspend fun update(task: Task) {
         actionItemDao.update(task)
@@ -44,6 +54,10 @@ class TaskRepository(private val actionItemDao: TaskDao) {
 
     suspend fun updateSubtask(subtask: Subtask) {
         actionItemDao.updateSubtask(subtask)
+    }
+
+    suspend fun updateChecklist(checklist: Checklist) {
+        actionItemDao.updateChecklist(checklist)
     }
 
     // Delete
@@ -55,6 +69,10 @@ class TaskRepository(private val actionItemDao: TaskDao) {
         actionItemDao.deleteSubtask(subtask)
     }
 
+    suspend fun deleteChecklist(checklist: Checklist) {
+        actionItemDao.deleteChecklist(checklist)
+    }
+
     // Delete all
     suspend fun deleteAll() {
         actionItemDao.deleteAll()
@@ -62,5 +80,9 @@ class TaskRepository(private val actionItemDao: TaskDao) {
 
     suspend fun deleteAllSubtasks() {
         actionItemDao.deleteAllSubtasks()
+    }
+
+    suspend fun deleteAllChecklists() {
+        actionItemDao.deleteAllChecklists()
     }
 }

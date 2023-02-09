@@ -5,10 +5,16 @@
 
     <!-- "Delete all", should appear as action button if possible -->
     <item
-        android:id="@+id/action_delete_all_tasks"
+        android:id="@+id/action_delete_all"
         android:icon="@drawable/ic_baseline_delete_sweep_24"
-        android:title="@string/delete_all_tasks"
+        android:title="@string/delete_all"
         app:showAsAction="ifRoom" />
+
+    <!-- Settings, should always be in the overflow -->
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/settings"
+        app:showAsAction="never" />
 
     <!-- [DEBUG] Print the database tables in the Log -->
     <item

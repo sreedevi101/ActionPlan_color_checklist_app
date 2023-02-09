@@ -41,6 +41,7 @@ class TaskApplication : Application() {
 
         // Flag to recreate  activities after theme change
         var recreateMainActivity: Boolean = false
+        var recreateChecklistActivity: Boolean = false
         var recreateTaskEditor: Boolean = false
     }
 
