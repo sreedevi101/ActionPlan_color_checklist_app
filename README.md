@@ -52,8 +52,12 @@ From the previous versions where MainActivity was displaying Tasks, in this vers
 - Modify MainActivity to display RecyclerView of Checklists and edit text to create new checklist
 - Add click listenerr to open Checklist Activity when a checklist item is clicked. Query DB & display tasks belonging to the selected checklist
 
-![image](https://user-images.githubusercontent.com/15008191/217927309-ded8ba2e-5670-4c34-933e-327019ac0ab8.png)
+![image](https://user-images.githubusercontent.com/15008191/217932717-5052920f-7ce1-4b2e-932a-1ecc66a6ece1.png)
+
 
 Tasks under checklists
 
-![image](https://user-images.githubusercontent.com/15008191/217931159-dec492d4-800a-40a5-9da0-6de1c647d67e.png)
+![image](https://user-images.githubusercontent.com/15008191/217933020-b76bfc66-0f2b-4d42-8ff9-cf1d527aa6ee.png)
+![image](https://user-images.githubusercontent.com/15008191/217933265-b1207de1-7472-4f6c-808f-94b54c564823.png)
+
+
