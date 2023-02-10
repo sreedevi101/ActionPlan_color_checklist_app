@@ -1,9 +1,11 @@
 package com.pixellore.checklist.DatabaseUtility
 
+import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.pixellore.checklist.DataClass.Font
 
 /**
  * Checklist table
@@ -15,7 +17,8 @@ data class Checklist(
     var created_on: String?,
     var checklist_isClosed: Boolean = false,
     var closed_on: String?,
-    var isPinned: Boolean = false
+    var isPinned: Boolean = false,
+    var font: Font?
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
@@ -23,7 +26,15 @@ data class Checklist(
         parcel.readString(),
         parcel.readByte() != 0.toByte(),
         parcel.readString(),
-        parcel.readByte() != 0.toByte()
+        parcel.readByte() != 0.toByte(),
+
+        // read parcelable class Font
+        if (Build.VERSION.SDK_INT >= 33) {
+            parcel.readParcelable(Font::class.java.classLoader, Font::class.java)
+        }else {
+            parcel.readParcelable(Font::class.java.classLoader)
+        }
+
     ) {
     }
 
@@ -34,6 +45,7 @@ data class Checklist(
         parcel.writeByte(if (checklist_isClosed) 1 else 0)
         parcel.writeString(closed_on)
         parcel.writeByte(if (isPinned) 1 else 0)
+        parcel.writeParcelable(font, flags)
     }
 
     override fun describeContents(): Int {

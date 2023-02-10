@@ -73,9 +73,6 @@ class ThemesRecycleAdapter(
                 if (font.textColorResId != null){
                     themeName.setTextColor(font.textColorResId!!)
                     currentTheme.setTextColor(font.textColorResId!!)
-                } else if (font.textColorString != null){
-                    themeName.setTextColor(Color.parseColor(font.textColorString))
-                    currentTheme.setTextColor(Color.parseColor(font.textColorString))
                 }
             }
 

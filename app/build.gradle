@@ -40,6 +40,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.core:core-ktx:+'
+    implementation 'androidx.core:core-ktx:+'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
@@ -59,4 +60,9 @@ dependencies {
     //implementation 'androidx.lifecycle:lifecycle-extensions-ktx:2.2.0'
     implementation 'androidx.activity:activity-ktx:1.6.1'
     implementation 'androidx.fragment:fragment-ktx:1.5.4'
+
+    // Third party library
+    // https://github.com/Dhaval2404/ColorPicker
+    implementation 'com.github.Dhaval2404:ColorPicker:2.3'
+
 }
