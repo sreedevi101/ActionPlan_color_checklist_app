@@ -57,7 +57,7 @@ From the previous versions where MainActivity was displaying Tasks, in this vers
 
 ## Development version 4.1 - Styling Checklists
 
-Background and text color changing options. ![ColorPicker](https://github.com/Dhaval2404/ColorPicker) is used for color selection.
+Background and text color changing options. [ColorPicker](https://github.com/Dhaval2404/ColorPicker) is used for color selection.
 
 ![image](https://user-images.githubusercontent.com/15008191/218152595-935e1752-2656-4dec-88f8-3c18ee9159da.png)
 
