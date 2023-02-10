@@ -102,8 +102,7 @@ class ThemePickerDialogFragment : DialogFragment() {
         if (currentThemeColors.containsKey("colorPrimary")){
 
             for (t in themesList){
-                t.font = Font(textColorResId = currentThemeColors["colorPrimary"],
-                    null,null,null)
+                t.font = Font(textColorResId = currentThemeColors["colorPrimary"])
             }
         }
 
@@ -148,8 +147,7 @@ class ThemePickerDialogFragment : DialogFragment() {
                     if (themeColors.containsKey("colorPrimary")){
 
                         for (t in themesList){
-                            t.font = Font(textColorResId = themeColors["colorPrimary"],
-                                null,null,null)
+                            t.font = Font(textColorResId = themeColors["colorPrimary"])
                         }
                     }
                 }

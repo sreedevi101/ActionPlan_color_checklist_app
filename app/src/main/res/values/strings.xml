@@ -20,6 +20,11 @@
 
     <string name="pinned">Pinned</string>
     <string name="checklist_title">Create new checklist</string>
+    <string name="change_background">Change Background</string>
+    <string name="add_todo_item">Add Todo item</string>
+    <string name="more_edit_options_for_checklist">More edit options for checklist</string>
+    <string name="change_text_color">Change Text color</string>
+    <string name="delete">Delete</string>
 
 
 </resources>

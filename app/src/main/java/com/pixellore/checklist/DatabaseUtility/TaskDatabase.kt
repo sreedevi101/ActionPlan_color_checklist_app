@@ -4,10 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.pixellore.checklist.DataClass.FontConverter
 import kotlinx.coroutines.CoroutineScope
 
 @Database(entities = [Checklist::class, Task::class, Subtask::class], version = 2, exportSchema = false)
+@TypeConverters(FontConverter::class)
 abstract class TaskDatabase : RoomDatabase() {
 
     abstract fun actionItemDao(): TaskDao

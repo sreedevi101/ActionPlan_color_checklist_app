@@ -12,6 +12,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pixellore.checklist.AdapterUtility.ChecklistRecycleAdapter
+import com.pixellore.checklist.DataClass.Font
 import com.pixellore.checklist.DatabaseUtility.*
 import com.pixellore.checklist.utils.BaseActivity
 import com.pixellore.checklist.utils.Constants
@@ -115,7 +116,9 @@ class MainActivity : BaseActivity() {
 
                 // todo add created on date
                 val newChecklist = Checklist(checklistId, checklistTitle,
-                    null, false, null, false)
+                    null, false, null, false,
+                    Font(null, null)
+                )
 
                 Log.v(Constants.TAG, "inserting new checklist")
                 actionPlanViewModel.insertChecklist(newChecklist)
@@ -148,6 +151,8 @@ class MainActivity : BaseActivity() {
             val intent = Intent(this, ChecklistActivity::class.java)
             intent.putExtra("Checklist",checklist)
             startActivity(intent)
+        } else if (actionRequested == Constants.DELETE) {
+            actionPlanViewModel.deleteChecklist(checklist)
         }
 
     }
@@ -249,6 +254,13 @@ class MainActivity : BaseActivity() {
                         }
 
                         Log.v(Constants.TAG, "Is pinned: ${it.isPinned}")
+
+                        if (it.font != null) {
+                            Log.v(Constants.TAG, "Font: ${it.font!!.backgroundColorResId}, ${it.font!!.textColorResId}")
+                        } else {
+                            Log.v(Constants.TAG, "Font is null")
+                        }
+
                         Log.v(
                             Constants.TAG,
                             "-----------------------------------------------------------------------"

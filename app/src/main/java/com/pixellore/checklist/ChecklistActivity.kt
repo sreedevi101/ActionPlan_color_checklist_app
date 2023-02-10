@@ -15,8 +15,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.github.dhaval2404.colorpicker.ColorPickerDialog
+import com.github.dhaval2404.colorpicker.model.ColorShape
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pixellore.checklist.AdapterUtility.TaskRecycleAdapter
+import com.pixellore.checklist.DataClass.Font
 import com.pixellore.checklist.DatabaseUtility.*
 import com.pixellore.checklist.utils.BaseActivity
 import com.pixellore.checklist.utils.Constants
@@ -43,6 +46,8 @@ class ChecklistActivity : BaseActivity() {
     // checklist object; clicking on this object opens this activity
     private var checklistToDisplay: Checklist? = null
 
+    // RecyclerView
+    private lateinit var actionListRecyclerView: RecyclerView
 
     // colors from current theme
     private lateinit var currentThemeColors: HashMap<String, Int>
@@ -110,10 +115,6 @@ class ChecklistActivity : BaseActivity() {
                         Toast.LENGTH_LONG)
                         .show()
                 }
-
-
-
-
             } else {
                 Toast.makeText(applicationContext, R.string.empty_not_saved, Toast.LENGTH_LONG)
                     .show()
@@ -164,7 +165,13 @@ class ChecklistActivity : BaseActivity() {
             currentThemeColors["colorOnPrimary"]?.let { toolbar.setTitleTextColor(it) }
         }
 
-        val actionListRecyclerView = findViewById<RecyclerView>(R.id.actionListRecyclerView)
+        actionListRecyclerView = findViewById<RecyclerView>(R.id.actionListRecyclerView)
+
+        // change background color
+        val bgColor = checklistToDisplay?.font?.backgroundColorResId
+        if (bgColor != null){
+            actionListRecyclerView.setBackgroundColor(bgColor)
+        }
 
         /*
         * This is to remove the flickering of items in the recycler view when the item is updated
@@ -185,6 +192,7 @@ class ChecklistActivity : BaseActivity() {
 
         actionListRecyclerView.adapter = adapter
         actionListRecyclerView.layoutManager = LinearLayoutManager(this)
+
 
         // Add an observer on the LiveData returned by ActionItem.getItem()
         // The onChanged() method fires when the observed data changes and the activity is
@@ -295,10 +303,7 @@ class ChecklistActivity : BaseActivity() {
 
             getItemEditActivityResult.launch(intent)
         }
-
-
     }
-
 
     private fun onListSubtaskClick(position: Int, subtask: Subtask) {
         actionPlanViewModel.updateSubtask(subtask)
@@ -322,6 +327,46 @@ class ChecklistActivity : BaseActivity() {
         R.id.action_print_database -> {
 
             printDbTables()
+            true
+        }
+
+        R.id.action_change_background -> {
+            if (checklistToDisplay != null){
+                // open color picker
+                ColorPickerDialog
+                    .Builder(this)        				// Pass Activity Instance
+                    .setTitle("Choose Color")           	// Default "Choose Color"
+                    .setColorShape(ColorShape.SQAURE)   // Default ColorShape.CIRCLE
+                    .setDefaultColor(android.R.color.white)     // Pass Default Color
+                    .setColorListener { color, colorHex ->
+                        // Handle Color Selection
+                        //Log.v(Constants.TAG, "Color Selected: $color")
+                        //Log.v(Constants.TAG, "Color Selected - Hex: $colorHex")
+
+                        // change background color
+                        actionListRecyclerView.setBackgroundColor(color)
+
+                        // modify Checklist item to save in the database
+                        if (checklistToDisplay!!.font != null){
+                            checklistToDisplay!!.font?.backgroundColorResId = color
+                        } else{
+                            val font = Font(backgroundColorResId = color)
+                            checklistToDisplay!!.font = font
+                        }
+
+                        // update in database
+                        actionPlanViewModel.updateChecklist(checklistToDisplay!!)
+                    }.show()
+                }
+            else {
+
+                Toast.makeText(applicationContext,
+                    "Parent Checklist missing. This feature will not work",
+                    Toast.LENGTH_LONG)
+                    .show()
+            }
+
+
             true
         }
 
