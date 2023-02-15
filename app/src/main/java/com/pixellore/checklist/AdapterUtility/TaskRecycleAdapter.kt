@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -65,17 +66,37 @@ class TaskRecycleAdapter(
                 val subLayout: ConstraintLayout = findViewById(R.id.subLayout)
                 val taskCardLayout: ConstraintLayout = findViewById(R.id.taskCardLayout)
 
-                val expandCollapseBtn: ImageButton =
-                    findViewById(R.id.expandCollapseSubLayoutButton)
+                val expandCollapseBtn: ImageButton = findViewById(R.id.expand_collapse_button)
+                val priorityBtn: ImageButton = findViewById(R.id.priority_button)
 
                 val completedCheckBox: CheckBox = findViewById(R.id.taskCompletedCheck)
 
+                // Title
                 taskTitleView.text = currentTask.task.task_title
-                taskDueDate.text = currentTask.task.due_date
-                detailsNote.text = currentTask.task.details_note
+                // Due date
+                if (!currentTask.task.due_date.equals("")){
+                    taskDueDate.text = currentTask.task.due_date
+                    taskDueDate.visibility = View.VISIBLE
+                } else {
+                    taskDueDate.visibility = View.GONE
+                }
+                // Details
+                if (!currentTask.task.details_note.equals("")){
+                    detailsNote.text = currentTask.task.details_note
+                    detailsNote.visibility = View.VISIBLE
+                } else {
+                    detailsNote.visibility = View.GONE
+                }
+
+
 
                 // bind view according to the status of  isExpanded (Default: false)
                 toggleSubtasksDisplay(currentTask, subLayout)
+                // set icon according to the status of expand-collapse
+                toggleExpandCollapseIconDisplay(currentTask, expandCollapseBtn)
+
+                // Set priority Icon according to the status of the priority field
+                setPriorityIcon(currentTask, priorityBtn)
 
                 // bind CheckBox status according to the value of the state task_isCompleted (Default: false)
                 toggleStrikeThrough(
@@ -98,10 +119,40 @@ class TaskRecycleAdapter(
                     //currentTask.subtaskList.forEach { Log.v(TAG, it.subtask_title) }
 
                     currentTask.task.isExpanded = !currentTask.task.isExpanded
+
+                    // toggle visibility of the subtasks
                     toggleSubtasksDisplay(currentTask, subLayout)
+
+                    // Toggle the expand-collapse icon with drop-down and drop-up
+                    toggleExpandCollapseIconDisplay(currentTask, expandCollapseBtn)
                     // Update in database
                     clickListener(adapterPosition, currentTask, Constants.UPDATE_DB)
                 }
+
+                /*
+                * Change priority each time the button is clicked
+                *
+                * Priority moves from "None" (default) to "Medium" -> "High" -> back to "None"
+                * */
+                priorityBtn.setOnClickListener {
+                    currentTask.task.priority = when(currentTask.task.priority) {
+                        "None" -> "Medium"
+                        "Medium" -> "High"
+                        "High" -> "None"
+                        else -> {
+                            // Show error message
+                            Toast.makeText(context,
+                            "Error in setting Priority", Toast.LENGTH_SHORT).show()
+
+                            // keep the current value of priority field
+                            currentTask.task.priority
+                        }
+                    }
+                    setPriorityIcon(currentTask, priorityBtn)
+                    // Update in database
+                    clickListener(adapterPosition, currentTask, Constants.UPDATE_DB)
+                }
+
 
 
                 /*
@@ -146,6 +197,14 @@ class TaskRecycleAdapter(
         }
 
 
+        private fun setPriorityIcon(currentTask: TaskWithSubtasks, priorityButton: ImageButton) {
+            when(currentTask.task.priority){
+                "None" -> priorityButton.setImageResource(R.drawable.star_outline)
+                "Medium" -> priorityButton.setImageResource(R.drawable.star_half)
+                "High" -> priorityButton.setImageResource(R.drawable.star_filled)
+            }
+        }
+
         private fun toggleSubtasksDisplay(currentTask: TaskWithSubtasks, view: ConstraintLayout) {
             //Debug
             val ex = currentTask.task.isExpanded
@@ -159,6 +218,22 @@ class TaskRecycleAdapter(
                 // isExpanded: false -> Collapse
                 Log.v(TAG, "Collapse")
                 view.visibility = View.GONE
+            }
+        }
+
+        private fun toggleExpandCollapseIconDisplay(currentTask: TaskWithSubtasks, buttonImage: ImageButton) {
+            //Debug
+            val ex = currentTask.task.isExpanded
+            Log.v(TAG, "isExpanded: $ex")
+            //
+            if (currentTask.task.isExpanded) {
+                // isExpanded: true -> Expand
+                Log.v(TAG, "Expand")
+                buttonImage.setImageResource(R.drawable.ic_baseline_arrow_drop_up_24)
+            } else {
+                // isExpanded: false -> Collapse
+                Log.v(TAG, "Collapse")
+                buttonImage.setImageResource(R.drawable.ic_baseline_arrow_drop_down_24)
             }
         }
 
