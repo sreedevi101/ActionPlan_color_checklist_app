@@ -62,3 +62,6 @@ Background and text color changing options. [ColorPicker](https://github.com/Dha
 ![image](https://user-images.githubusercontent.com/15008191/218152595-935e1752-2656-4dec-88f8-3c18ee9159da.png)
 
 
+## Development version 4.2 - Task item layout change
+
+![image](https://user-images.githubusercontent.com/15008191/219059531-a5745813-d793-4599-9e1b-37d9b4fd3966.png)
