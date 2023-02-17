@@ -81,14 +81,6 @@ class MainActivity : BaseActivity() {
             currentThemeColors["colorOnPrimary"]?.let { toolbar.setTitleTextColor(it) }
         }
 
-
-
-        /*val buttonClick = findViewById<Button>(R.id.sample_button)
-     buttonClick.setOnClickListener {
-         val intent = Intent(this, ChecklistActivity::class.java)
-         startActivity(intent)
-     }*/
-
         val highlightQuickAddBar = findViewById<LinearLayout>(R.id.quick_add_layout_outside)
         val insideQuickAddBar = findViewById<LinearLayout>(R.id.quick_add_layout_inside)
         val checklistTitleEditText = findViewById<EditText>(R.id.checklist_title)

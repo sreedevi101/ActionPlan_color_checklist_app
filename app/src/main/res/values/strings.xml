@@ -2,12 +2,12 @@
     <string name="app_name">Checklist</string>
 
     <string name="hint_task">Add a task…</string>
-    <string name="hint_task_details">Add task details…</string>
+    <string name="hint_task_details">Add task details (Optional)</string>
     <string name="button_save">Save</string>
     <string name="empty_not_saved">Task not saved because it is empty.</string>
     <string name="add_word">Add Task</string>
     <string name="priority">Priority</string>
-    <string name="due_date">Enter due date</string>
+    <string name="due_date">Enter due date (Optional)</string>
     <string name="add_subtask">Add Subtask</string>
     <string name="delete_all">Delete all</string>
     <string name="delete_all_tasks">Delete all tasks</string>
@@ -25,6 +25,7 @@
     <string name="more_edit_options_for_checklist">More edit options for checklist</string>
     <string name="change_text_color">Change Text color</string>
     <string name="delete">Delete</string>
+    <string name="delete_subtask">Delete subtask</string>
 
 
 </resources>

@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="16dp">
+    android:padding="16dp">
 
     <EditText
         android:id="@+id/edit_task_title"
@@ -35,7 +35,6 @@
         style="@style/edittext_task_editor" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp">
@@ -49,23 +48,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <EditText
-                android:id="@+id/subtask1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/add_subtask"
-                style="@style/edittext_task_editor" />
-
 
         </LinearLayout>
 
 
-        <ImageButton
+        <Button
             android:id="@+id/add_subtask_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="@string/add_subtask"
-            android:src="@drawable/ic_baseline_add_24"
+            android:text="@string/add_subtask"
+            android:minHeight="48dp"
+            android:minWidth="48dp"
+            android:background="@android:color/transparent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/subtask_layout" />

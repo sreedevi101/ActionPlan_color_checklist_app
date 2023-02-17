@@ -38,7 +38,6 @@ interface TaskDao {
     @Query("DELETE FROM task_table")
     suspend fun deleteAll()
 
-
     @Insert
     suspend fun insertSubtask(subtask: Subtask)
 

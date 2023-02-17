@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+    A key to save subtask id as tag in the associated edit text
+    edit text displays the subtask title and save subtask id as tag for reference
+   -->
+    <item type="id" name="subtask_id_as_tag" />
+</resources>

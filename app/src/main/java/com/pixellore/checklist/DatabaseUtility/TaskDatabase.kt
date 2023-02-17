@@ -9,7 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.pixellore.checklist.DataClass.FontConverter
 import kotlinx.coroutines.CoroutineScope
 
-@Database(entities = [Checklist::class, Task::class, Subtask::class], version = 2, exportSchema = false)
+@Database(entities = [Checklist::class, Task::class, Subtask::class], version = 1, exportSchema = false)
 @TypeConverters(FontConverter::class)
 abstract class TaskDatabase : RoomDatabase() {
 

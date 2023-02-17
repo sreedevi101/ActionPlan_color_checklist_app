@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.github.dhaval2404.colorpicker.util.setVisibility
 import com.pixellore.checklist.DatabaseUtility.Subtask
 import com.pixellore.checklist.DatabaseUtility.TaskWithSubtasks
 import com.pixellore.checklist.R
@@ -31,7 +32,7 @@ class TaskRecycleAdapter(
     private val clickListener: (position: Int, taskWithSubtasks: TaskWithSubtasks, actionRequested: Int) -> Unit,
     private val clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit
 ) :
-    ListAdapter<TaskWithSubtasks, TaskRecycleAdapter.TaskRecycleViewHolder>(ActionItemComparator()) {
+    ListAdapter<TaskWithSubtasks, TaskRecycleAdapter.TaskRecycleViewHolder>(ActionItemComparator()){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskRecycleViewHolder {
         return TaskRecycleViewHolder.create(parent)
@@ -56,7 +57,8 @@ class TaskRecycleAdapter(
 
             with(itemView) {
                 val subtaskRecyclerView: RecyclerView = findViewById(R.id.subTaskRecycler)
-                var subtaskRecyclerAdapter = SubTaskRecycleAdapter(clickListenerSubtask)
+                var subtaskRecyclerAdapter = SubTaskRecycleAdapter(clickListenerSubtask,
+                    { position, subtask -> onListSubtaskLayoutClick(position, subtask) })
 
                 val taskTitleView: TextView = findViewById(R.id.actionItemTitle)
                 val detailsNote: TextView = findViewById(R.id.detailsNote)
@@ -88,6 +90,14 @@ class TaskRecycleAdapter(
                     detailsNote.visibility = View.GONE
                 }
 
+                /*
+                * Display expand-collapse button only if there is any task details or subtasks to display
+                * */
+                if (currentTask.subtaskList.isEmpty() && currentTask.task.details_note.equals("")){
+                    expandCollapseBtn.visibility = View.GONE
+                } else {
+                    expandCollapseBtn.visibility = View.VISIBLE
+                }
 
 
                 // bind view according to the status of  isExpanded (Default: false)
@@ -177,6 +187,10 @@ class TaskRecycleAdapter(
 
         }
 
+        private fun onListSubtaskLayoutClick(position: Int, subtask: Subtask) {
+            //clickListener(adapterPosition, currentTask, Constants.OPEN_EDITOR)
+        }
+
         companion object {
             fun create(parent: ViewGroup): TaskRecycleViewHolder {
                 val view: View = LayoutInflater.from(parent.context)
@@ -196,7 +210,9 @@ class TaskRecycleAdapter(
             }
         }
 
-
+        /*
+        * Change icon displayed based on the 'currentTask' field 'priority'
+        * */
         private fun setPriorityIcon(currentTask: TaskWithSubtasks, priorityButton: ImageButton) {
             when(currentTask.task.priority){
                 "None" -> priorityButton.setImageResource(R.drawable.star_outline)
@@ -205,34 +221,32 @@ class TaskRecycleAdapter(
             }
         }
 
+        /*
+        * set visibility of view (input) based on the 'currentTask' field 'isExpanded'
+        * */
         private fun toggleSubtasksDisplay(currentTask: TaskWithSubtasks, view: ConstraintLayout) {
-            //Debug
             val ex = currentTask.task.isExpanded
-            Log.v(TAG, "isExpanded: $ex")
-            //
+
             if (currentTask.task.isExpanded) {
                 // isExpanded: true -> Expand
-                Log.v(TAG, "Expand")
                 view.visibility = View.VISIBLE
             } else {
                 // isExpanded: false -> Collapse
-                Log.v(TAG, "Collapse")
                 view.visibility = View.GONE
             }
         }
 
+        /*
+        * Change icon displayed based on the 'currentTask' field 'isExpanded'
+        * */
         private fun toggleExpandCollapseIconDisplay(currentTask: TaskWithSubtasks, buttonImage: ImageButton) {
-            //Debug
             val ex = currentTask.task.isExpanded
-            Log.v(TAG, "isExpanded: $ex")
-            //
+
             if (currentTask.task.isExpanded) {
                 // isExpanded: true -> Expand
-                Log.v(TAG, "Expand")
                 buttonImage.setImageResource(R.drawable.ic_baseline_arrow_drop_up_24)
             } else {
                 // isExpanded: false -> Collapse
-                Log.v(TAG, "Collapse")
                 buttonImage.setImageResource(R.drawable.ic_baseline_arrow_drop_down_24)
             }
         }
@@ -267,6 +281,4 @@ class TaskRecycleAdapter(
             return oldItem == newItem
         }
     }
-
-
 }

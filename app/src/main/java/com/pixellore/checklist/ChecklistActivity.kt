@@ -53,60 +53,73 @@ class ChecklistActivity : BaseActivity() {
     private lateinit var currentThemeColors: HashMap<String, Int>
 
 
-    // Receiver
+    // Receiver for data from TaskEditorActivity - if TaskEditorActivity is opened to create new task
     private val getItemAddActivityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
-                val taskId = taskListSize + 1
-                var newTaskTitle = ""
-                var newTaskDetails = ""
-                var newTaskDueDate = ""
-                var newTaskSubtaskList: Array<String>? = null
-                it.data?.getStringExtra(TaskEditorActivity.TASK_TITLE)
-                    ?.let { reply -> newTaskTitle = reply }
-                it.data?.getStringExtra(TaskEditorActivity.TASK_DETAILS)
-                    ?.let { reply -> newTaskDetails = reply }
-                it.data?.getStringExtra(TaskEditorActivity.DUE_DATE)
-                    ?.let { reply -> newTaskDueDate = reply }
-                it.data?.getStringArrayExtra(TaskEditorActivity.SUBTASK_LIST)
-                    ?.let { reply -> newTaskSubtaskList = reply }
 
-                // get parent checklist id from the Checklist object passed to this intent when opening it
+                // Receive task object and array of subtask objects from editor activity
+
+                /**
+                 * Updated Task object from TaskEditorActivity
+                 * */
+                val taskUpdatedReceived: Task?
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) { // TIRAMISU onwards
+                    taskUpdatedReceived = it.data?.getParcelableExtra(TaskEditorActivity.TASK, Task::class.java)
+                } else {
+                    taskUpdatedReceived = it.data?.getParcelableExtra(TaskEditorActivity.TASK)
+                }
+
+                /**
+                 * Updated Subtask objects array from TaskEditorActivity
+                 * */
+                val subtasksUpdatedReceivedArray: Array<Subtask?>
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) { // TIRAMISU onwards
+                    val subtasksUpdatedList = it.data?.getParcelableArrayListExtra<Subtask>(
+                        TaskEditorActivity.SUBTASK_LIST, Subtask::class.java) ?: ArrayList()
+                    subtasksUpdatedReceivedArray = subtasksUpdatedList.toTypedArray()
+                } else {
+
+                    val subtasksUpdatedList = it.data?.getParcelableArrayListExtra<Subtask>(
+                        TaskEditorActivity.SUBTASK_LIST) ?: ArrayList()
+                    subtasksUpdatedReceivedArray = subtasksUpdatedList.toTypedArray()
+                }
+
+
+
+                // continue to add the Task if only it has a  parent Checklist
                 if (checklistToDisplay!=null){
-                    // continue to add the Task if only it has a  parent Checklist
 
+                    // find id to be used for the new task
+                    val taskId = taskListSize + 1
+
+                    // get parent checklist id from the Checklist object passed to this intent when opening it
                     val parentChecklistId = checklistToDisplay!!.checklist_id
 
+                    // IMPORTANT STEP
+                    // Add correct values for IDs
+                    if (taskUpdatedReceived != null) {
+                        taskUpdatedReceived.task_id = taskId
+                        taskUpdatedReceived.parent_checklist_id = parentChecklistId
 
-                    Log.v(Constants.TAG, "Task ID: $taskId")
-                    Log.v(
-                        Constants.TAG,
-                        "Title: $newTaskTitle\nDetails: $newTaskDetails\nDueDate: $newTaskDueDate"
-                    )
+                        // Insert new task
+                        actionPlanViewModel.insert(taskUpdatedReceived)
 
-                    newTaskSubtaskList?.forEach { Log.v(Constants.TAG, "MainActivity Subtasks : " + it) }
+                        // insert corresponding subtasks
+                        var subtaskId: Int = subtaskListSize + 1
+                        subtasksUpdatedReceivedArray.forEach { subtask ->
+                            if (subtask != null){
+                                // IMPORTANT STEP
+                                // Add correct values for IDs
+                                subtask.subtask_id = subtaskId
+                                subtask.parent_task_id = taskId
 
-
-                    // insert corresponding subtasks
-                    var subtask: Subtask
-                    var subtaskId: Int = subtaskListSize + 1
-                    newTaskSubtaskList?.forEach {
-                        subtask = Subtask(
-                            parent_task_id = taskId,
-                            subtask_title = it, subtask_id = subtaskId
-                        )
-                        actionPlanViewModel.insertSubtask(subtask)
-                        subtaskId++
+                                actionPlanViewModel.insertSubtask(subtask)
+                                subtaskId++
+                            }
+                        }
                     }
 
-                    // Insert new task
-                    //Todo add "parent_checklist_id"
-                    val task = Task(
-                        task_title = newTaskTitle, task_id = taskId,
-                        details_note = newTaskDetails, due_date = newTaskDueDate,
-                        parent_checklist_id = parentChecklistId
-                    )
-                    actionPlanViewModel.insert(task)
                 } else {
                     Log.v(Constants.TAG, "Parent Checklist missing. Task cannot be added")
 
@@ -121,11 +134,168 @@ class ChecklistActivity : BaseActivity() {
             }
         }
 
+    // Receiver for data from TaskEditorActivity - if TaskEditorActivity is opened to edit existing task
     private val getItemEditActivityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
                 // ToDo
                 Toast.makeText(applicationContext, "Update task DEBUG", Toast.LENGTH_LONG).show()
+
+                // Receive task object and array of subtask objects from editor activity
+
+                /**
+                 * Updated Task object from TaskEditorActivity
+                 * */
+                val taskUpdatedReceived: Task?
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) { // TIRAMISU onwards
+                    taskUpdatedReceived = it.data?.getParcelableExtra(TaskEditorActivity.TASK, Task::class.java)
+                } else {
+                    taskUpdatedReceived = it.data?.getParcelableExtra(TaskEditorActivity.TASK)
+                }
+
+                /**
+                 * Updated Subtask objects array from TaskEditorActivity
+                 * */
+                val subtasksUpdatedReceivedArray: Array<Subtask?>
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) { // TIRAMISU onwards
+                    val subtasksUpdatedList = it.data?.getParcelableArrayListExtra<Subtask>(
+                        TaskEditorActivity.SUBTASK_LIST, Subtask::class.java) ?: ArrayList()
+                    subtasksUpdatedReceivedArray = subtasksUpdatedList.toTypedArray()
+                } else {
+
+                    val subtasksUpdatedList = it.data?.getParcelableArrayListExtra<Subtask>(
+                        TaskEditorActivity.SUBTASK_LIST) ?: ArrayList()
+                    subtasksUpdatedReceivedArray = subtasksUpdatedList.toTypedArray()
+                }
+
+
+
+                /**
+                 * Subtask labels - list of dictionary with keys "id" and "label"
+                 *
+                 * ids corresponds to the  subtask ids sent to TaskEditorActivity (already existing
+                 * in database as subtasks of this parent task)
+                 *
+                 * labels mention the action to be done based on the modification made by user
+                 * in the TaskEditorActivity layout
+                 * labels - DELETE, UPDATE, NO_CHANGE
+                 *
+                 * Note: Newly created tasks are not in this list. If any subtask id received is not
+                 * in this list of dicts, its a new subtask ane need to be inserted into the database
+                 * */
+                val subtaskLabelList: ArrayList<MutableMap<String, Any>>?
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) {
+                    subtaskLabelList = it.data?.getSerializableExtra(TaskEditorActivity.SUBTASK_LABEL,
+                        ArrayList::class.java) as ArrayList<MutableMap<String, Any>>?
+
+                } else {
+                    // Use Serializable
+                    subtaskLabelList = it.data?.getSerializableExtra(TaskEditorActivity.SUBTASK_LABEL)
+                            as ArrayList<MutableMap<String, Any>>?
+                }
+
+
+                // DEBUG
+                if (subtaskLabelList == null){
+                    Log.v(Constants.TAG, "Subtasks list received is NULL")
+                } else if (subtaskLabelList.isEmpty()){
+                    Log.v(Constants.TAG, "Subtasks list received is EMPTY")
+                }
+
+
+                // continue to add the Task if only it has a  parent Checklist
+                if (checklistToDisplay!=null){
+
+                    if (taskUpdatedReceived != null) {
+
+                        // Update new task
+                        actionPlanViewModel.update(taskUpdatedReceived)
+
+
+                        // Update/Insert corresponding subtasks - Delete is separate
+
+                        // subtask id for newly added subtasks (to be inserted into database)
+                        var subtaskId: Int = subtaskListSize + 1
+
+                        // iterate through all the subtasks received from TaskEditorActivity
+                        subtasksUpdatedReceivedArray.forEach { subtask ->
+                            if (subtask != null){
+
+                                /*
+                                 If any dictionary in the list has a value of 'subtask.subtask_id' for the "id" key,
+                                  the value of isIdMatched will be true. Otherwise, it will be false.
+                                * */
+                                val isIdMatched = subtaskLabelList?.any { dict ->
+                                    dict["id"] == subtask.subtask_id
+                                }
+                                // if 'isIdMatched' is false that means it is a new subtask and
+                                // has to be inserted to database
+
+                                // ********* INSERT *************
+                                if (!isIdMatched!!){
+
+                                    // IMPORTANT STEP
+                                    // Add correct values for IDs
+                                    subtask.subtask_id = subtaskId
+                                    subtask.parent_task_id = taskId
+
+                                    actionPlanViewModel.insertSubtask(subtask)
+                                    subtaskId++
+                                } else {
+                                    // if 'isIdMatched' is true, the id is already available, meaning its an
+                                    // update/ delete or no change
+
+                                    // get the "label"
+                                    val matchedDict = subtaskLabelList.find { dict ->
+                                        dict["id"] == subtask.subtask_id
+                                    }
+                                    val label = matchedDict?.get("label")
+
+                                    when(label){
+                                        "UPDATE"-> actionPlanViewModel.updateSubtask(subtask)
+                                    }
+
+                                }
+                            }
+                        }
+
+                        // To delete subtasks from database, iterate through list of dict of labels
+                        // returned from TaskEditorActivity
+
+                        // get the "ids" with "label" DELETE
+                        val deleteIds = subtaskLabelList
+                            ?.filter { dict ->
+                                dict["label"] == "DELETE"
+                            }
+                            ?.mapNotNull { dict ->
+                                dict["id"] as? Int
+                            }
+
+
+
+                        deleteIds?.forEach { idToDelete ->
+                            // DEBUG
+
+                            val subtaskListLiveDb = actionPlanViewModel.allChecklistSubtasks.value
+                            val subtaskToDelete = subtaskListLiveDb?.find { it.subtask_id == idToDelete }
+
+                            if (subtaskToDelete != null) {
+                                actionPlanViewModel.deleteSubtask(subtaskToDelete)
+
+                                /*Log.v(Constants.TAG, "Subtask deleted: " + subtaskToDelete.subtask_id +
+                                        " - " + subtaskToDelete.subtask_title)*/
+                            }
+                        }
+                    }
+
+                } else {
+                    Log.v(Constants.TAG, "Parent Checklist missing. Task cannot be added")
+
+                    Toast.makeText(applicationContext,
+                        "Parent Checklist missing. Task cannot be added",
+                        Toast.LENGTH_LONG)
+                        .show()
+                }
             } else {
                 Toast.makeText(applicationContext, "Could not update", Toast.LENGTH_LONG).show()
             }
