@@ -6,13 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.pixellore.checklist.DatabaseUtility.Subtask
 import com.pixellore.checklist.R
 
-class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit) :
+class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit,
+                            private val listener:  (position: Int, subtask: Subtask) -> Unit) :
     ListAdapter<Subtask, SubTaskRecycleAdapter.SubtaskViewHolder>(SubItemComparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubtaskViewHolder {
@@ -21,16 +23,18 @@ class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, su
 
     override fun onBindViewHolder(holder: SubtaskViewHolder, position: Int) {
         val current = getItem(position)
-        holder.bind(current, clickListenerSubtask)
+        holder.bind(current, clickListenerSubtask, listener)
     }
 
     class SubtaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val subtaskItem: ConstraintLayout = itemView.findViewById(R.id.subtask_item_layout)
         private val subtaskTitleView: TextView = itemView.findViewById(R.id.subtaskTitle)
         private val completedCheckBox: CheckBox = itemView.findViewById(R.id.subtaskCompletedCheck)
 
         fun bind(
             currentSubtask: Subtask,
-            clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit
+            clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit,
+            listener: (position: Int, subtask: Subtask) -> Unit
         ) {
             subtaskTitleView.text = currentSubtask.subtask_title
 
@@ -47,6 +51,11 @@ class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, su
                 toggleStrikeThrough(textViewToStrike = subtaskTitleView, isChecked)
                 clickListenerSubtask(adapterPosition, currentSubtask)
 
+            }
+
+            subtaskItem.setOnClickListener {
+                // Call the interface method to notify the listener
+                listener(adapterPosition, currentSubtask)
             }
         }
 
