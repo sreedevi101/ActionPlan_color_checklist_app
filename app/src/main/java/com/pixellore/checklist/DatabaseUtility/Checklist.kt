@@ -12,7 +12,7 @@ import com.pixellore.checklist.DataClass.Font
  * */
 @Entity(tableName = "checklist_table")
 data class Checklist(
-    @PrimaryKey val checklist_id: Int,
+    @PrimaryKey var checklist_id: Int,
     var checklist_title: String?,
     var created_on: String?,
     var checklist_isClosed: Boolean = false,

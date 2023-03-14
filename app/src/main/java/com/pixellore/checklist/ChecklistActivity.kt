@@ -3,7 +3,6 @@ package com.pixellore.checklist
 import android.app.Activity
 import android.content.Intent
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -23,7 +22,7 @@ import com.pixellore.checklist.DataClass.Font
 import com.pixellore.checklist.DatabaseUtility.*
 import com.pixellore.checklist.utils.BaseActivity
 import com.pixellore.checklist.utils.Constants
-import java.io.Serializable
+import kotlinx.coroutines.runBlocking
 import java.util.HashMap
 
 class ChecklistActivity : BaseActivity() {
@@ -33,15 +32,17 @@ class ChecklistActivity : BaseActivity() {
     }
 
     /*
-    * number of tasks and subtasks - this is to find the unique id when creating the next Task or Subtask
+    * List of Task and Subtask Ids obtained as LiveData
+    * This is used to find out the unque ID to be assigned to the next task item and subtask item
     *
     * Task unique id irrespective of the checklist it belongs to, its unique among all the tasks objects.
     * same about subtasks as well
     *
     * unique id is assigned in the order the object is created
     * */
-    private var taskListSize: Int = 0
-    private var subtaskListSize: Int = 0
+    private var taskIds: List<Int> = emptyList()
+    private var subtaskIds: List<Int> = emptyList()
+
 
     // checklist object; clicking on this object opens this activity
     private var checklistToDisplay: Checklist? = null
@@ -65,7 +66,8 @@ class ChecklistActivity : BaseActivity() {
                  * */
                 val taskUpdatedReceived: Task?
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) { // TIRAMISU onwards
-                    taskUpdatedReceived = it.data?.getParcelableExtra(TaskEditorActivity.TASK, Task::class.java)
+                    taskUpdatedReceived =
+                        it.data?.getParcelableExtra(TaskEditorActivity.TASK, Task::class.java)
                 } else {
                     taskUpdatedReceived = it.data?.getParcelableExtra(TaskEditorActivity.TASK)
                 }
@@ -76,56 +78,75 @@ class ChecklistActivity : BaseActivity() {
                 val subtasksUpdatedReceivedArray: Array<Subtask?>
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) { // TIRAMISU onwards
                     val subtasksUpdatedList = it.data?.getParcelableArrayListExtra<Subtask>(
-                        TaskEditorActivity.SUBTASK_LIST, Subtask::class.java) ?: ArrayList()
+                        TaskEditorActivity.SUBTASK_LIST, Subtask::class.java
+                    ) ?: ArrayList()
                     subtasksUpdatedReceivedArray = subtasksUpdatedList.toTypedArray()
                 } else {
 
                     val subtasksUpdatedList = it.data?.getParcelableArrayListExtra<Subtask>(
-                        TaskEditorActivity.SUBTASK_LIST) ?: ArrayList()
+                        TaskEditorActivity.SUBTASK_LIST
+                    ) ?: ArrayList()
                     subtasksUpdatedReceivedArray = subtasksUpdatedList.toTypedArray()
                 }
 
 
-
                 // continue to add the Task if only it has a  parent Checklist
-                if (checklistToDisplay!=null){
+                if (checklistToDisplay != null) {
 
                     // find id to be used for the new task
-                    val taskId = taskListSize + 1
+                    val taskId = findNextId(taskIds)
+                    if (taskId == -1){ // unique ids reached max limit of Int
+                        // todo alert dialog saying reached max limit
+                    } else {
+                        // get parent checklist id from the Checklist object passed to this intent when opening it
+                        val parentChecklistId = checklistToDisplay!!.checklist_id
 
-                    // get parent checklist id from the Checklist object passed to this intent when opening it
-                    val parentChecklistId = checklistToDisplay!!.checklist_id
+                        // IMPORTANT STEP
+                        // Add correct values for IDs
+                        if (taskUpdatedReceived != null) {
+                            taskUpdatedReceived.task_id = taskId
+                            taskUpdatedReceived.parent_checklist_id = parentChecklistId
 
-                    // IMPORTANT STEP
-                    // Add correct values for IDs
-                    if (taskUpdatedReceived != null) {
-                        taskUpdatedReceived.task_id = taskId
-                        taskUpdatedReceived.parent_checklist_id = parentChecklistId
+                            // Insert new task
+                            actionPlanViewModel.insertTask(taskUpdatedReceived)
 
-                        // Insert new task
-                        actionPlanViewModel.insert(taskUpdatedReceived)
+                            // insert corresponding subtasks
+                            subtasksUpdatedReceivedArray.forEach { subtask ->
+                                if (subtask != null) {
+                                    // IMPORTANT STEP
+                                    // Add correct values for IDs
+                                    val subtaskId = findNextId(subtaskIds)
+                                    if (subtaskId == -1){ // unique ids reached max limit of Int
+                                        // todo alert dialog saying max limit reached
+                                    } else{
+                                        subtask.subtask_id = subtaskId
+                                        subtask.parent_task_id = taskId
 
-                        // insert corresponding subtasks
-                        var subtaskId: Int = subtaskListSize + 1
-                        subtasksUpdatedReceivedArray.forEach { subtask ->
-                            if (subtask != null){
-                                // IMPORTANT STEP
-                                // Add correct values for IDs
-                                subtask.subtask_id = subtaskId
-                                subtask.parent_task_id = taskId
+                                        Log.v(Constants.TAG, "Subtask to be Inserted " +
+                                                "${subtask.subtask_id} - ${subtask.subtask_title} " +
+                                                "- parent task id ${subtask.parent_task_id}")
 
-                                actionPlanViewModel.insertSubtask(subtask)
-                                subtaskId++
+                                        actionPlanViewModel.insertSubtask(subtask)
+
+                                        val currentSubtaskIds = subtaskIds.orEmpty().toMutableList()
+                                        currentSubtaskIds.add(subtaskId) // id added now
+                                        subtaskIds = currentSubtaskIds
+                                    }
+                                }
                             }
                         }
+
                     }
+
 
                 } else {
                     Log.v(Constants.TAG, "Parent Checklist missing. Task cannot be added")
 
-                    Toast.makeText(applicationContext,
+                    Toast.makeText(
+                        applicationContext,
                         "Parent Checklist missing. Task cannot be added",
-                        Toast.LENGTH_LONG)
+                        Toast.LENGTH_LONG
+                    )
                         .show()
                 }
             } else {
@@ -148,7 +169,8 @@ class ChecklistActivity : BaseActivity() {
                  * */
                 val taskUpdatedReceived: Task?
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) { // TIRAMISU onwards
-                    taskUpdatedReceived = it.data?.getParcelableExtra(TaskEditorActivity.TASK, Task::class.java)
+                    taskUpdatedReceived =
+                        it.data?.getParcelableExtra(TaskEditorActivity.TASK, Task::class.java)
                 } else {
                     taskUpdatedReceived = it.data?.getParcelableExtra(TaskEditorActivity.TASK)
                 }
@@ -159,15 +181,16 @@ class ChecklistActivity : BaseActivity() {
                 val subtasksUpdatedReceivedArray: Array<Subtask?>
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) { // TIRAMISU onwards
                     val subtasksUpdatedList = it.data?.getParcelableArrayListExtra<Subtask>(
-                        TaskEditorActivity.SUBTASK_LIST, Subtask::class.java) ?: ArrayList()
+                        TaskEditorActivity.SUBTASK_LIST, Subtask::class.java
+                    ) ?: ArrayList()
                     subtasksUpdatedReceivedArray = subtasksUpdatedList.toTypedArray()
                 } else {
 
                     val subtasksUpdatedList = it.data?.getParcelableArrayListExtra<Subtask>(
-                        TaskEditorActivity.SUBTASK_LIST) ?: ArrayList()
+                        TaskEditorActivity.SUBTASK_LIST
+                    ) ?: ArrayList()
                     subtasksUpdatedReceivedArray = subtasksUpdatedList.toTypedArray()
                 }
-
 
 
                 /**
@@ -185,41 +208,43 @@ class ChecklistActivity : BaseActivity() {
                  * */
                 val subtaskLabelList: ArrayList<MutableMap<String, Any>>?
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2) {
-                    subtaskLabelList = it.data?.getSerializableExtra(TaskEditorActivity.SUBTASK_LABEL,
-                        ArrayList::class.java) as ArrayList<MutableMap<String, Any>>?
+                    subtaskLabelList = it.data?.getSerializableExtra(
+                        TaskEditorActivity.SUBTASK_LABEL,
+                        ArrayList::class.java
+                    ) as ArrayList<MutableMap<String, Any>>?
 
                 } else {
                     // Use Serializable
-                    subtaskLabelList = it.data?.getSerializableExtra(TaskEditorActivity.SUBTASK_LABEL)
-                            as ArrayList<MutableMap<String, Any>>?
+                    subtaskLabelList =
+                        it.data?.getSerializableExtra(TaskEditorActivity.SUBTASK_LABEL)
+                                as ArrayList<MutableMap<String, Any>>?
                 }
 
 
                 // DEBUG
-                if (subtaskLabelList == null){
+                if (subtaskLabelList == null) {
                     Log.v(Constants.TAG, "Subtasks list received is NULL")
-                } else if (subtaskLabelList.isEmpty()){
+                } else if (subtaskLabelList.isEmpty()) {
                     Log.v(Constants.TAG, "Subtasks list received is EMPTY")
                 }
+                subtaskLabelList?.forEach { dictItem ->
+                    Log.v(Constants.TAG, "subtaskLabelList ${dictItem["id"]} - ${dictItem["label"]} ") }
 
 
                 // continue to add the Task if only it has a  parent Checklist
-                if (checklistToDisplay!=null){
+                if (checklistToDisplay != null) {
 
                     if (taskUpdatedReceived != null) {
 
                         // Update new task
-                        actionPlanViewModel.update(taskUpdatedReceived)
+                        actionPlanViewModel.updateTask(taskUpdatedReceived)
 
 
                         // Update/Insert corresponding subtasks - Delete is separate
 
-                        // subtask id for newly added subtasks (to be inserted into database)
-                        var subtaskId: Int = subtaskListSize + 1
-
                         // iterate through all the subtasks received from TaskEditorActivity
                         subtasksUpdatedReceivedArray.forEach { subtask ->
-                            if (subtask != null){
+                            if (subtask != null) {
 
                                 /*
                                  If any dictionary in the list has a value of 'subtask.subtask_id' for the "id" key,
@@ -232,15 +257,24 @@ class ChecklistActivity : BaseActivity() {
                                 // has to be inserted to database
 
                                 // ********* INSERT *************
-                                if (!isIdMatched!!){
+                                if (!isIdMatched!!) {
 
                                     // IMPORTANT STEP
                                     // Add correct values for IDs
-                                    subtask.subtask_id = subtaskId
-                                    subtask.parent_task_id = taskId
+                                    val subtaskId = findNextId(subtaskIds)
+                                    if (subtaskId == -1){
+                                        // todo alert dialog saying max limit reached
+                                    } else{
+                                        subtask.subtask_id = subtaskId
+                                        subtask.parent_task_id = taskUpdatedReceived.task_id
 
-                                    actionPlanViewModel.insertSubtask(subtask)
-                                    subtaskId++
+                                        actionPlanViewModel.insertSubtask(subtask)
+
+                                        val currentSubtaskIds = subtaskIds.orEmpty().toMutableList()
+                                        currentSubtaskIds.add(subtaskId) // id added now
+                                        subtaskIds = currentSubtaskIds
+                                    }
+
                                 } else {
                                     // if 'isIdMatched' is true, the id is already available, meaning its an
                                     // update/ delete or no change
@@ -251,8 +285,8 @@ class ChecklistActivity : BaseActivity() {
                                     }
                                     val label = matchedDict?.get("label")
 
-                                    when(label){
-                                        "UPDATE"-> actionPlanViewModel.updateSubtask(subtask)
+                                    when (label) {
+                                        "UPDATE" -> actionPlanViewModel.updateSubtask(subtask)
                                     }
 
                                 }
@@ -271,29 +305,21 @@ class ChecklistActivity : BaseActivity() {
                                 dict["id"] as? Int
                             }
 
-
-
-                        deleteIds?.forEach { idToDelete ->
-                            // DEBUG
-
-                            val subtaskListLiveDb = actionPlanViewModel.allChecklistSubtasks.value
-                            val subtaskToDelete = subtaskListLiveDb?.find { it.subtask_id == idToDelete }
-
-                            if (subtaskToDelete != null) {
-                                actionPlanViewModel.deleteSubtask(subtaskToDelete)
-
-                                /*Log.v(Constants.TAG, "Subtask deleted: " + subtaskToDelete.subtask_id +
-                                        " - " + subtaskToDelete.subtask_title)*/
-                            }
+                        Log.v(Constants.TAG, "deleteIds: $deleteIds")
+                        if (deleteIds != null) {
+                            actionPlanViewModel.deleteSubtasks(deleteIds)
                         }
+
                     }
 
                 } else {
                     Log.v(Constants.TAG, "Parent Checklist missing. Task cannot be added")
 
-                    Toast.makeText(applicationContext,
+                    Toast.makeText(
+                        applicationContext,
                         "Parent Checklist missing. Task cannot be added",
-                        Toast.LENGTH_LONG)
+                        Toast.LENGTH_LONG
+                    )
                         .show()
                 }
             } else {
@@ -302,20 +328,23 @@ class ChecklistActivity : BaseActivity() {
         }
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme() // to set theme to the theme saved in SharedPreference
         setContentView(R.layout.activity_checklist)
 
+
         // get data from calling activity
         if (Build.VERSION.SDK_INT >= 33) {
             checklistToDisplay = intent.getParcelableExtra("Checklist", Checklist::class.java)
-        }else {
+        } else {
             checklistToDisplay = intent.getParcelableExtra<Checklist>("Checklist")
         }
 
-        Log.v(Constants.TAG, "Opening Checklist: " + (checklistToDisplay?.checklist_title ?: "Checklist is null"))
+        Log.v(
+            Constants.TAG,
+            "Opening Checklist: " + (checklistToDisplay?.checklist_title ?: "Checklist is null")
+        )
 
         // get colors from current theme, so it can applied to the toolbar and popup menu
         currentThemeColors = getColorsFromTheme(TaskApplication.appTheme)
@@ -339,7 +368,7 @@ class ChecklistActivity : BaseActivity() {
 
         // change background color
         val bgColor = checklistToDisplay?.font?.backgroundColorResId
-        if (bgColor != null){
+        if (bgColor != null) {
             actionListRecyclerView.setBackgroundColor(bgColor)
         }
 
@@ -364,52 +393,33 @@ class ChecklistActivity : BaseActivity() {
         actionListRecyclerView.layoutManager = LinearLayoutManager(this)
 
 
-        // Add an observer on the LiveData returned by ActionItem.getItem()
-        // The onChanged() method fires when the observed data changes and the activity is
-        // in the foreground.
-        /*actionPlanViewModel.allChecklistItems.observe(this) { tasks ->
-            // Update the cached copy of the tasks in the adapter.
-            tasks.let {
-                Log.v("ViewModel", it.size.toString())
-                adapter.submitList(it) }
-        }*/
-
-
-
-
-        /*actionPlanViewModel.allTasksWithSubtasks.observe(this) { tasks ->
-            // Update the cached copy of the tasks in the adapter.
-            tasks.let {
-                adapter.submitList(it)
-            }
-        }*/
-
         // get only TasksWithSubtasks belongs to this checklist
-        if (checklistToDisplay!=null){
-            actionPlanViewModel.allTasksWithSubtasksByChecklistId(checklistToDisplay!!.checklist_id).observe(this) { tasks ->
-                // Update the cached copy of the tasks in the adapter.
-                tasks.let {
-                    adapter.submitList(it)
+        // to display only TasksWithSubtasks belonging to this checklist, when the user opens the checklist
+        if (checklistToDisplay != null) {
+            actionPlanViewModel.allTasksWithSubtasksByChecklistId(checklistToDisplay!!.checklist_id)
+                .observe(this) { tasks ->
+                    // Update the cached copy of the tasks in the adapter.
+                    tasks.let {
+                        adapter.submitList(it)
+                    }
                 }
-            }
         }
         // todo add an else condition
 
-
-        actionPlanViewModel.allChecklistTasks.observe(this) { tasks ->
-            // Update the cached copy of the tasks in the adapter.
-            tasks.let {
-                Log.v("ViewModel", it.size.toString())
-                taskListSize = it.size
-            }
+        // Observe the list of IDs
+        actionPlanViewModel.getAllTaskIds().observe(this) { ids ->
+            // Update the list of IDs
+            taskIds = ids
+            // DEBUG
+            //Log.d(Constants.TAG, "All Task IDs: $taskIds")
         }
 
-
-
-        actionPlanViewModel.allChecklistSubtasks.observe(this) { subtasks ->
-            subtasks.let {
-                subtaskListSize = it.size
-            }
+        // Observe the list of IDs
+        actionPlanViewModel.getAllSubtaskIds().observe(this) { ids ->
+            // Update the list of IDs
+            subtaskIds = ids
+            // DEBUG
+            //Log.d(Constants.TAG, "All Subtask IDs: $subtaskIds")
         }
 
 
@@ -421,11 +431,10 @@ class ChecklistActivity : BaseActivity() {
 
     }
 
-
     override fun onResume() {
         super.onResume()
         setTheme()
-        if (TaskApplication.recreateChecklistActivity){
+        if (TaskApplication.recreateChecklistActivity) {
             recreate()
             TaskApplication.recreateChecklistActivity = false
         }
@@ -434,12 +443,11 @@ class ChecklistActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
         setTheme()
-        if (TaskApplication.recreateChecklistActivity){
+        if (TaskApplication.recreateChecklistActivity) {
             recreate()
             TaskApplication.recreateChecklistActivity = false
         }
     }
-
 
 
     /**
@@ -456,7 +464,7 @@ class ChecklistActivity : BaseActivity() {
         //Toast.makeText(applicationContext, position.toString(), Toast.LENGTH_SHORT).show()
 
         if (actionRequested == Constants.UPDATE_DB) {
-            actionPlanViewModel.update(taskWithSubtasks.task)
+            actionPlanViewModel.updateTask(taskWithSubtasks.task)
         } else if (actionRequested == Constants.OPEN_EDITOR) {
             val intent = Intent(this@ChecklistActivity, TaskEditorActivity::class.java)
 
@@ -472,6 +480,15 @@ class ChecklistActivity : BaseActivity() {
             intent.putExtra("NoOfSubtasks", taskWithSubtasks.subtaskList.size)
 
             getItemEditActivityResult.launch(intent)
+        } else if (actionRequested == Constants.DELETE) {
+            // delete this task
+            actionPlanViewModel.deleteTask(taskWithSubtasks.task)
+
+            // get the subtasks - already available in taskWithSubtasks.subtaskList
+
+            for (subtask in taskWithSubtasks.subtaskList) {
+                actionPlanViewModel.deleteSubtask(subtask)
+            }
         }
     }
 
@@ -489,7 +506,7 @@ class ChecklistActivity : BaseActivity() {
 
         R.id.action_delete_all -> {
             // User chose "Delete all", delete all the tasks and subtasks in the checklist
-            actionPlanViewModel.deleteAll()
+            actionPlanViewModel.deleteAllTasks()
             actionPlanViewModel.deleteAllSubtasks()
             true
         }
@@ -501,11 +518,11 @@ class ChecklistActivity : BaseActivity() {
         }
 
         R.id.action_change_background -> {
-            if (checklistToDisplay != null){
+            if (checklistToDisplay != null) {
                 // open color picker
                 ColorPickerDialog
-                    .Builder(this)        				// Pass Activity Instance
-                    .setTitle("Choose Color")           	// Default "Choose Color"
+                    .Builder(this)                        // Pass Activity Instance
+                    .setTitle("Choose Color")            // Default "Choose Color"
                     .setColorShape(ColorShape.SQAURE)   // Default ColorShape.CIRCLE
                     .setDefaultColor(android.R.color.white)     // Pass Default Color
                     .setColorListener { color, colorHex ->
@@ -517,9 +534,9 @@ class ChecklistActivity : BaseActivity() {
                         actionListRecyclerView.setBackgroundColor(color)
 
                         // modify Checklist item to save in the database
-                        if (checklistToDisplay!!.font != null){
+                        if (checklistToDisplay!!.font != null) {
                             checklistToDisplay!!.font?.backgroundColorResId = color
-                        } else{
+                        } else {
                             val font = Font(backgroundColorResId = color)
                             checklistToDisplay!!.font = font
                         }
@@ -527,12 +544,13 @@ class ChecklistActivity : BaseActivity() {
                         // update in database
                         actionPlanViewModel.updateChecklist(checklistToDisplay!!)
                     }.show()
-                }
-            else {
+            } else {
 
-                Toast.makeText(applicationContext,
+                Toast.makeText(
+                    applicationContext,
                     "Parent Checklist missing. This feature will not work",
-                    Toast.LENGTH_LONG)
+                    Toast.LENGTH_LONG
+                )
                     .show()
             }
 
@@ -549,90 +567,85 @@ class ChecklistActivity : BaseActivity() {
     }
 
     private fun printDbTables() {
-        val tag = "Print Database Tables"
-        val tasksTableSize = taskListSize
+        val tag = Constants.TAG
         var count: Int
 
-        Log.v(tag, "There are $tasksTableSize tasks")
-        if (tasksTableSize > 0) {
-            actionPlanViewModel.allChecklistTasks.observe(this) { tasks ->
-                tasks.let {
-                    count = 1
-                    it.forEach {
-                        if (count == 1) {
-                            Log.v(
-                                tag,
-                                "\n\n-----------------------------------------------------------------------"
-                            )
-                        }
-                        Log.v(tag, "${it.task_id} - ${it.task_title}")
-                        Log.v(tag, "Due Date: ${it.due_date}")
-                        Log.v(tag, "Details: ${it.details_note}")
-                        Log.v(tag, "Priority: ${it.priority}")
-                        Log.v(tag, "Expanded: ${it.isExpanded}, Completed: ${it.task_isCompleted}")
+        actionPlanViewModel.allChecklistTasks.observe(this) { tasks ->
+            val numberOfTaskItems = tasks.size
+            Log.v(tag, "There are $numberOfTaskItems tasks")
+            tasks.let {
+                count = 1
+                it.forEach {
+                    if (count == 1) {
                         Log.v(
                             tag,
-                            "-----------------------------------------------------------------------"
+                            "\n\n-----------------------------------------------------------------------"
                         )
-                        count++
                     }
+                    Log.v(tag, "${it.task_id} - ${it.task_title}")
+                    Log.v(tag, "Due Date: ${it.due_date}")
+                    Log.v(tag, "Details: ${it.details_note}")
+                    Log.v(tag, "Priority: ${it.priority}")
+                    Log.v(tag, "Expanded: ${it.isExpanded}, Completed: ${it.task_isCompleted}")
+                    Log.v(
+                        tag,
+                        "-----------------------------------------------------------------------"
+                    )
+                    count++
                 }
             }
+        }
+
+        actionPlanViewModel.allChecklistSubtasks.observe(this) { subtasks ->
+            val numberOfSubtaskItems = subtasks.size
+            Log.v(tag, "There are $numberOfSubtaskItems subtasks")
+            subtasks.let {
+                count = 1
+                it.forEach {
+                    if (count == 1) {
+                        Log.v(
+                            tag,
+                            "\n\n-----------------------------------------------------------------------"
+                        )
+                    }
+                    Log.v(tag, "${it.subtask_id} - ${it.subtask_title}")
+                    Log.v(tag, "Parent ID: ${it.parent_task_id}")
+                    Log.v(tag, "Completed: ${it.subtask_isCompleted}")
+                    Log.v(
+                        tag,
+                        "-----------------------------------------------------------------------"
+                    )
+                    count++
+                }
+            }
+        }
 
 
-            val subtasksTableSize = subtaskListSize
-            Log.v(tag, "There are $subtasksTableSize subtasks")
-            actionPlanViewModel.allChecklistSubtasks.observe(this) { tasks ->
-                tasks.let {
-                    count = 1
-                    it.forEach {
-                        if (count == 1) {
-                            Log.v(
-                                tag,
-                                "\n\n-----------------------------------------------------------------------"
-                            )
-                        }
+        actionPlanViewModel.allTasksWithSubtasks.observe(this) { tasks ->
+            tasks.let {
+                count = 1
+                it.forEach {
+                    if (count == 1) {
+                        Log.v(
+                            tag,
+                            "\n\n-----------------------------------------------------------------------"
+                        )
+                    }
+                    Log.v(tag, "${it.task.task_id} - ${it.task.task_title}")
+                    Log.v(tag, "Number of subtasks: ${it.subtaskList.size}")
+                    it.subtaskList.forEach {
                         Log.v(tag, "${it.subtask_id} - ${it.subtask_title}")
-                        Log.v(tag, "Parent ID: ${it.parent_task_id}")
-                        Log.v(tag, "Completed: ${it.subtask_isCompleted}")
-                        Log.v(
-                            tag,
-                            "-----------------------------------------------------------------------"
-                        )
-                        count++
                     }
+
+                    Log.v(
+                        tag,
+                        "-----------------------------------------------------------------------"
+                    )
+                    count++
                 }
             }
-
-
-            actionPlanViewModel.allTasksWithSubtasks.observe(this) { tasks ->
-                tasks.let {
-                    count = 1
-                    it.forEach {
-                        if (count == 1) {
-                            Log.v(
-                                tag,
-                                "\n\n-----------------------------------------------------------------------"
-                            )
-                        }
-                        Log.v(tag, "${it.task.task_id} - ${it.task.task_title}")
-                        Log.v(tag, "Number of subtasks: ${it.subtaskList.size}")
-                        it.subtaskList.forEach {
-                            Log.v(tag, "${it.subtask_id} - ${it.subtask_title}")
-                        }
-
-                        Log.v(
-                            tag,
-                            "-----------------------------------------------------------------------"
-                        )
-                        count++
-                    }
-                }
-            }
-
         }
 
     }
-
 
 }
