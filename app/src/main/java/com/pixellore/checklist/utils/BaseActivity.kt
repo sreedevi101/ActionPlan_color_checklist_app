@@ -19,6 +19,8 @@ import java.util.HashMap
 *  - function to set the selected theme to the app
 *  - function to switch to the theme selected by user
 *  - write selected theme to Shared Preference
+*
+*  - Place for functions to be used in multiple activities
 * */
 abstract class BaseActivity : AppCompatActivity(), BaseActivityListener {
 
@@ -65,7 +67,7 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityListener {
         }
     }
 
-    fun writeToSharedPref() {
+    private fun writeToSharedPref() {
         // Write New theme to Shared Preferences file
         val sharedPrefToWrite = this.getSharedPreferences(
             resources.getString(R.string.shared_preference_file),
@@ -234,5 +236,25 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityListener {
         return false
     }
 
+    /**
+     * Find the id to be assigned to the new item
+     *
+     * Given a list of IDs, finds and return the next ID. If the list is empty, returns 1 as the next ID.
+     *
+     * Function common for Checklist, Task or Subtask being added
+     * To be used in multiple activities
+     * */
+    fun findNextId(ids: List<Int>): Int {
+        if (ids.isEmpty()) {
+            return 1
+        }
+        val highestId = ids.maxOrNull() ?: 0
+
+        if (highestId + 1 == Int.MAX_VALUE){
+            return -1 // reached max limit
+        } else {
+            return highestId + 1
+        }
+    }
 
 }

@@ -10,6 +10,7 @@ import android.widget.CheckBox
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -70,6 +71,7 @@ class TaskRecycleAdapter(
 
                 val expandCollapseBtn: ImageButton = findViewById(R.id.expand_collapse_button)
                 val priorityBtn: ImageButton = findViewById(R.id.priority_button)
+                val moreOptionsBtn: ImageButton = findViewById(R.id.more_options)
 
                 val completedCheckBox: CheckBox = findViewById(R.id.taskCompletedCheck)
 
@@ -183,9 +185,27 @@ class TaskRecycleAdapter(
                     clickListener(adapterPosition, currentTask, Constants.OPEN_EDITOR)
                 }
 
-            }
 
+
+                moreOptionsBtn.setOnClickListener {
+                    val moreEditMenu = PopupMenu(context, moreOptionsBtn)
+                    val menu = moreEditMenu.menu
+                    moreEditMenu.menuInflater.inflate(R.menu.checklist_item_popup_menu, menu)
+                    moreEditMenu.setOnMenuItemClickListener { menuItem ->
+                        when (menuItem.itemId) {
+                            R.id.popup_delete_checklist_item -> {
+                                // Handle edit action
+                                clickListener(adapterPosition, currentTask, Constants.DELETE)
+                                true
+                            }
+                            else -> false
+                        }
+                    }
+                    moreEditMenu.show()
+                }
+            }
         }
+
 
         private fun onListSubtaskLayoutClick(position: Int, subtask: Subtask) {
             //clickListener(adapterPosition, currentTask, Constants.OPEN_EDITOR)
