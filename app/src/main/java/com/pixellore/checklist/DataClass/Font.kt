@@ -4,16 +4,19 @@ import android.os.Parcel
 import android.os.Parcelable
 
 data class Font(
-    var textColorResId: Int? = null,
+    var headingTextColorResId: Int? = null,
+    var bodyTextColorResId: Int? = null,
     var backgroundColorResId: Int? = null
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
+        parcel.readValue(Int::class.java.classLoader) as? Int,
         parcel.readValue(Int::class.java.classLoader) as? Int,
         parcel.readValue(Int::class.java.classLoader) as? Int
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeValue(textColorResId)
+        parcel.writeValue(headingTextColorResId)
+        parcel.writeValue(bodyTextColorResId)
         parcel.writeValue(backgroundColorResId)
     }
 

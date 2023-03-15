@@ -1,7 +1,5 @@
 package com.pixellore.checklist.AdapterUtility
 
-import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,8 +9,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.pixellore.checklist.DataClass.Theme
 import com.pixellore.checklist.R
-import com.pixellore.checklist.utils.Constants
-import kotlin.properties.Delegates
 
 /*
 * This adapter class is part of the feature "Theme Selection by User"
@@ -70,9 +66,9 @@ class ThemesRecycleAdapter(
 
             val font = themeAtPos.font
             if (font != null){
-                if (font.textColorResId != null){
-                    themeName.setTextColor(font.textColorResId!!)
-                    currentTheme.setTextColor(font.textColorResId!!)
+                if (font.headingTextColorResId != null){
+                    themeName.setTextColor(font.headingTextColorResId!!)
+                    currentTheme.setTextColor(font.headingTextColorResId!!)
                 }
             }
 

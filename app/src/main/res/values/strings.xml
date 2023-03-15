@@ -26,6 +26,9 @@
     <string name="change_text_color">Change Text color</string>
     <string name="delete">Delete</string>
     <string name="delete_subtask">Delete subtask</string>
+    <string name="change_font_style">Change Font style</string>
+    <string name="change_title_text_color">Change Title Text color</string>
+    <string name="change_other_text_color">Change Other Text color</string>
 
 
 </resources>

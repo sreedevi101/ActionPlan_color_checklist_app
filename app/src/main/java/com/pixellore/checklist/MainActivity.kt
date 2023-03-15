@@ -16,8 +16,6 @@ import com.pixellore.checklist.DataClass.Font
 import com.pixellore.checklist.DatabaseUtility.*
 import com.pixellore.checklist.utils.BaseActivity
 import com.pixellore.checklist.utils.Constants
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
 import java.util.HashMap
 
 
@@ -141,7 +139,7 @@ class MainActivity : BaseActivity() {
                     val newChecklist = Checklist(
                         checklistId, checklistTitle,
                         null, false, null, false,
-                        Font(null, null)
+                        Font(null, null, null)
                     )
 
                     Log.v(Constants.TAG, "inserting new checklist")
@@ -509,7 +507,7 @@ class MainActivity : BaseActivity() {
                     if (it.font != null) {
                         Log.v(
                             Constants.TAG,
-                            "Font: ${it.font!!.backgroundColorResId}, ${it.font!!.textColorResId}"
+                            "Font: ${it.font!!.backgroundColorResId}, ${it.font!!.headingTextColorResId}"
                         )
                     } else {
                         Log.v(Constants.TAG, "Font is null")

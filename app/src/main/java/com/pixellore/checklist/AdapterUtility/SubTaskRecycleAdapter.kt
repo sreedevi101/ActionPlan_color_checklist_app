@@ -1,6 +1,8 @@
 package com.pixellore.checklist.AdapterUtility
 
+import android.content.res.ColorStateList
 import android.graphics.Paint
+import android.graphics.PorterDuff
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,6 +46,14 @@ class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, su
                 currentSubtask.subtask_isCompleted
             )
             completedCheckBox.isChecked = currentSubtask.subtask_isCompleted
+
+            // set color if bodyTextColorResId is not null
+            currentSubtask.subtask_font?.bodyTextColorResId?.let {
+                subtaskTitleView.setTextColor(it)
+
+                val colorStateList = ColorStateList.valueOf(it)
+                completedCheckBox.buttonTintList = colorStateList
+            }
 
             completedCheckBox.setOnClickListener {
                 val isChecked = completedCheckBox.isChecked

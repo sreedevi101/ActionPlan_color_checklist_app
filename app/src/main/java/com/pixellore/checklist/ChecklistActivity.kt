@@ -465,6 +465,10 @@ class ChecklistActivity : BaseActivity() {
 
         if (actionRequested == Constants.UPDATE_DB) {
             actionPlanViewModel.updateTask(taskWithSubtasks.task)
+        }else if (actionRequested == Constants.UPDATE_DB_PLUS){
+            taskWithSubtasks.subtaskList.forEach {
+                actionPlanViewModel.updateSubtask(it)
+            }
         } else if (actionRequested == Constants.OPEN_EDITOR) {
             val intent = Intent(this@ChecklistActivity, TaskEditorActivity::class.java)
 
@@ -587,6 +591,7 @@ class ChecklistActivity : BaseActivity() {
                     Log.v(tag, "Details: ${it.details_note}")
                     Log.v(tag, "Priority: ${it.priority}")
                     Log.v(tag, "Expanded: ${it.isExpanded}, Completed: ${it.task_isCompleted}")
+                    Log.v(tag, "Font: ${it.task_font}")
                     Log.v(
                         tag,
                         "-----------------------------------------------------------------------"
@@ -611,6 +616,7 @@ class ChecklistActivity : BaseActivity() {
                     Log.v(tag, "${it.subtask_id} - ${it.subtask_title}")
                     Log.v(tag, "Parent ID: ${it.parent_task_id}")
                     Log.v(tag, "Completed: ${it.subtask_isCompleted}")
+                    Log.v(tag, "Font: ${it.subtask_font}")
                     Log.v(
                         tag,
                         "-----------------------------------------------------------------------"
