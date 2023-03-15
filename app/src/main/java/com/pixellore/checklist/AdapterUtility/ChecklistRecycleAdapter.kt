@@ -1,13 +1,11 @@
 package com.pixellore.checklist.AdapterUtility
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
@@ -17,7 +15,6 @@ import com.github.dhaval2404.colorpicker.ColorPickerDialog
 import com.github.dhaval2404.colorpicker.model.ColorShape
 import com.pixellore.checklist.DataClass.Font
 import com.pixellore.checklist.DatabaseUtility.Checklist
-import com.pixellore.checklist.DatabaseUtility.TaskWithSubtasks
 import com.pixellore.checklist.R
 import com.pixellore.checklist.utils.Constants
 
@@ -104,9 +101,9 @@ class ChecklistRecycleAdapter(private val clickListenerChecklist: (position: Int
 
                                     // modify Checklist item to save in the database
                                     if (currentChecklist.font != null){
-                                        currentChecklist.font?.textColorResId = color
+                                        currentChecklist.font?.headingTextColorResId = color
                                     } else{
-                                        val font = Font(textColorResId = color)
+                                        val font = Font(headingTextColorResId = color)
                                         currentChecklist.font = font
                                     }
 
@@ -151,7 +148,7 @@ class ChecklistRecycleAdapter(private val clickListenerChecklist: (position: Int
                 }
 
                 // set title text color
-                currentChecklist.font?.textColorResId?.let {
+                currentChecklist.font?.headingTextColorResId?.let {
                     checklistTitleView.setTextColor(it)
                 }
 

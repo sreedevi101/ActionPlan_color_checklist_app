@@ -1,7 +1,9 @@
 package com.pixellore.checklist.AdapterUtility
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Paint
+import android.graphics.PorterDuff
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +18,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.github.dhaval2404.colorpicker.util.setVisibility
+import com.github.dhaval2404.colorpicker.ColorPickerDialog
+import com.github.dhaval2404.colorpicker.model.ColorShape
+import com.pixellore.checklist.DataClass.Font
 import com.pixellore.checklist.DatabaseUtility.Subtask
 import com.pixellore.checklist.DatabaseUtility.TaskWithSubtasks
 import com.pixellore.checklist.R
@@ -41,8 +45,10 @@ class TaskRecycleAdapter(
 
     override fun onBindViewHolder(holder: TaskRecycleViewHolder, position: Int) {
         val currentTask = getItem(position)
-        holder.bind(currentTask, holder.itemView.context, clickListener, clickListenerSubtask)
+        holder.bind(currentTask, position, holder.itemView.context, clickListener, clickListenerSubtask)
     }
+
+
 
 
     class TaskRecycleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -51,7 +57,7 @@ class TaskRecycleAdapter(
 
 
         fun bind(
-            currentTask: TaskWithSubtasks, context: Context,
+            currentTask: TaskWithSubtasks, position: Int, context: Context,
             clickListener: (position: Int, taskWithSubtasks: TaskWithSubtasks, actionRequested: Int) -> Unit,
             clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit
         ) {
@@ -75,8 +81,17 @@ class TaskRecycleAdapter(
 
                 val completedCheckBox: CheckBox = findViewById(R.id.taskCompletedCheck)
 
+                // set background color
+                currentTask.task.task_font?.backgroundColorResId?.let {
+                    taskCardLayout.setBackgroundColor(it)
+                }
+
                 // Title
                 taskTitleView.text = currentTask.task.task_title
+                // set title text color
+                currentTask.task.task_font?.headingTextColorResId?.let {
+                    taskTitleView.setTextColor(it)
+                }
                 // Due date
                 if (!currentTask.task.due_date.equals("")){
                     taskDueDate.text = currentTask.task.due_date
@@ -117,6 +132,19 @@ class TaskRecycleAdapter(
                 )
                 completedCheckBox.isChecked = currentTask.task.task_isCompleted
 
+                // set color if bodyTextColorResId is not null
+                currentTask.task.task_font?.bodyTextColorResId?.let {
+                    Log.v(Constants.TAG, "bodyTextColorResId: $it")
+                    detailsNote.setTextColor(it)
+                    taskDueDate.setTextColor(it)
+
+                    priorityBtn.setColorFilter(it, PorterDuff.Mode.SRC_ATOP)
+                    expandCollapseBtn.setColorFilter(it, PorterDuff.Mode.SRC_ATOP)
+                    moreOptionsBtn.setColorFilter(it, PorterDuff.Mode.SRC_ATOP)
+
+                    val colorStateList = ColorStateList.valueOf(it)
+                    completedCheckBox.buttonTintList = colorStateList
+                }
 
                 // Subtask list RecyclerView
                 subtaskRecyclerAdapter.submitList(currentTask.subtaskList)
@@ -190,10 +218,111 @@ class TaskRecycleAdapter(
                 moreOptionsBtn.setOnClickListener {
                     val moreEditMenu = PopupMenu(context, moreOptionsBtn)
                     val menu = moreEditMenu.menu
-                    moreEditMenu.menuInflater.inflate(R.menu.checklist_item_popup_menu, menu)
+                    moreEditMenu.menuInflater.inflate(R.menu.task_item_popup_menu, menu)
                     moreEditMenu.setOnMenuItemClickListener { menuItem ->
                         when (menuItem.itemId) {
-                            R.id.popup_delete_checklist_item -> {
+                            R.id.popup_change_background ->
+                            {
+                                ColorPickerDialog
+                                    .Builder(context)        				// Pass Activity Instance
+                                    .setTitle("Choose Color")           	// Default "Choose Color"
+                                    .setColorShape(ColorShape.SQAURE)   // Default ColorShape.CIRCLE
+                                    .setDefaultColor(android.R.color.white)     // Pass Default Color
+                                    .setColorListener { color, colorHex ->
+                                        // Handle Color Selection
+                                        //Log.v(Constants.TAG, "Color Selected: $color")
+
+                                        // change background color of task item
+                                        taskCardLayout.setBackgroundColor(color)
+
+                                        // modify task item to save in the database
+                                        if (currentTask.task.task_font != null){
+                                            currentTask.task.task_font?.backgroundColorResId = color
+                                        } else{
+                                            val font = Font(backgroundColorResId = color)
+                                            currentTask.task.task_font = font
+                                        }
+
+                                        // update in database
+                                        clickListener(adapterPosition, currentTask, Constants.UPDATE_DB)
+
+                                    }.show()
+
+                                return@setOnMenuItemClickListener true
+                            }
+                            R.id.popup_change_title_color ->
+                            {
+                                ColorPickerDialog
+                                    .Builder(context)        				// Pass Activity Instance
+                                    .setTitle("Choose Color")           	// Default "Choose Color"
+                                    .setColorShape(ColorShape.SQAURE)   // Default ColorShape.CIRCLE
+                                    .setDefaultColor(android.R.color.white)     // Pass Default Color
+                                    .setColorListener { color, colorHex ->
+                                        // Handle Color Selection
+                                        //Log.v(Constants.TAG, "Color Selected: $color")
+
+                                        // change text color
+                                        taskTitleView.setTextColor(color)
+
+                                        // modify task item to save in the database
+                                        if (currentTask.task.task_font != null){
+                                            currentTask.task.task_font?.headingTextColorResId = color
+                                        } else{
+                                            val font = Font(headingTextColorResId = color)
+                                            currentTask.task.task_font = font
+                                        }
+
+                                        // update in database
+                                        clickListener(adapterPosition, currentTask, Constants.UPDATE_DB)
+
+                                    }.show()
+
+                                return@setOnMenuItemClickListener true
+                            }
+                            R.id.popup_change_other_title_color ->
+                            {
+                                ColorPickerDialog
+                                    .Builder(context)        				// Pass Activity Instance
+                                    .setTitle("Choose Color")           	// Default "Choose Color"
+                                    .setColorShape(ColorShape.SQAURE)   // Default ColorShape.CIRCLE
+                                    .setDefaultColor(android.R.color.white)     // Pass Default Color
+                                    .setColorListener { color, colorHex ->
+                                        // Handle Color Selection
+                                        Log.v(Constants.TAG, "Color Selected: $color")
+
+                                        // modify task item to save in the database
+                                        if (currentTask.task.task_font != null){
+                                            currentTask.task.task_font?.bodyTextColorResId = color
+                                        } else{
+                                            val font = Font(bodyTextColorResId = color)
+                                            currentTask.task.task_font = font
+                                        }
+                                        Log.v(Constants.TAG, "font: ${currentTask.task.task_font}")
+
+                                        currentTask.subtaskList.forEach {
+                                            if (it.subtask_font != null){
+                                                it.subtask_font?.bodyTextColorResId = color
+                                            } else{
+                                                val font = Font(bodyTextColorResId = color)
+                                                it.subtask_font = font
+                                            }
+                                        }
+
+                                        // update in database
+                                        clickListener(adapterPosition, currentTask, Constants.UPDATE_DB)
+
+                                        clickListener(adapterPosition, currentTask, Constants.UPDATE_DB_PLUS)
+
+                                        // notify adapter to redraw this task item
+                                        val adapter = (itemView.parent as RecyclerView).adapter
+                                        adapter?.notifyItemChanged(position)
+
+
+                                    }.show()
+
+                                return@setOnMenuItemClickListener true
+                            }
+                            R.id.popup_delete_task_item -> {
                                 // Handle edit action
                                 clickListener(adapterPosition, currentTask, Constants.DELETE)
                                 true
@@ -205,6 +334,8 @@ class TaskRecycleAdapter(
                 }
             }
         }
+
+
 
 
         private fun onListSubtaskLayoutClick(position: Int, subtask: Subtask) {

@@ -16,6 +16,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import com.pixellore.checklist.DataClass.Font
 import com.pixellore.checklist.DatabaseUtility.Subtask
 import com.pixellore.checklist.DatabaseUtility.Task
 import com.pixellore.checklist.DatabaseUtility.TaskApplication
@@ -176,10 +177,12 @@ class TaskEditorActivity : BaseActivity() {
                 val isExpanded:Boolean
                 val isCompleted: Boolean
                 val taskParentChecklistId: Int
+                val taskFont: Font
                 if (taskReceived != null){
                     // If task is received,
                     taskId = taskReceived.task_id
                     taskParentChecklistId = taskReceived.parent_checklist_id
+                    taskFont = taskReceived.task_font!!
 
                     // task details
                     if (editTaskDetailsView.text.toString().isNotEmpty()) {
@@ -204,6 +207,7 @@ class TaskEditorActivity : BaseActivity() {
                     // inserting in the database
                     taskId = TASK_ID
                     taskParentChecklistId = TASK_PARENT_CHECKLIST_ID
+                    taskFont = Font(null, null, null)
 
                     // task details
                     if (editTaskDetailsView.text.toString().isNotEmpty()) {
@@ -234,8 +238,7 @@ class TaskEditorActivity : BaseActivity() {
                  * temporary values are assigned to fields like ids (will be updated in the caller activity)
                  */
                 val taskUpdated = Task(taskId, title, details, dueDate,
-                    priority, isExpanded, isCompleted,
-                taskParentChecklistId)
+                    priority, isExpanded, isCompleted, taskParentChecklistId, taskFont)
 
                 replyIntent.putExtra(TASK, taskUpdated)
 
@@ -294,6 +297,7 @@ class TaskEditorActivity : BaseActivity() {
 
                         var subtaskParentTaskId = SUBTASK_PARENT_TASK_ID
                         var subtaskIsCompleted = SUBTASK_IS_COMPLETED
+                        var font = Font(null, null, null)
                         // If there are subtasks..
                         if (subtaskListReceived.isNotEmpty()) {
                             // .. iterate through the subtasks ..
@@ -306,6 +310,7 @@ class TaskEditorActivity : BaseActivity() {
                                         // get other filed like parent_task_id, subtask_isCompleted
                                         subtaskParentTaskId = subtaskListReceived[count]?.parent_task_id!!
                                         subtaskIsCompleted = subtaskListReceived[count]?.subtask_isCompleted!!
+                                        font = subtaskListReceived[count]?.subtask_font!!
                                     }
                                 }
                             }
@@ -314,7 +319,7 @@ class TaskEditorActivity : BaseActivity() {
 
                         // Create subtask object
                         val subtaskUpdated = Subtask(subtaskId, subtaskParentTaskId,
-                            subtaskTitle, subtaskIsCompleted)
+                            subtaskTitle, subtaskIsCompleted, font)
 
                         subtasksUpdatedList.add(subtaskUpdated)
                     }
