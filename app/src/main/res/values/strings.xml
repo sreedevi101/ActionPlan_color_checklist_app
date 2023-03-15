@@ -29,6 +29,8 @@
     <string name="change_font_style">Change Font style</string>
     <string name="change_title_text_color">Change Title Text color</string>
     <string name="change_other_text_color">Change Other Text color</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

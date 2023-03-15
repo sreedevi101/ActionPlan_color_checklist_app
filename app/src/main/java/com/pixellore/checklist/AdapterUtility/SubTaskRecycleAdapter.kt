@@ -1,8 +1,10 @@
 package com.pixellore.checklist.AdapterUtility
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Paint
 import android.graphics.PorterDuff
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,7 +27,7 @@ class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, su
 
     override fun onBindViewHolder(holder: SubtaskViewHolder, position: Int) {
         val current = getItem(position)
-        holder.bind(current, clickListenerSubtask, listener)
+        holder.bind(current, holder.itemView.context, clickListenerSubtask, listener)
     }
 
     class SubtaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -34,7 +36,7 @@ class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, su
         private val completedCheckBox: CheckBox = itemView.findViewById(R.id.subtaskCompletedCheck)
 
         fun bind(
-            currentSubtask: Subtask,
+            currentSubtask: Subtask,context:Context,
             clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit,
             listener: (position: Int, subtask: Subtask) -> Unit
         ) {
@@ -53,6 +55,12 @@ class SubTaskRecycleAdapter(private val clickListenerSubtask: (position: Int, su
 
                 val colorStateList = ColorStateList.valueOf(it)
                 completedCheckBox.buttonTintList = colorStateList
+            }
+
+            // set font if textFontName is not null
+            currentSubtask.subtask_font?.textFontName?.let {
+                val typeface = Typeface.createFromAsset(context.assets, it)
+                subtaskTitleView.typeface = typeface
             }
 
             completedCheckBox.setOnClickListener {

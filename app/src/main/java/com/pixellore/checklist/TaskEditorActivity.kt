@@ -4,8 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.Parcel
-import android.os.Parcelable
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
@@ -16,7 +14,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
-import com.pixellore.checklist.DataClass.Font
+import com.pixellore.checklist.DataClass.CustomStyle
 import com.pixellore.checklist.DatabaseUtility.Subtask
 import com.pixellore.checklist.DatabaseUtility.Task
 import com.pixellore.checklist.DatabaseUtility.TaskApplication
@@ -177,7 +175,7 @@ class TaskEditorActivity : BaseActivity() {
                 val isExpanded:Boolean
                 val isCompleted: Boolean
                 val taskParentChecklistId: Int
-                val taskFont: Font
+                val taskFont: CustomStyle
                 if (taskReceived != null){
                     // If task is received,
                     taskId = taskReceived.task_id
@@ -207,7 +205,8 @@ class TaskEditorActivity : BaseActivity() {
                     // inserting in the database
                     taskId = TASK_ID
                     taskParentChecklistId = TASK_PARENT_CHECKLIST_ID
-                    taskFont = Font(null, null, null)
+                    taskFont = CustomStyle(null, null,
+                        null, null)
 
                     // task details
                     if (editTaskDetailsView.text.toString().isNotEmpty()) {
@@ -297,7 +296,8 @@ class TaskEditorActivity : BaseActivity() {
 
                         var subtaskParentTaskId = SUBTASK_PARENT_TASK_ID
                         var subtaskIsCompleted = SUBTASK_IS_COMPLETED
-                        var font = Font(null, null, null)
+                        var font = CustomStyle(null, null,
+                            null, null)
                         // If there are subtasks..
                         if (subtaskListReceived.isNotEmpty()) {
                             // .. iterate through the subtasks ..

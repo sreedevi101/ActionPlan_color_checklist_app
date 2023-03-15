@@ -16,7 +16,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pixellore.checklist.AdapterUtility.ThemesRecycleAdapter
-import com.pixellore.checklist.DataClass.Font
+import com.pixellore.checklist.DataClass.CustomStyle
 import com.pixellore.checklist.DataClass.Theme
 import com.pixellore.checklist.DatabaseUtility.TaskApplication
 import com.pixellore.checklist.utils.BaseActivityListener
@@ -27,7 +27,7 @@ import kotlin.collections.ArrayList
 
 class ThemePickerDialogFragment : DialogFragment() {
 
-    // RecyclerView for listing age groups
+    // RecyclerView for listing themes
     private lateinit var themesRecyclerViewList: RecyclerView
 
     private lateinit var themeSelectedListener: ThemeSelectedListener
@@ -102,7 +102,7 @@ class ThemePickerDialogFragment : DialogFragment() {
         if (currentThemeColors.containsKey("colorPrimary")){
 
             for (t in themesList){
-                t.font = Font(headingTextColorResId = currentThemeColors["colorPrimary"])
+                t.font = CustomStyle(headingTextColorResId = currentThemeColors["colorPrimary"])
             }
         }
 
@@ -142,12 +142,12 @@ class ThemePickerDialogFragment : DialogFragment() {
                     if (themeColors.containsKey("colorSecondary")) {
                         themeColors["colorSecondary"]?.let { designLine.setBackgroundColor(it) }
                     }
-                    // Add the primary color of the selected as color (in Font data class) of the theme data
+                    // Add the primary color of the selected as color (in CustomStyle data class) of the theme data
                     // passed to recyclerview adapter
                     if (themeColors.containsKey("colorPrimary")){
 
                         for (t in themesList){
-                            t.font = Font(headingTextColorResId = themeColors["colorPrimary"])
+                            t.font = CustomStyle(headingTextColorResId = themeColors["colorPrimary"])
                         }
                     }
                 }
@@ -155,7 +155,7 @@ class ThemePickerDialogFragment : DialogFragment() {
 
 
 
-        // create AgeGroupAdapter and pass as parameters the agelist and the AgeItemSelectListener
+        // create ThemesRecycleAdapter and pass as parameters the themesList and the ThemesRecycleAdapter.ThemeItemSelectListener
         val adapter: ThemesRecycleAdapter = ThemesRecycleAdapter(themesList, listenerTheme)
         themesRecyclerViewList.adapter = adapter
 

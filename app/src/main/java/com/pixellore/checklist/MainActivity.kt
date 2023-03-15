@@ -12,7 +12,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pixellore.checklist.AdapterUtility.ChecklistRecycleAdapter
-import com.pixellore.checklist.DataClass.Font
+import com.pixellore.checklist.DataClass.CustomStyle
 import com.pixellore.checklist.DatabaseUtility.*
 import com.pixellore.checklist.utils.BaseActivity
 import com.pixellore.checklist.utils.Constants
@@ -40,12 +40,6 @@ class MainActivity : BaseActivity() {
         setTheme() // to set theme to the theme saved in SharedPreference
         setContentView(R.layout.activity_main)
 
-        // Update database ids
-        var sequencingIdsFlag: Boolean
-        var taskIdList = mutableListOf<Int>()
-        var subtaskIdList = mutableListOf<Int>()
-        var taskWithSubtasksList = mutableListOf<TaskWithSubtasks>()
-
         // get colors from current theme, so it can applied to the toolbar and popup menu
         currentThemeColors = getColorsFromTheme(TaskApplication.appTheme)
 
@@ -72,22 +66,6 @@ class MainActivity : BaseActivity() {
             }
         }
 
-
-
-        actionPlanViewModel.allTasksWithSubtasks.observe(this) { tasks ->
-            taskWithSubtasksList = tasks as MutableList<TaskWithSubtasks>
-            //runBlocking { sequence(checklistIds, taskWithSubtasksList, subtaskIdList) }
-
-        }
-
-
-        // Update the list of IDs
-        actionPlanViewModel.getAllSubtaskIds().observe(this) { ids ->
-            // save the latest list of ids
-            subtaskIdList = ids as MutableList<Int>
-
-            //runBlocking { sequence(checklistIds, taskWithSubtasksList, subtaskIdList) }
-        }
 
         // Observe the list of IDs
         actionPlanViewModel.getAllChecklistIds().observe(this) { ids ->
@@ -139,7 +117,8 @@ class MainActivity : BaseActivity() {
                     val newChecklist = Checklist(
                         checklistId, checklistTitle,
                         null, false, null, false,
-                        Font(null, null, null)
+                        CustomStyle(null, null,
+                            null, null)
                     )
 
                     Log.v(Constants.TAG, "inserting new checklist")
@@ -158,195 +137,6 @@ class MainActivity : BaseActivity() {
         }
 
     }
-
-   /* private suspend fun sequence(idsChecklist: List<Int>,
-                                 taskWithSubtasksList: List<TaskWithSubtasks>,
-                                 idsSubtask: List<Int>){
-
-        // get all task IDs
-        val idsTask = mutableListOf<Int>()
-        taskWithSubtasksList.forEach {
-            idsTask.add(it.task.task_id)
-        }
-
-        Log.v(Constants.TAG, "checklist: $idsChecklist task: $idsTask subtask: $idsSubtask")
-
-        if (isIdSequencingRequired(idsChecklist)){ // Checklists
-            Log.v(Constants.TAG, "checklist")
-
-            // get new IDs to replace existing IDs
-            val newIds = calculateNewIds(idsTask)
-
-            idsChecklist.zip(newIds).forEach checklistIdUpdateLoop@{ (currentId, newId) ->
-                if (currentId != newId) {
-                    // get the tasks in this checklist
-                    // i.e., task_ids with this checklist_id as parent_checklist_id
-                    val correspondingTaskIdsList =
-                        actionPlanViewModel.getTaskIdsByChecklistId(currentId).toList().flatten()
-
-                    // verify that tasks with these ids exists in database before updating
-                    var allTasksExists = true
-                    correspondingTaskIdsList.forEach { childTaskId ->
-                        val task = actionPlanViewModel.getTaskById(childTaskId)
-                        if (task != null) { // task exists
-
-                        } else {
-                            // task with this id does not exist, discard further update
-                            allTasksExists = false
-                        }
-                    }
-
-                    if (allTasksExists) {
-                        // update task Ids
-                        actionPlanViewModel.updateChecklistId(currentId, newId)
-
-                        correspondingTaskIdsList.forEach { childTaskId ->
-
-                            Log.v(
-                                Constants.TAG, "Task Parent ID - id: $childTaskId " +
-                                        "current: $currentId new: $newId"
-                            )
-                            // update task parent Id
-                            actionPlanViewModel.updateTaskParentChecklistId(
-                                childTaskId,
-                                currentId,
-                                newId
-                            )
-
-                        }
-                    } else {
-                        // break the loop
-                        return@checklistIdUpdateLoop
-                    }
-
-                }
-            }
-
-
-
-        } else if (isIdSequencingRequired(idsTask)) { // Tasks
-            Log.v(Constants.TAG, "tasks")
-
-            // create a map of task id and list of the corresponding subtask ids
-            val taskSubtaskIdMap = mutableMapOf<String, MutableList<Int>>()
-            taskWithSubtasksList.forEach {
-                val subtasksIds = mutableListOf<Int>()
-                it.subtaskList.forEach { subtask -> subtasksIds.add(subtask.subtask_id) }
-                taskSubtaskIdMap[it.task.task_id.toString()] = subtasksIds
-            }
-
-
-            // get new IDs to replace existing IDs
-            val newIds = calculateNewIds(idsTask)
-
-            Log.v(Constants.TAG, "needs Task ID update - current: $idsTask new: $newIds")
-
-            idsTask.zip(newIds).forEach taskIdUpdateLoop@{ (currentId, newId) ->
-                if (currentId != newId) {
-                    Log.v(Constants.TAG, "Task ID - current: $currentId new: $newId")
-
-//                    * Check if all the subtasks with 'subtaskId' exists
-//                    *
-//                    * There is a situation where the subtask Ids might have updated as part of sequencing
-//                    * but the changes are not yet reflected in LiveData List<TaskWithSubtasks>. This will
-//                    * result in failure to update 'parent_task_id' of subtasks, but task ids might get changed
-//                    * resulting in orphaned subtasks with parent_task_id pointing to a task_id that no longer exists
-//                    *
-
-                    // check if this subtask exists in database
-
-                    // flag to indicate if all the subtasks with the mentioned subtask_ids
-                    // (associated with task_id = currentId) actually exist
-                    var allSubtasksExists = true
-                    taskSubtaskIdMap[currentId.toString()]?.forEach { subtaskId ->
-
-                        val subtask = actionPlanViewModel.getSubtaskById(subtaskId)
-                        if (subtask != null) { // subtask exists
-
-                        } else {
-                            // subtask with this id does not exist, discard further update
-                            allSubtasksExists = false
-                        }
-
-                    }
-
-                    if (allSubtasksExists) {
-                        // update task Ids
-                        actionPlanViewModel.updateTaskId(currentId, newId)
-
-                        taskSubtaskIdMap[currentId.toString()]?.forEach { subtaskId ->
-
-                            Log.v(
-                                Constants.TAG, "Subtask Parent ID - id: $subtaskId " +
-                                        "current: $currentId new: $newId"
-                            )
-                            // update subtask parent Id
-                            actionPlanViewModel.updateSubtaskParentTaskId(
-                                subtaskId,
-                                currentId,
-                                newId
-                            )
-
-                        }
-                    } else {
-                        // break the loop
-                        return@taskIdUpdateLoop
-                    }
-
-                }
-            }
-        } else if (isIdSequencingRequired(idsSubtask)){ // Subtasks
-            Log.v(Constants.TAG, "subtasks")
-
-            // get new IDs to replace existing IDs
-            val newIds = calculateNewIds(idsSubtask)
-
-            Log.v(Constants.TAG, "needs Subtask ID update - current: $idsSubtask new: $newIds")
-
-            idsSubtask.zip(newIds).forEach { (currentId, newId) ->
-                if (currentId != newId){
-                    Log.v(Constants.TAG, "Subtask ID - current: $currentId new: $newId")
-                    // update subtask Ids
-                    actionPlanViewModel.updateSubtaskId(currentId, newId)
-                }
-            }
-        }
-    }
-*/
-
-    /*
-    * This function is to support Sequencing of IDs
-    * check if the ids are out of sequence, return false if IDs are in sequence (no sequencing required),
-    * return true if sequencing required (Ids not in sequence)
-    * */
-/*
-    private fun isIdSequencingRequired(ids: List<Int>):Boolean{
-        var flag = false
-        if (ids.isNotEmpty()) {
-            val highestId = ids.maxOrNull() ?: 0
-            val newIdsList = (1..highestId).toList().take(ids.size) // this is how ids should be without gaps
-
-            if (newIdsList != ids) {
-                flag = true
-            }
-        }
-        return flag
-    }
-*/
-
-    /*
-    * This function is to support Sequencing of IDs
-    * make a new list of IDs in sequence
-    * */
-/*
-    private fun calculateNewIds(ids: List<Int>):List<Int>{
-
-        val highestId = ids.maxOfOrNull { it } ?: 0
-        val newIdsList = (1..highestId).toList().take(ids.size) // this is how ids should be without gaps
-
-        return newIdsList
-    }
-*/
 
     private fun onListChecklistClick(
         position: Int,
@@ -507,10 +297,10 @@ class MainActivity : BaseActivity() {
                     if (it.font != null) {
                         Log.v(
                             Constants.TAG,
-                            "Font: ${it.font!!.backgroundColorResId}, ${it.font!!.headingTextColorResId}"
+                            "CustomStyle: ${it.font!!.backgroundColorResId}, ${it.font!!.headingTextColorResId}"
                         )
                     } else {
-                        Log.v(Constants.TAG, "Font is null")
+                        Log.v(Constants.TAG, "CustomStyle is null")
                     }
 
                     Log.v(

@@ -1,5 +1,6 @@
 package com.pixellore.checklist.utils
 
+import com.pixellore.checklist.DataClass.TextFont
 import com.pixellore.checklist.DataClass.Theme
 import java.util.HashMap
 
@@ -16,5 +17,7 @@ interface BaseActivityListener {
     fun getThemesData(): ArrayList<Theme>
 
     fun getColorsFromTheme(themeResId:Int): HashMap<String, Int>
+
+    fun getFontsData() : ArrayList<TextFont>
 
 }

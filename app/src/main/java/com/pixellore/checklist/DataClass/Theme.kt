@@ -13,6 +13,6 @@ data class Theme(
     val theme_name: String,
     val theme_resource_id: Int, // Resource ID of a theme; this number will be saved in Shared Preferences file
     var is_current_theme: Boolean, // if this is the current theme stored in Shared preferences
-    var font: Font?
+    var font: CustomStyle?
 ) {
 }
