@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Paint
 import android.graphics.PorterDuff
+import android.graphics.Typeface
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -20,41 +21,41 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.github.dhaval2404.colorpicker.ColorPickerDialog
 import com.github.dhaval2404.colorpicker.model.ColorShape
-import com.pixellore.checklist.DataClass.Font
+import com.pixellore.checklist.DataClass.CustomStyle
 import com.pixellore.checklist.DatabaseUtility.Subtask
 import com.pixellore.checklist.DatabaseUtility.TaskWithSubtasks
 import com.pixellore.checklist.R
-import com.pixellore.checklist.utils.Constants
-import com.pixellore.checklist.utils.SpaceDecorator
+import com.pixellore.checklist.utils.*
 
 /**
  * Adapter for the RecyclerView in ChecklistActivity
  * to display task items (in database) as a list
  *
+ * activity: BaseActivity - to call BaseActivity functions from Adapter or ViewHolder class
  * */
 
 class TaskRecycleAdapter(
     private val clickListener: (position: Int, taskWithSubtasks: TaskWithSubtasks, actionRequested: Int) -> Unit,
-    private val clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit
+    private val clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit,
+    private val activity: BaseActivity
 ) :
     ListAdapter<TaskWithSubtasks, TaskRecycleAdapter.TaskRecycleViewHolder>(ActionItemComparator()){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskRecycleViewHolder {
-        return TaskRecycleViewHolder.create(parent)
+        return TaskRecycleViewHolder.create(parent, activity)
     }
 
     override fun onBindViewHolder(holder: TaskRecycleViewHolder, position: Int) {
         val currentTask = getItem(position)
-        holder.bind(currentTask, position, holder.itemView.context, clickListener, clickListenerSubtask)
+        holder.bind(currentTask, position,
+            holder.itemView.context, clickListener, clickListenerSubtask)
     }
 
 
+    class TaskRecycleViewHolder(itemView: View, activity: BaseActivity) : RecyclerView.ViewHolder(itemView) {
 
 
-    class TaskRecycleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        private val TAG = "Debug"
-
+        val baseActivity: BaseActivity = activity
 
         fun bind(
             currentTask: TaskWithSubtasks, position: Int, context: Context,
@@ -70,7 +71,6 @@ class TaskRecycleAdapter(
                 val taskTitleView: TextView = findViewById(R.id.actionItemTitle)
                 val detailsNote: TextView = findViewById(R.id.detailsNote)
                 val taskDueDate: TextView = findViewById(R.id.dueDate)
-
 
                 val subLayout: ConstraintLayout = findViewById(R.id.subLayout)
                 val taskCardLayout: ConstraintLayout = findViewById(R.id.taskCardLayout)
@@ -146,6 +146,17 @@ class TaskRecycleAdapter(
                     completedCheckBox.buttonTintList = colorStateList
                 }
 
+
+                // set font if textFontName is not null
+                currentTask.task.task_font?.textFontName?.let {
+                    // Load the custom font file from the assets folder
+                    val typeface = Typeface.createFromAsset(context.assets, it)
+                    taskTitleView.typeface = typeface
+                    detailsNote.typeface = typeface
+                    taskDueDate.typeface = typeface
+                }
+
+
                 // Subtask list RecyclerView
                 subtaskRecyclerAdapter.submitList(currentTask.subtaskList)
                 subtaskRecyclerView.addItemDecoration(SpaceDecorator(0))
@@ -194,7 +205,6 @@ class TaskRecycleAdapter(
                 }
 
 
-
                 /*
                 * Check the checkbox and strike through the text on pressing the checkbox
                 * */
@@ -212,7 +222,6 @@ class TaskRecycleAdapter(
                 taskCardLayout.setOnClickListener {
                     clickListener(adapterPosition, currentTask, Constants.OPEN_EDITOR)
                 }
-
 
 
                 moreOptionsBtn.setOnClickListener {
@@ -239,7 +248,7 @@ class TaskRecycleAdapter(
                                         if (currentTask.task.task_font != null){
                                             currentTask.task.task_font?.backgroundColorResId = color
                                         } else{
-                                            val font = Font(backgroundColorResId = color)
+                                            val font = CustomStyle(backgroundColorResId = color)
                                             currentTask.task.task_font = font
                                         }
 
@@ -268,7 +277,7 @@ class TaskRecycleAdapter(
                                         if (currentTask.task.task_font != null){
                                             currentTask.task.task_font?.headingTextColorResId = color
                                         } else{
-                                            val font = Font(headingTextColorResId = color)
+                                            val font = CustomStyle(headingTextColorResId = color)
                                             currentTask.task.task_font = font
                                         }
 
@@ -294,7 +303,7 @@ class TaskRecycleAdapter(
                                         if (currentTask.task.task_font != null){
                                             currentTask.task.task_font?.bodyTextColorResId = color
                                         } else{
-                                            val font = Font(bodyTextColorResId = color)
+                                            val font = CustomStyle(bodyTextColorResId = color)
                                             currentTask.task.task_font = font
                                         }
                                         Log.v(Constants.TAG, "font: ${currentTask.task.task_font}")
@@ -303,7 +312,7 @@ class TaskRecycleAdapter(
                                             if (it.subtask_font != null){
                                                 it.subtask_font?.bodyTextColorResId = color
                                             } else{
-                                                val font = Font(bodyTextColorResId = color)
+                                                val font = CustomStyle(bodyTextColorResId = color)
                                                 it.subtask_font = font
                                             }
                                         }
@@ -313,12 +322,51 @@ class TaskRecycleAdapter(
 
                                         clickListener(adapterPosition, currentTask, Constants.UPDATE_DB_PLUS)
 
-                                        // notify adapter to redraw this task item
+                                        // notify adapter to redraw this task item`
                                         val adapter = (itemView.parent as RecyclerView).adapter
                                         adapter?.notifyItemChanged(position)
 
 
                                     }.show()
+
+                                return@setOnMenuItemClickListener true
+                            }
+                            R.id.popup_text_styling -> {
+
+                                val fontsData = baseActivity.getFontsData()
+                                val fontPicker = FontPickerDialogFragment(fontsData
+                                ) { textFont, textFontPosition ->
+
+                                    // modify task item to save in the database
+                                    if (currentTask.task.task_font != null){
+                                        currentTask.task.task_font?.textFontName = textFont.file_name
+                                    } else{
+                                        val font = CustomStyle(textFontName = textFont.file_name)
+                                        currentTask.task.task_font = font
+                                    }
+
+
+                                    currentTask.subtaskList.forEach {
+                                        if (it.subtask_font != null){
+                                            it.subtask_font?.textFontName = textFont.file_name
+                                        } else{
+                                            val font = CustomStyle(textFontName = textFont.file_name)
+                                            it.subtask_font = font
+                                        }
+                                    }
+
+                                    // update in database
+                                    clickListener(adapterPosition, currentTask, Constants.UPDATE_DB)
+
+                                    clickListener(adapterPosition, currentTask, Constants.UPDATE_DB_PLUS)
+
+                                    // notify adapter to redraw this task item`
+                                    val adapter = (itemView.parent as RecyclerView).adapter
+                                    adapter?.notifyItemChanged(position)
+
+
+                                }
+                                fontPicker.show(baseActivity.supportFragmentManager, "font_picker")
 
                                 return@setOnMenuItemClickListener true
                             }
@@ -335,21 +383,17 @@ class TaskRecycleAdapter(
             }
         }
 
-
-
+        companion object {
+            fun create(parent: ViewGroup, activity: BaseActivity): TaskRecycleViewHolder {
+                val view: View = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.task_item, parent, false)
+                return TaskRecycleViewHolder(view, activity)
+            }
+        }
 
         private fun onListSubtaskLayoutClick(position: Int, subtask: Subtask) {
             //clickListener(adapterPosition, currentTask, Constants.OPEN_EDITOR)
         }
-
-        companion object {
-            fun create(parent: ViewGroup): TaskRecycleViewHolder {
-                val view: View = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.task_item, parent, false)
-                return TaskRecycleViewHolder((view))
-            }
-        }
-
 
         private fun toggleStrikeThrough(textViewToStrike: TextView, isChecked: Boolean) {
             if (isChecked) {

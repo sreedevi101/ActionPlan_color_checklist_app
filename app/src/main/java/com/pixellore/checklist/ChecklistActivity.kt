@@ -18,11 +18,10 @@ import com.github.dhaval2404.colorpicker.ColorPickerDialog
 import com.github.dhaval2404.colorpicker.model.ColorShape
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pixellore.checklist.AdapterUtility.TaskRecycleAdapter
-import com.pixellore.checklist.DataClass.Font
+import com.pixellore.checklist.DataClass.CustomStyle
 import com.pixellore.checklist.DatabaseUtility.*
 import com.pixellore.checklist.utils.BaseActivity
 import com.pixellore.checklist.utils.Constants
-import kotlinx.coroutines.runBlocking
 import java.util.HashMap
 
 class ChecklistActivity : BaseActivity() {
@@ -386,7 +385,8 @@ class ChecklistActivity : BaseActivity() {
                     actionRequested
                 )
             },
-            { position, subtask -> onListSubtaskClick(position, subtask) })
+            { position, subtask -> onListSubtaskClick(position, subtask) },
+        this)
 
 
         actionListRecyclerView.adapter = adapter
@@ -541,7 +541,7 @@ class ChecklistActivity : BaseActivity() {
                         if (checklistToDisplay!!.font != null) {
                             checklistToDisplay!!.font?.backgroundColorResId = color
                         } else {
-                            val font = Font(backgroundColorResId = color)
+                            val font = CustomStyle(backgroundColorResId = color)
                             checklistToDisplay!!.font = font
                         }
 
@@ -591,7 +591,7 @@ class ChecklistActivity : BaseActivity() {
                     Log.v(tag, "Details: ${it.details_note}")
                     Log.v(tag, "Priority: ${it.priority}")
                     Log.v(tag, "Expanded: ${it.isExpanded}, Completed: ${it.task_isCompleted}")
-                    Log.v(tag, "Font: ${it.task_font}")
+                    Log.v(tag, "CustomStyle: ${it.task_font}")
                     Log.v(
                         tag,
                         "-----------------------------------------------------------------------"
@@ -616,7 +616,7 @@ class ChecklistActivity : BaseActivity() {
                     Log.v(tag, "${it.subtask_id} - ${it.subtask_title}")
                     Log.v(tag, "Parent ID: ${it.parent_task_id}")
                     Log.v(tag, "Completed: ${it.subtask_isCompleted}")
-                    Log.v(tag, "Font: ${it.subtask_font}")
+                    Log.v(tag, "CustomStyle: ${it.subtask_font}")
                     Log.v(
                         tag,
                         "-----------------------------------------------------------------------"

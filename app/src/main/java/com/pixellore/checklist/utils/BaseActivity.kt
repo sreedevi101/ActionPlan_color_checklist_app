@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.pixellore.checklist.DataClass.TextFont
 import com.pixellore.checklist.DataClass.Theme
 import com.pixellore.checklist.DatabaseUtility.TaskApplication
 import com.pixellore.checklist.R
@@ -257,4 +258,63 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityListener {
         }
     }
 
+    private fun getFontAssets() : MutableList<String>{
+        val assetManager = this.assets
+        val fontPath = "fonts"
+        val fontFiles = assetManager.list(fontPath)
+        val fontList = mutableListOf<String>()
+        fontFiles?.let {
+            for (font in it) {
+                if (font.endsWith(".ttf") || font.endsWith(".otf")) {
+                    fontList.add("$fontPath/$font")
+                }
+            }
+        }
+
+        // Debug
+        fontList.forEach { Log.v(Constants.TAG, ""+it) }
+
+        return fontList
+    }
+
+
+    private fun formatFontNamesToDisplay(fontsNamesList:ArrayList<String>) : ArrayList<String>{
+
+        // split each font name and add the resulting parts to a new list
+        val fontFamilies: ArrayList<String> = ArrayList()
+
+        for (fontName in fontsNamesList) {
+            val nameParts = fontName.split("-", "/")
+            if (nameParts.isNotEmpty()) {
+                val fontFamily = nameParts[1]
+                if (!fontFamilies.contains(fontFamily)) {
+                    fontFamilies.add(fontFamily)
+                }
+            }
+        }
+
+        return fontFamilies
+    }
+
+    override fun getFontsData(): ArrayList<TextFont> {
+
+        val fontsList: ArrayList<TextFont> = ArrayList()
+
+        val fontNamesList = getFontAssets()
+
+        val fontNamesFormatted = formatFontNamesToDisplay(fontNamesList as ArrayList<String>)
+
+
+        for (i in 0 until fontNamesFormatted.size) {
+            val fontName = fontNamesFormatted[i]
+            val fileName = fontNamesList[i]
+            val id = i + 1
+
+            val textFont = TextFont(fontName, fileName,
+                id, false)
+            fontsList.add(textFont)
+        }
+
+        return fontsList
+    }
 }

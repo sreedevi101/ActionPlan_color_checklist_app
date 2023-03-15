@@ -5,7 +5,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.pixellore.checklist.DataClass.Font
+import com.pixellore.checklist.DataClass.CustomStyle
 
 @Entity(tableName = "subtask_table")
 data class Subtask(
@@ -13,7 +13,7 @@ data class Subtask(
     var parent_task_id: Int,
     var subtask_title: String?,
     var subtask_isCompleted: Boolean = false,
-    var subtask_font: Font?
+    var subtask_font: CustomStyle?
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
@@ -21,11 +21,11 @@ data class Subtask(
         parcel.readString(),
         parcel.readByte() != 0.toByte(),
 
-        // read parcelable class Font
+        // read parcelable class CustomStyle
         if (Build.VERSION.SDK_INT >= 33) {
-            parcel.readParcelable(Font::class.java.classLoader, Font::class.java)
+            parcel.readParcelable(CustomStyle::class.java.classLoader, CustomStyle::class.java)
         }else {
-            parcel.readParcelable(Font::class.java.classLoader)
+            parcel.readParcelable(CustomStyle::class.java.classLoader)
         }
     ) {
     }

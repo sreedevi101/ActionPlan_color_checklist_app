@@ -5,7 +5,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.pixellore.checklist.DataClass.Font
+import com.pixellore.checklist.DataClass.CustomStyle
 
 /**
  * Checklist table
@@ -18,7 +18,7 @@ data class Checklist(
     var checklist_isClosed: Boolean = false,
     var closed_on: String?,
     var isPinned: Boolean = false,
-    var font: Font?
+    var font: CustomStyle?
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
@@ -28,11 +28,11 @@ data class Checklist(
         parcel.readString(),
         parcel.readByte() != 0.toByte(),
 
-        // read parcelable class Font
+        // read parcelable class CustomStyle
         if (Build.VERSION.SDK_INT >= 33) {
-            parcel.readParcelable(Font::class.java.classLoader, Font::class.java)
+            parcel.readParcelable(CustomStyle::class.java.classLoader, CustomStyle::class.java)
         }else {
-            parcel.readParcelable(Font::class.java.classLoader)
+            parcel.readParcelable(CustomStyle::class.java.classLoader)
         }
 
     ) {

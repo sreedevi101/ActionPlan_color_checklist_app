@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.github.dhaval2404.colorpicker.ColorPickerDialog
 import com.github.dhaval2404.colorpicker.model.ColorShape
-import com.pixellore.checklist.DataClass.Font
+import com.pixellore.checklist.DataClass.CustomStyle
 import com.pixellore.checklist.DatabaseUtility.Checklist
 import com.pixellore.checklist.R
 import com.pixellore.checklist.utils.Constants
@@ -74,7 +74,7 @@ class ChecklistRecycleAdapter(private val clickListenerChecklist: (position: Int
                                     if (currentChecklist.font != null){
                                         currentChecklist.font?.backgroundColorResId = color
                                     } else{
-                                        val font = Font(backgroundColorResId = color)
+                                        val font = CustomStyle(backgroundColorResId = color)
                                         currentChecklist.font = font
                                     }
 
@@ -103,7 +103,7 @@ class ChecklistRecycleAdapter(private val clickListenerChecklist: (position: Int
                                     if (currentChecklist.font != null){
                                         currentChecklist.font?.headingTextColorResId = color
                                     } else{
-                                        val font = Font(headingTextColorResId = color)
+                                        val font = CustomStyle(headingTextColorResId = color)
                                         currentChecklist.font = font
                                     }
 
