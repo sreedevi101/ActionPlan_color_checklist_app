@@ -70,3 +70,14 @@ Background and text color changing options. [ColorPicker](https://github.com/Dha
 
 ![image](https://user-images.githubusercontent.com/15008191/224891428-69161fd1-c2a5-423f-8efb-33be06662919.png)
 
+## Development version 4.6 - Font Picker
+
+![image](https://user-images.githubusercontent.com/15008191/225401103-15079ee3-df12-4c5e-a8f1-cdde0136e29d.png)
+
+![image](https://user-images.githubusercontent.com/15008191/225401251-1423998b-2f49-48f9-a5a4-da92217f00cb.png)
+
+
+
+
+
+
