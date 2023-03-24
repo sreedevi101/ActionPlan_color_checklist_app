@@ -93,7 +93,11 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityListener {
             android.R.attr.titleTextColor,
             com.google.android.material.R.attr.colorSecondary,
             com.google.android.material.R.attr.colorSecondaryVariant,
-            com.google.android.material.R.attr.colorOnSecondary
+            com.google.android.material.R.attr.colorOnSecondary,
+            com.google.android.material.R.attr.colorSurface,
+            com.google.android.material.R.attr.colorSurfaceVariant,
+            com.google.android.material.R.attr.colorOnSurface,
+            com.google.android.material.R.attr.colorOnSurfaceVariant,
         )
 
         attrs.let {
@@ -105,6 +109,10 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityListener {
             val colorSecondaryIndex = 3
             val colorSecondaryVariantIndex = 4
             val colorOnSecondaryIndex = 5
+            val colorSurfaceIndex = 6
+            val colorSurfaceVariantIndex = 7
+            val colorOnSurfaceIndex = 8
+            val colorOnSurfaceVariantIndex = 9
             // Fetching the colors defined in your style
             //Primary Colors
             val colorPrimary = typedArray?.getColor(colorPrimaryIndex, Color.BLACK)
@@ -116,6 +124,12 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityListener {
             val colorSecondaryVariant =
                 typedArray?.getColor(colorSecondaryVariantIndex, Color.BLACK)
             val colorOnSecondary = typedArray?.getColor(colorOnSecondaryIndex, Color.BLACK)
+
+            // Surface colors
+            val colorSurface = typedArray?.getColor(colorSurfaceIndex, Color.BLACK)
+            val colorSurfaceVariant = typedArray?.getColor(colorSurfaceVariantIndex, Color.BLACK)
+            val colorOnSurface = typedArray?.getColor(colorOnSurfaceIndex, Color.BLACK)
+            val colorOnSurfaceVariant = typedArray?.getColor(colorOnSurfaceVariantIndex, Color.BLACK)
 
             typedArray?.recycle()
 
@@ -137,6 +151,18 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityListener {
             }
             if (colorOnSecondary != null) {
                 colors["colorOnSecondary"] = colorOnSecondary
+            }
+            if (colorSurface != null) {
+                colors["colorSurface"] = colorSurface
+            }
+            if (colorSurfaceVariant != null) {
+                colors["colorSurfaceVariant"] = colorSurfaceVariant
+            }
+            if (colorOnSurface != null) {
+                colors["colorOnSurface"] = colorOnSurface
+            }
+            if (colorOnSurfaceVariant != null) {
+                colors["colorOnSurfaceVariant"] = colorOnSurfaceVariant
             }
 
             return colors
@@ -255,6 +281,29 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityListener {
             return -1 // reached max limit
         } else {
             return highestId + 1
+        }
+    }
+
+    /**
+     * return the position id. find the position id based on the unique ids of the items
+     *
+     * need not be unique so if max value reached, return highest value. Moreover, position id
+     * would always be equal to or less than unique id. No checks performed for simplicity
+     */
+    fun findNextPositionId(uniqueIds: List<Int>): Int {
+
+        if (uniqueIds.isEmpty()) { //if no items
+            return 1 // place as first item
+        }
+
+        val numberOfItems = uniqueIds.size
+
+        if (numberOfItems + 1 == Int.MAX_VALUE){
+            val nextItemPosition = numberOfItems // reached max limit
+            return nextItemPosition
+        } else {
+            val nextItemPosition = numberOfItems + 1
+            return nextItemPosition
         }
     }
 

@@ -4,9 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ThemePickerDialogFragment">
+    tools:context=".utils.ThemePickerDialogFragment">
 
-    <!--android:background="?attr/colorOnPrimary"-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/dialog_layout"
         android:layout_width="300dp"
@@ -25,7 +24,6 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!--android:background="?attr/colorPrimary"-->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/mock_toolbar"
             android:layout_width="match_parent"
@@ -105,7 +103,8 @@
                 app:layout_constraintEnd_toStartOf="@id/ok_button"
                 app:layout_constraintTop_toTopOf="parent"
                 android:layout_margin="18dp"
-                android:background="@android:color/transparent"
+                android:background="@android:color/white"
+                android:elevation="5dp"
                 android:textColor="?attr/colorPrimary" />
 
             <Button
@@ -117,7 +116,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:layout_margin="18dp"
-                android:background="@android:color/transparent"
+                android:background="@android:color/white"
+                android:elevation="5dp"
                 android:textColor="?attr/colorPrimary" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

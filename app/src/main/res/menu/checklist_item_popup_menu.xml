@@ -3,15 +3,37 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/popup_change_background"
-        android:title="@string/change_background"
-        app:showAsAction="never" />
 
     <item
-        android:id="@+id/popup_change_title_color"
-        android:title="@string/change_text_color"
+        android:id="@+id/popup_rename"
+        android:title="@string/rename_list"
         app:showAsAction="never" />
+
+    <group
+        android:id="@+id/formatting">
+
+        <item
+            android:id="@+id/popup_change_background"
+            android:title="@string/change_background"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/popup_change_title_color"
+            android:title="@string/change_text_color"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/popup_text_styling"
+            android:title="@string/change_font_style"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/popup_clear_format"
+            android:title="@string/change_to_default_format"
+            app:showAsAction="never" />
+
+    </group>
+
 
     <item
         android:id="@+id/popup_delete_checklist_item"

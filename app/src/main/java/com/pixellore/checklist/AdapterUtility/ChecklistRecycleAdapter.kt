@@ -1,6 +1,7 @@
 package com.pixellore.checklist.AdapterUtility
 
 import android.content.Context
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.MenuCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -16,19 +18,25 @@ import com.github.dhaval2404.colorpicker.model.ColorShape
 import com.pixellore.checklist.DataClass.CustomStyle
 import com.pixellore.checklist.DatabaseUtility.Checklist
 import com.pixellore.checklist.R
+import com.pixellore.checklist.utils.BaseActivity
 import com.pixellore.checklist.utils.Constants
+import com.pixellore.checklist.utils.FontPickerDialogFragment
+import com.pixellore.checklist.utils.MultipurposeAlertDialogFragment
 
 /**
  * Adapter for the recycler view in Main Activity
  * to display the checklists in database
  * */
-class ChecklistRecycleAdapter(private val clickListenerChecklist: (position: Int, checklist:Checklist, actionRequested: Int) -> Unit) :
+class ChecklistRecycleAdapter(
+    private val clickListenerChecklist: (position: Int, checklist:Checklist, actionRequested: Int) -> Unit,
+    private val activity: BaseActivity
+) :
     ListAdapter<Checklist, ChecklistRecycleAdapter.ChecklistRecycleViewHolder>(ChecklistItemComparator()) {
 
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChecklistRecycleViewHolder {
-        return ChecklistRecycleViewHolder.create(parent)
+        return ChecklistRecycleViewHolder.create(parent, activity)
     }
 
     override fun onBindViewHolder(holder: ChecklistRecycleViewHolder, position: Int) {
@@ -36,8 +44,10 @@ class ChecklistRecycleAdapter(private val clickListenerChecklist: (position: Int
         holder.bind(currentChecklist, holder.itemView.context, clickListenerChecklist)
     }
 
-    class ChecklistRecycleViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
+    class ChecklistRecycleViewHolder(itemView: View, activity: BaseActivity): RecyclerView.ViewHolder(itemView){
 
+
+        val baseActivity: BaseActivity = activity
 
         fun bind(currentChecklist: Checklist, context: Context,
                  clickListenerChecklist: (position: Int, checklist: Checklist, actionRequested: Int) -> Unit,)
@@ -52,10 +62,14 @@ class ChecklistRecycleAdapter(private val clickListenerChecklist: (position: Int
                 val moreEditMenu = PopupMenu(context, checklistMoreButton)
                 val menu = moreEditMenu.menu
                 moreEditMenu.menuInflater.inflate(R.menu.checklist_item_popup_menu, menu)
-
+                MenuCompat.setGroupDividerEnabled(menu, true);
 
                 moreEditMenu.setOnMenuItemClickListener {
                     when(it.itemId){
+                        R.id.popup_rename->{
+                            //todo rename checklist
+                            return@setOnMenuItemClickListener true
+                        }
                         R.id.popup_change_background ->
                         {
                             ColorPickerDialog
@@ -114,9 +128,51 @@ class ChecklistRecycleAdapter(private val clickListenerChecklist: (position: Int
 
                             return@setOnMenuItemClickListener true
                         }
-                        R.id.popup_delete_checklist_item->{
+                        R.id.popup_text_styling -> {
 
-                            // todo show alert dialog and get confirmation from user
+                            val fontsData = baseActivity.getFontsData()
+                            val fontPicker = FontPickerDialogFragment(fontsData
+                            ) { textFont, textFontPosition ->
+
+                                // modify checklist item to save in the database
+                                if (currentChecklist.font != null){
+                                    currentChecklist.font?.textFontName = textFont.file_name
+                                } else{
+                                    val font = CustomStyle(textFontName = textFont.file_name)
+                                    currentChecklist.font = font
+                                }
+
+                                // update in database
+                                clickListenerChecklist(adapterPosition, currentChecklist, Constants.UPDATE_DB)
+
+
+                                // notify adapter to redraw this task item`
+                                val adapter = (itemView.parent as RecyclerView).adapter
+                                adapter?.notifyItemChanged(position)
+
+
+                            }
+                            fontPicker.show(baseActivity.supportFragmentManager, "font_picker")
+
+                            return@setOnMenuItemClickListener true
+                        }
+                        R.id.popup_clear_format->{
+                            // clear the formatting and apply default format
+                            val font = CustomStyle(null, null,
+                                null, null)
+                            currentChecklist.font = font
+
+                            // update in database
+                            clickListenerChecklist(adapterPosition, currentChecklist, Constants.UPDATE_DB)
+
+                            // notify adapter to redraw this task item`
+                            val adapter = (itemView.parent as RecyclerView).adapter
+                            adapter?.notifyItemChanged(position)
+
+
+                            return@setOnMenuItemClickListener true
+                        }
+                        R.id.popup_delete_checklist_item->{
 
                             // update in database
                             clickListenerChecklist(adapterPosition, currentChecklist, Constants.DELETE)
@@ -152,12 +208,19 @@ class ChecklistRecycleAdapter(private val clickListenerChecklist: (position: Int
                     checklistTitleView.setTextColor(it)
                 }
 
+                // set font
+                currentChecklist.font?.textFontName?.let {
+                    // Load the custom font file from the assets folder
+                    val typeface = Typeface.createFromAsset(context.assets, it)
+                    checklistTitleView.typeface = typeface
+                }
+
 
                 checklistLayout.setOnClickListener {
                     clickListenerChecklist(adapterPosition, currentChecklist, Constants.OPEN_EDITOR)
                 }
 
-                // todo move pinned to another recycler view
+                //todo move pinned to another recycler view
                 checklistPinnedButton.setOnClickListener {
                     if (currentChecklist.isPinned){
                         // if pinned, unpin
@@ -179,10 +242,10 @@ class ChecklistRecycleAdapter(private val clickListenerChecklist: (position: Int
 
 
         companion object {
-            fun create(parent: ViewGroup): ChecklistRecycleViewHolder {
+            fun create(parent: ViewGroup, activity: BaseActivity): ChecklistRecycleViewHolder {
                 val view: View = LayoutInflater.from(parent.context)
                     .inflate(R.layout.checklist_item, parent, false)
-                return ChecklistRecycleViewHolder((view))
+                return ChecklistRecycleViewHolder(view, activity)
             }
         }
     }

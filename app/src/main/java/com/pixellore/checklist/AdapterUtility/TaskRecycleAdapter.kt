@@ -15,6 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.MenuCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -228,6 +229,7 @@ class TaskRecycleAdapter(
                     val moreEditMenu = PopupMenu(context, moreOptionsBtn)
                     val menu = moreEditMenu.menu
                     moreEditMenu.menuInflater.inflate(R.menu.task_item_popup_menu, menu)
+                    MenuCompat.setGroupDividerEnabled(menu, true);
                     moreEditMenu.setOnMenuItemClickListener { menuItem ->
                         when (menuItem.itemId) {
                             R.id.popup_change_background ->
@@ -367,6 +369,28 @@ class TaskRecycleAdapter(
 
                                 }
                                 fontPicker.show(baseActivity.supportFragmentManager, "font_picker")
+
+                                return@setOnMenuItemClickListener true
+                            }
+                            R.id.popup_clear_format -> {
+                                // clear the formatting and apply default format
+                                val font = CustomStyle(null, null,
+                                    null, null)
+
+                                currentTask.task.task_font = font
+
+                                currentTask.subtaskList.forEach {
+                                    it.subtask_font = font
+                                }
+
+                                // update in database
+                                clickListener(adapterPosition, currentTask, Constants.UPDATE_DB)
+
+                                clickListener(adapterPosition, currentTask, Constants.UPDATE_DB_PLUS)
+
+                                // notify adapter to redraw this task item`
+                                val adapter = (itemView.parent as RecyclerView).adapter
+                                adapter?.notifyItemChanged(position)
 
                                 return@setOnMenuItemClickListener true
                             }

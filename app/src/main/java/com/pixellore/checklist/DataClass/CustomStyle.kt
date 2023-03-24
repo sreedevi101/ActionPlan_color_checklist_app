@@ -2,6 +2,7 @@ package com.pixellore.checklist.DataClass
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.pixellore.checklist.DatabaseUtility.Task
 
 data class CustomStyle(
     var headingTextColorResId: Int? = null,
@@ -9,6 +10,16 @@ data class CustomStyle(
     var backgroundColorResId: Int? = null,
     var textFontName: String? = null
 ) : Parcelable {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is CustomStyle) return false
+        return (headingTextColorResId == other.headingTextColorResId) &&
+                (bodyTextColorResId == other.bodyTextColorResId) &&
+                (backgroundColorResId == other.backgroundColorResId) &&
+                (textFontName == other.textFontName)
+    }
+
     constructor(parcel: Parcel) : this(
         parcel.readValue(Int::class.java.classLoader) as? Int,
         parcel.readValue(Int::class.java.classLoader) as? Int,

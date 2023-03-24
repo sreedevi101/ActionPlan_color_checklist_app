@@ -1,4 +1,4 @@
-package com.pixellore.checklist
+package com.pixellore.checklist.utils
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -19,6 +19,7 @@ import com.pixellore.checklist.AdapterUtility.ThemesRecycleAdapter
 import com.pixellore.checklist.DataClass.CustomStyle
 import com.pixellore.checklist.DataClass.Theme
 import com.pixellore.checklist.DatabaseUtility.TaskApplication
+import com.pixellore.checklist.R
 import com.pixellore.checklist.utils.BaseActivityListener
 import com.pixellore.checklist.utils.Constants
 import java.util.*
@@ -56,6 +57,8 @@ class ThemePickerDialogFragment : DialogFragment() {
 
         return inflater.inflate(R.layout.fragment_theme_picker_dialog, null, false)
     }
+
+
 
     //dialog view is ready
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

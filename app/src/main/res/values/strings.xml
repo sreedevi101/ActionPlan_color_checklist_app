@@ -29,8 +29,17 @@
     <string name="change_font_style">Change Font style</string>
     <string name="change_title_text_color">Change Title Text color</string>
     <string name="change_other_text_color">Change Other Text color</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
+    <string name="change_to_default_format">Change to default format</string>
+    <string name="rename_list">Rename list</string>
+    <string name="style_list_items">Apply Style to all tasks</string>
+    <string name="delete_list">Delete list</string>
+    <string name="share_list">Share list</string>
+    <string name="rearrange_tasks">Rearrange tasks</string>
+    <string name="change_task_style">Change task style?</string>
+    <string name="select_the_style_to_apply_to_all_tasks_in_this_checklist">Select the style to apply to ALL tasks in this checklist</string>
+    <string name="background_color">Background color</string>
+    <string name="task_title_text_color">Task title Text color</string>
+    <string name="task_details_text_color">Task details Text color</string>
+    <string name="font_style">Font style</string>
 
 </resources>
