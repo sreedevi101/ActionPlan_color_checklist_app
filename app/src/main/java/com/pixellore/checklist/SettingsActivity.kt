@@ -1,12 +1,14 @@
 package com.pixellore.checklist
 
 import android.os.Bundle
+import android.view.MenuItem
 import android.widget.LinearLayout
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.pixellore.checklist.DatabaseUtility.TaskApplication
 import com.pixellore.checklist.utils.BaseActivity
+import com.pixellore.checklist.utils.ThemePickerDialogFragment
 import java.util.HashMap
 
 class SettingsActivity : BaseActivity(), ThemePickerDialogFragment.ThemeSelectedListener {
@@ -28,6 +30,7 @@ class SettingsActivity : BaseActivity(), ThemePickerDialogFragment.ThemeSelected
         setSupportActionBar(toolbar)
         // Get a support ActionBar corresponding to this toolbar and enable the Up button
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = "Settings"
 
         // set toolbar background color to colorPrimary of the current theme
         if (currentThemeColors.containsKey("colorPrimary")) {
@@ -65,5 +68,16 @@ class SettingsActivity : BaseActivity(), ThemePickerDialogFragment.ThemeSelected
         TaskApplication.recreateMainActivity = true
         TaskApplication.recreateChecklistActivity = true
         TaskApplication.recreateTaskEditor = true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                // Navigate back to parent activity
+                onBackPressed()
+                return true
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
     }
 }

@@ -13,14 +13,17 @@ import com.pixellore.checklist.DataClass.CustomStyle
 @Entity(tableName = "checklist_table")
 data class Checklist(
     @PrimaryKey var checklist_id: Int,
+    var checklist_pos_id: Int,
     var checklist_title: String?,
     var created_on: String?,
     var checklist_isClosed: Boolean = false,
     var closed_on: String?,
+
     var isPinned: Boolean = false,
     var font: CustomStyle?
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
+        parcel.readInt(),
         parcel.readInt(),
         parcel.readString(),
         parcel.readString(),
@@ -40,6 +43,7 @@ data class Checklist(
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(checklist_id)
+        parcel.writeInt(checklist_pos_id)
         parcel.writeString(checklist_title)
         parcel.writeString(created_on)
         parcel.writeByte(if (checklist_isClosed) 1 else 0)

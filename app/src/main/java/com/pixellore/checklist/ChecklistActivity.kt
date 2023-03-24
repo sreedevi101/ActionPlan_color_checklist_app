@@ -2,6 +2,7 @@ package com.pixellore.checklist
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.core.view.MenuCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.dhaval2404.colorpicker.ColorPickerDialog
@@ -19,9 +22,12 @@ import com.github.dhaval2404.colorpicker.model.ColorShape
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.pixellore.checklist.AdapterUtility.TaskRecycleAdapter
 import com.pixellore.checklist.DataClass.CustomStyle
+import com.pixellore.checklist.DataClass.TextFont
 import com.pixellore.checklist.DatabaseUtility.*
 import com.pixellore.checklist.utils.BaseActivity
 import com.pixellore.checklist.utils.Constants
+import com.pixellore.checklist.utils.MultipurposeAlertDialogFragment
+import com.pixellore.checklist.utils.StyleSelectionDialogFragment
 import java.util.HashMap
 
 class ChecklistActivity : BaseActivity() {
@@ -48,9 +54,22 @@ class ChecklistActivity : BaseActivity() {
 
     // RecyclerView
     private lateinit var actionListRecyclerView: RecyclerView
+    private val adapter = TaskRecycleAdapter(
+        { position, taskWithSubtasks, actionRequested ->
+            onListItemClick(
+                position,
+                taskWithSubtasks,
+                actionRequested
+            )
+        },
+        { position, subtask -> onListSubtaskClick(position, subtask) },
+        this)
 
     // colors from current theme
     private lateinit var currentThemeColors: HashMap<String, Int>
+
+    // save a copy of the data being displayed (to Share as text and to apply same style to all tasks)
+    private lateinit var taskWithSubtasksList: List<TaskWithSubtasks>
 
 
     // Receiver for data from TaskEditorActivity - if TaskEditorActivity is opened to create new task
@@ -94,16 +113,34 @@ class ChecklistActivity : BaseActivity() {
 
                     // find id to be used for the new task
                     val taskId = findNextId(taskIds)
-                    if (taskId == -1){ // unique ids reached max limit of Int
-                        // todo alert dialog saying reached max limit
+
+                    if (taskId == -1){ // unique ids reached max limit of Int (Int.MAX_VALUE = 2147483647)
+                        // alert dialog saying reached max limit
+                        val myDialog = MultipurposeAlertDialogFragment.newInstance(
+                            headline = "Maximum Limit Reached",
+                            text = "The maximum limit of ${Int.MAX_VALUE} task unique IDs " +
+                                    "has been reached. You cannot create any more tasks.",
+                            posButtonText = "OK",
+                            negButtonText = ""
+                        ) {
+
+                        }
+                        myDialog.setBaseActivityListener(this)
+                        myDialog.show(supportFragmentManager, "dialog")
+
                     } else {
                         // get parent checklist id from the Checklist object passed to this intent when opening it
                         val parentChecklistId = checklistToDisplay!!.checklist_id
+
+
+                        // get position of the new task
+                        val taskPosId = findNextPositionId(taskIds)
 
                         // IMPORTANT STEP
                         // Add correct values for IDs
                         if (taskUpdatedReceived != null) {
                             taskUpdatedReceived.task_id = taskId
+                            taskUpdatedReceived.task_pos_id = taskPosId
                             taskUpdatedReceived.parent_checklist_id = parentChecklistId
 
                             // Insert new task
@@ -116,9 +153,26 @@ class ChecklistActivity : BaseActivity() {
                                     // Add correct values for IDs
                                     val subtaskId = findNextId(subtaskIds)
                                     if (subtaskId == -1){ // unique ids reached max limit of Int
-                                        // todo alert dialog saying max limit reached
+                                        // alert dialog saying reached max limit
+                                        val myDialog = MultipurposeAlertDialogFragment.newInstance(
+                                            headline = "Maximum Limit Reached",
+                                            text = "The maximum limit of ${Int.MAX_VALUE} subtask unique IDs " +
+                                                    "has been reached. You cannot create any more subtasks.",
+                                            posButtonText = "OK",
+                                            negButtonText = ""
+                                        ) {
+
+                                        }
+                                        myDialog.setBaseActivityListener(this)
+                                        myDialog.show(supportFragmentManager, "dialog")
+
                                     } else{
+
+                                        // get position of this subtask
+                                        val subtaskPosId = findNextPositionId(subtaskIds)
+
                                         subtask.subtask_id = subtaskId
+                                        subtask.subtask_pos_id = subtaskPosId
                                         subtask.parent_task_id = taskId
 
                                         Log.v(Constants.TAG, "Subtask to be Inserted " +
@@ -148,7 +202,14 @@ class ChecklistActivity : BaseActivity() {
                     )
                         .show()
                 }
-            } else {
+            }
+            else if(it.resultCode == Activity.RESULT_CANCELED) {
+                Toast.makeText(
+                    applicationContext,
+                    "Task not saved", Toast.LENGTH_LONG
+                ).show()
+            }
+            else {
                 Toast.makeText(applicationContext, R.string.empty_not_saved, Toast.LENGTH_LONG)
                     .show()
             }
@@ -158,9 +219,6 @@ class ChecklistActivity : BaseActivity() {
     private val getItemEditActivityResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
-                // ToDo
-                Toast.makeText(applicationContext, "Update task DEBUG", Toast.LENGTH_LONG).show()
-
                 // Receive task object and array of subtask objects from editor activity
 
                 /**
@@ -220,6 +278,7 @@ class ChecklistActivity : BaseActivity() {
                 }
 
 
+                /*
                 // DEBUG
                 if (subtaskLabelList == null) {
                     Log.v(Constants.TAG, "Subtasks list received is NULL")
@@ -228,6 +287,7 @@ class ChecklistActivity : BaseActivity() {
                 }
                 subtaskLabelList?.forEach { dictItem ->
                     Log.v(Constants.TAG, "subtaskLabelList ${dictItem["id"]} - ${dictItem["label"]} ") }
+                */
 
 
                 // continue to add the Task if only it has a  parent Checklist
@@ -262,7 +322,19 @@ class ChecklistActivity : BaseActivity() {
                                     // Add correct values for IDs
                                     val subtaskId = findNextId(subtaskIds)
                                     if (subtaskId == -1){
-                                        // todo alert dialog saying max limit reached
+                                        // alert dialog saying reached max limit
+                                        val myDialog = MultipurposeAlertDialogFragment.newInstance(
+                                            headline = "Maximum Limit Reached",
+                                            text = "The maximum limit of ${Int.MAX_VALUE} subtasks unique IDs " +
+                                                    "has been reached. You cannot create any more subtasks.",
+                                            posButtonText = "OK",
+                                            negButtonText = ""
+                                        ) {
+
+                                        }
+                                        myDialog.setBaseActivityListener(this)
+                                        myDialog.show(supportFragmentManager, "dialog")
+
                                     } else{
                                         subtask.subtask_id = subtaskId
                                         subtask.parent_task_id = taskUpdatedReceived.task_id
@@ -308,21 +380,24 @@ class ChecklistActivity : BaseActivity() {
                         if (deleteIds != null) {
                             actionPlanViewModel.deleteSubtasks(deleteIds)
                         }
-
+                        Toast.makeText(applicationContext, "Updated ${taskUpdatedReceived.task_title}",
+                            Toast.LENGTH_LONG).show()
                     }
 
                 } else {
                     Log.v(Constants.TAG, "Parent Checklist missing. Task cannot be added")
 
-                    Toast.makeText(
-                        applicationContext,
-                        "Parent Checklist missing. Task cannot be added",
+                    Toast.makeText(applicationContext,
+                        "Error: Parent Checklist missing. Task cannot be updated!",
                         Toast.LENGTH_LONG
-                    )
-                        .show()
+                    ).show()
                 }
+            } else if(it.resultCode == Activity.RESULT_CANCELED) {
+                Toast.makeText(applicationContext,
+                    "Task not saved", Toast.LENGTH_LONG).show()
             } else {
-                Toast.makeText(applicationContext, "Could not update", Toast.LENGTH_LONG).show()
+                Toast.makeText(applicationContext,
+                    "Error: Something went wrong. Could not update!", Toast.LENGTH_LONG).show()
             }
         }
 
@@ -352,6 +427,8 @@ class ChecklistActivity : BaseActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.title = checklistToDisplay?.checklist_title ?: "Checklist"
+        // Get a support ActionBar corresponding to this toolbar and enable the Up button
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
 
         // set toolbar background color to colorPrimary of the current theme
@@ -361,11 +438,17 @@ class ChecklistActivity : BaseActivity() {
         // set toolbar title text color to colorOnPrimary of the current theme
         if (currentThemeColors.containsKey("colorOnPrimary")) {
             currentThemeColors["colorOnPrimary"]?.let { toolbar.setTitleTextColor(it) }
+
+            // set back arrow color
+            val nav = toolbar.navigationIcon
+            if (nav!=null){
+                currentThemeColors["colorOnPrimary"]?.let { nav.setTint(it) }
+            }
         }
 
         actionListRecyclerView = findViewById<RecyclerView>(R.id.actionListRecyclerView)
 
-        // change background color
+        // change background color according to checklist item color
         val bgColor = checklistToDisplay?.font?.backgroundColorResId
         if (bgColor != null) {
             actionListRecyclerView.setBackgroundColor(bgColor)
@@ -377,34 +460,36 @@ class ChecklistActivity : BaseActivity() {
         actionListRecyclerView.itemAnimator?.changeDuration = 0
 
 
-        val adapter = TaskRecycleAdapter(
-            { position, taskWithSubtasks, actionRequested ->
-                onListItemClick(
-                    position,
-                    taskWithSubtasks,
-                    actionRequested
-                )
-            },
-            { position, subtask -> onListSubtaskClick(position, subtask) },
-        this)
 
 
         actionListRecyclerView.adapter = adapter
         actionListRecyclerView.layoutManager = LinearLayoutManager(this)
-
 
         // get only TasksWithSubtasks belongs to this checklist
         // to display only TasksWithSubtasks belonging to this checklist, when the user opens the checklist
         if (checklistToDisplay != null) {
             actionPlanViewModel.allTasksWithSubtasksByChecklistId(checklistToDisplay!!.checklist_id)
                 .observe(this) { tasks ->
+                    taskWithSubtasksList = tasks
                     // Update the cached copy of the tasks in the adapter.
                     tasks.let {
                         adapter.submitList(it)
                     }
                 }
         }
-        // todo add an else condition
+        else{
+            // Unlikely scenario: the checklist activity opened without a checklist (checklist object = null)
+
+            Toast.makeText(
+                applicationContext,
+                "Error: Something gone really bad!!",
+                Toast.LENGTH_LONG
+            )
+                .show()
+
+            // Navigate back to parent activity
+            onBackPressed()
+        }
 
         // Observe the list of IDs
         actionPlanViewModel.getAllTaskIds().observe(this) { ids ->
@@ -422,8 +507,25 @@ class ChecklistActivity : BaseActivity() {
             //Log.d(Constants.TAG, "All Subtask IDs: $subtaskIds")
         }
 
-
+        // Floating Button
         val fab = findViewById<FloatingActionButton>(R.id.addItemFab)
+        // customize colors
+        if (currentThemeColors.containsKey("colorSecondary")) {
+            currentThemeColors["colorSecondary"]?.let {
+
+                // Set the background color of the button
+                fab.backgroundTintList = ColorStateList.valueOf(it)
+            }
+        }
+        if (currentThemeColors.containsKey("colorOnSecondary")) {
+            currentThemeColors["colorOnSecondary"]?.let {
+                // Set the icon of the button with a new color
+                val drawable = ContextCompat.getDrawable(this, R.drawable.ic_baseline_add_24)?.mutate()
+                drawable?.setTint(it)
+                fab.setImageDrawable(drawable)
+            }
+        }
+        // click listener
         fab.setOnClickListener {
             val intent = Intent(this@ChecklistActivity, TaskEditorActivity::class.java)
             getItemAddActivityResult.launch(intent)
@@ -485,14 +587,28 @@ class ChecklistActivity : BaseActivity() {
 
             getItemEditActivityResult.launch(intent)
         } else if (actionRequested == Constants.DELETE) {
-            // delete this task
-            actionPlanViewModel.deleteTask(taskWithSubtasks.task)
+            // confirm delete action
+            val myDialog = MultipurposeAlertDialogFragment.newInstance(
+                headline = "Delete task?",
+                text = "",
+                posButtonText = "Delete",
+                negButtonText = "Cancel"
+            ) {
 
-            // get the subtasks - already available in taskWithSubtasks.subtaskList
+                // delete this task
+                actionPlanViewModel.deleteTask(taskWithSubtasks.task)
 
-            for (subtask in taskWithSubtasks.subtaskList) {
-                actionPlanViewModel.deleteSubtask(subtask)
+                // get the subtasks - already available in taskWithSubtasks.subtaskList
+
+                for (subtask in taskWithSubtasks.subtaskList) {
+                    actionPlanViewModel.deleteSubtask(subtask)
+                }
+
             }
+
+            myDialog.setBaseActivityListener(this)
+
+            myDialog.show(supportFragmentManager, "dialog")
         }
     }
 
@@ -503,24 +619,41 @@ class ChecklistActivity : BaseActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
         inflater.inflate(R.menu.checklist_menu, menu)
+        if (menu != null) {
+            MenuCompat.setGroupDividerEnabled(menu, true)
+        };
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
 
+        R.id.action_share -> {
+            val checklistText = createChecklistText(taskWithSubtasksList)
+            Log.v(Constants.TAG,checklistText)
+
+            val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, checklistText)
+                putExtra(Intent.EXTRA_SUBJECT, Constants.APP_NAME +
+                        ":" + (checklistToDisplay?.checklist_title ?: "Checklist"))
+                type = "text/plain"
+            }
+
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            startActivity(shareIntent)
+
+            true
+        }
+        R.id.action_rearrange_list -> {
+            // todo implement "Rearrange items"
+            true
+        }
         R.id.action_delete_all -> {
             // User chose "Delete all", delete all the tasks and subtasks in the checklist
             actionPlanViewModel.deleteAllTasks()
             actionPlanViewModel.deleteAllSubtasks()
             true
         }
-
-        R.id.action_print_database -> {
-
-            printDbTables()
-            true
-        }
-
         R.id.action_change_background -> {
             if (checklistToDisplay != null) {
                 // open color picker
@@ -550,24 +683,173 @@ class ChecklistActivity : BaseActivity() {
                     }.show()
             } else {
 
-                Toast.makeText(
-                    applicationContext,
-                    "Parent Checklist missing. This feature will not work",
+                Toast.makeText(applicationContext,
+                    "Error:Parent Checklist missing. This feature will not work!",
                     Toast.LENGTH_LONG
-                )
-                    .show()
+                ).show()
             }
-
-
             true
         }
+        R.id.action_format_all_items -> {
+            // "Format all items"
+            val selectStyle = StyleSelectionDialogFragment(
+                this) {colorOrFont, styleSelection ->  applySelectedStyle(colorOrFont, styleSelection)}
+            selectStyle.setBaseActivityListener(this)
+            selectStyle.show(supportFragmentManager, "style_selector")
+            true
+        }
+        R.id.action_print_database -> {
 
+            printDbTables()
+            true
+        }
+        android.R.id.home -> {
+            // Navigate back to parent activity
+            onBackPressed()
+            true
+        }
         else -> {
             // If we got here, the user's action was not recognized.
             // Invoke the superclass to handle it.
             super.onOptionsItemSelected(item)
         }
 
+    }
+
+    private fun applySelectedStyle(colorOrFont: Any, styleSelection: Int) {
+        var color: Int? = null
+        var font: TextFont? = null
+
+        when (styleSelection) {
+            R.id.style_selector_background,
+            R.id.style_selector_title_color,
+            R.id.style_selector_details_color -> {
+                // styleSelection is equal to one of the specified values
+                if (colorOrFont is Int){
+                    color = colorOrFont
+                } else {
+                    Log.e(Constants.TAG,"Wrong input type: color (Int) was expected as input 'colorOrFont")
+                }
+            }
+            R.id.style_selector_font -> {
+                if (colorOrFont is TextFont){
+                    font = colorOrFont
+                } else {
+                    Log.e(Constants.TAG,"Wrong input type: font (TextFont) was expected as input 'colorOrFont")
+                }
+            }
+            else -> {
+                // styleSelection is not equal to any of the specified values
+                Log.e(Constants.TAG,"Wrong input for 'styleSelection' to applySelectedStyle function")
+            }
+        }
+
+
+        when (styleSelection) {
+            R.id.style_selector_background -> {
+                taskWithSubtasksList.forEach { taskWithSubtask ->
+                    taskWithSubtask.task.task_font?.backgroundColorResId = color
+                    actionPlanViewModel.updateTask(taskWithSubtask.task)
+                }
+            }
+            R.id.style_selector_title_color -> {
+                taskWithSubtasksList.forEach { taskWithSubtask ->
+                    taskWithSubtask.task.task_font?.headingTextColorResId = color
+                    actionPlanViewModel.updateTask(taskWithSubtask.task)
+                }
+            }
+            R.id.style_selector_details_color -> {
+                taskWithSubtasksList.forEach { taskWithSubtask ->
+                    taskWithSubtask.task.task_font?.bodyTextColorResId = color
+                    actionPlanViewModel.updateTask(taskWithSubtask.task)
+
+                    taskWithSubtask.subtaskList.forEach {subtask ->
+                        subtask.subtask_font?.bodyTextColorResId = color
+                        actionPlanViewModel.updateSubtask(subtask)
+                    }
+                }
+            }
+            R.id.style_selector_font -> {
+                taskWithSubtasksList.forEach { taskWithSubtask ->
+                    if (font != null) {
+                        taskWithSubtask.task.task_font?.textFontName = font.file_name
+                    }
+                    actionPlanViewModel.updateTask(taskWithSubtask.task)
+
+                    taskWithSubtask.subtaskList.forEach {subtask ->
+                        Log.v(Constants.TAG, "subtask: ${subtask.subtask_title}")
+                        if (font != null) {
+                            Log.v(Constants.TAG, "subtask: ${subtask.subtask_title}, font ${font.file_name}")
+                            subtask.subtask_font?.textFontName = font.file_name
+                        }
+                        actionPlanViewModel.updateSubtask(subtask)
+                    }
+                }
+            }
+            else -> {
+                // handle other types of arguments
+
+                Log.e(Constants.TAG,"Wrong input for 'styleSelection' to applySelectedStyle function")
+            }
+        }
+
+        adapter.notifyDataSetChanged()
+    }
+    private fun createChecklistText(checklistContent: List<TaskWithSubtasks>): String{
+
+        val fourSpaces = "    "
+        var stringOutput = ""
+
+        stringOutput += checklistToDisplay?.checklist_title
+        stringOutput += "\n"
+        stringOutput += "-".repeat(30)
+        stringOutput += "\n"
+
+        if (checklistContent.isEmpty()){
+            stringOutput += "There are no tasks in this checklist"
+        }
+
+        var i = 1
+        checklistContent.let { tasksList ->
+            tasksList.forEach {
+                stringOutput += "$i. " + it.task.task_title
+                if (!it.task.priority.equals("None")){
+                    stringOutput += " (${it.task.priority?.uppercase()} priority)"
+                }
+                stringOutput += "\n"
+
+                if (!it.task.due_date.equals("")){
+                    stringOutput += fourSpaces + "Due date: " + it.task.due_date
+                    if (it.task.task_isCompleted){
+                        stringOutput += " (COMPLETED)"
+                    }
+                    stringOutput += "\n"
+                } else if (it.task.task_isCompleted){
+                    stringOutput += fourSpaces
+                    stringOutput += "(COMPLETED)"
+                    stringOutput += "\n"
+                }
+
+                if (!it.task.details_note.equals("")){
+                    stringOutput += fourSpaces + it.task.details_note
+                    stringOutput += "\n"
+                }
+
+                var j = 1
+                it.subtaskList.forEach {subtasksList ->
+                    stringOutput += fourSpaces.repeat(2) + "$i.$j " + subtasksList.subtask_title
+                    stringOutput += "\n"
+                    j += 1
+                }
+                i += 1
+                stringOutput += "\n"
+            }
+
+        }
+        stringOutput += "-".repeat(30)
+        stringOutput += "\nSend from " + Constants.APP_NAME
+        // todo add "website name" of the app
+        return stringOutput
     }
 
     private fun printDbTables() {

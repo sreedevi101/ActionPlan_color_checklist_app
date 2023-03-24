@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".utils.MultipurposeAlertDialogFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/style_selection_dialog_layout"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="24dp">
+
+
+        <LinearLayout
+            android:id="@+id/style_selection_text_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <TextView
+                android:id="@+id/style_selection_headline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
+                android:text="@string/change_task_style" />
+
+
+            <TextView
+                android:id="@+id/supporting_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                android:text="@string/select_the_style_to_apply_to_all_tasks_in_this_checklist" />
+
+            <RadioGroup
+                android:id="@+id/style_selector"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RadioButton
+                    android:id="@+id/style_selector_background"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/background_color"/>
+
+                <RadioButton
+                    android:id="@+id/style_selector_title_color"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/task_title_text_color"/>
+
+                <RadioButton
+                    android:id="@+id/style_selector_details_color"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/task_details_text_color"/>
+
+                <RadioButton
+                    android:id="@+id/style_selector_font"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/font_style"/>
+
+            </RadioGroup>
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

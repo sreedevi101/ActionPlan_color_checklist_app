@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.MenuCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pixellore.checklist.AdapterUtility.ChecklistRecycleAdapter
@@ -16,6 +17,7 @@ import com.pixellore.checklist.DataClass.CustomStyle
 import com.pixellore.checklist.DatabaseUtility.*
 import com.pixellore.checklist.utils.BaseActivity
 import com.pixellore.checklist.utils.Constants
+import com.pixellore.checklist.utils.MultipurposeAlertDialogFragment
 import java.util.HashMap
 
 
@@ -49,13 +51,13 @@ class MainActivity : BaseActivity() {
 
         // Setup the recycler view to display the checklists in database
         val checklistRecyclerView = findViewById<RecyclerView>(R.id.checklist_recycler_view)
-        val checklistAdapter = ChecklistRecycleAdapter { position, checklist, actionRequested ->
+        val checklistAdapter = ChecklistRecycleAdapter ({ position, checklist, actionRequested ->
             onListChecklistClick(
                 position,
                 checklist,
                 actionRequested
             )
-        }
+        }, this)
         checklistRecyclerView.adapter = checklistAdapter
         checklistRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -65,7 +67,6 @@ class MainActivity : BaseActivity() {
                 checklistAdapter.submitList(it)
             }
         }
-
 
         // Observe the list of IDs
         actionPlanViewModel.getAllChecklistIds().observe(this) { ids ->
@@ -109,13 +110,29 @@ class MainActivity : BaseActivity() {
                 // insert the checklist with the user entered title
                 val checklistId = findNextId(checklistIds)
                 if (checklistId == -1){ // unique ids reached max limit of Int
-                    // todo alert dialog saying max limit reached
+
+                    // alert dialog saying reached max limit
+                    val myDialog = MultipurposeAlertDialogFragment.newInstance(
+                        headline = "Maximum Limit Reached",
+                        text = "The maximum limit of ${Int.MAX_VALUE} checklist unique IDs " +
+                                "has been reached. You cannot create any more checklists.",
+                        posButtonText = "OK",
+                        negButtonText = ""
+                    ) {
+
+                    }
+                    myDialog.setBaseActivityListener(this)
+                    myDialog.show(supportFragmentManager, "dialog")
+
                 } else{
                     val checklistTitle = checklistTitleEditText.text.toString()
 
+                    // get position id (where to place the new checklist)
+                    val checklistPositionId = findNextPositionId(checklistIds)
+
                     // todo add created on date
                     val newChecklist = Checklist(
-                        checklistId, checklistTitle,
+                        checklistId, checklistPositionId, checklistTitle,
                         null, false, null, false,
                         CustomStyle(null, null,
                             null, null)
@@ -124,7 +141,7 @@ class MainActivity : BaseActivity() {
                     Log.v(Constants.TAG, "inserting new checklist")
                     actionPlanViewModel.insertChecklist(newChecklist)
 
-                    // Todo update recycler view to show the new checklist
+                    // update recycler view to show the new checklist
                     checklistAdapter.notifyItemChanged(checklistId)
 
                     // clear the text from edit text
@@ -153,52 +170,64 @@ class MainActivity : BaseActivity() {
             startActivity(intent)
         } else if (actionRequested == Constants.DELETE) {
 
-            Log.v(Constants.TAG, "Deleting...")
-            // todo alert dialog
+            // confirm delete action
+            val myDialog = MultipurposeAlertDialogFragment.newInstance(
+                headline = "Delete checklist?",
+                text = "",
+                posButtonText = "Delete",
+                negButtonText = "Cancel"
+            ) {
+                // delete this checklist
+                Log.v(Constants.TAG, "Deleting ${checklist.checklist_title}")
+                actionPlanViewModel.deleteChecklist(checklist)
 
-            // delete this checklist
-            actionPlanViewModel.deleteChecklist(checklist)
+                // delete tasks and subtasks in this checklist
 
-            // delete tasks and subtasks in this checklist
+                // Get the LiveData object
+                val tasksLiveData =
+                    actionPlanViewModel.allTasksWithSubtasksByChecklistId(checklist.checklist_id)
 
-            // Get the LiveData object
-            val tasksLiveData =
-                actionPlanViewModel.allTasksWithSubtasksByChecklistId(checklist.checklist_id)
+                // Get the value of the LiveData object
+                //val tasksWithSubtasksList = tasksLiveData.value
 
-            // Get the value of the LiveData object
-            //val tasksWithSubtasksList = tasksLiveData.value
+                // Observe the LiveData object to get the updated value
+                tasksLiveData.observe(this) { tasksWithSubtasksList ->
+                    // Get the task ids
+                    val taskIds = tasksWithSubtasksList?.map { it.task.task_id }
 
-            // Observe the LiveData object to get the updated value
-            tasksLiveData.observe(this) { tasksWithSubtasksList ->
-                // Get the task ids
-                val taskIds = tasksWithSubtasksList?.map { it.task.task_id }
+                    // Get the list of subtask ids for each task
+                    val subtaskIds =
+                        tasksWithSubtasksList.flatMap { taskWithSubtasks: TaskWithSubtasks ->
+                            taskWithSubtasks.subtaskList.map { subtask: Subtask -> subtask.subtask_id }
+                        }
 
-                // Get the list of subtask ids for each task
-                val subtaskIds =
-                    tasksWithSubtasksList.flatMap { taskWithSubtasks: TaskWithSubtasks ->
-                        taskWithSubtasks.subtaskList.map { subtask: Subtask -> subtask.subtask_id }
+
+                    // delete all tasks in this checklist using their IDs
+                    Log.v(Constants.TAG, "Deleting taskIds $taskIds") // DEBUG
+                    if (taskIds != null) {
+                        actionPlanViewModel.deleteTasks(taskIds)
                     }
 
-
-                // delete all tasks in this checklist using their IDs
-                Log.v(Constants.TAG, "Deleting taskIds $taskIds") // DEBUG
-                if (taskIds != null) {
-                    actionPlanViewModel.deleteTasks(taskIds)
-                }
-
-                // delete all associated subtasks using their IDs
-                Log.v(Constants.TAG, "Deleting subtaskIds $subtaskIds") // DEBUG
-                if (subtaskIds != null) {
-                    actionPlanViewModel.deleteSubtasks(subtaskIds)
+                    // delete all associated subtasks using their IDs
+                    Log.v(Constants.TAG, "Deleting subtaskIds $subtaskIds") // DEBUG
+                    if (subtaskIds != null) {
+                        actionPlanViewModel.deleteSubtasks(subtaskIds)
+                    }
                 }
             }
-        }
 
+            myDialog.setBaseActivityListener(this)
+
+            myDialog.show(supportFragmentManager, "dialog")
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
         inflater.inflate(R.menu.main_activity_menu, menu)
+        if (menu != null) {
+            MenuCompat.setGroupDividerEnabled(menu, true)
+        };
         return true
     }
 
@@ -207,9 +236,9 @@ class MainActivity : BaseActivity() {
         R.id.action_delete_all -> {
             // User chose "Delete all", delete database
 
-            // todo alert dialog
+            //todo alert dialog requesting confirmation to DELETE (warn app will restart)
             this.deleteDatabase("action_plan_database")
-            //todo restart app
+            // todo implement restart app
             true
         }
 
@@ -297,7 +326,7 @@ class MainActivity : BaseActivity() {
                     if (it.font != null) {
                         Log.v(
                             Constants.TAG,
-                            "CustomStyle: ${it.font!!.backgroundColorResId}, ${it.font!!.headingTextColorResId}"
+                            "CustomStyle: ${it.font!!}"
                         )
                     } else {
                         Log.v(Constants.TAG, "CustomStyle is null")

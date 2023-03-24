@@ -17,6 +17,11 @@
         <item name="colorSecondary">@color/secondaryColorSet1</item>
         <item name="colorSecondaryVariant">@color/secondaryLightColorSet1</item>
         <item name="colorOnSecondary">@color/secondaryTextColorSet1</item>
+        <!-- Surface color. -->
+        <item name="colorSurface">@android:color/white</item>
+        <item name="colorSurfaceVariant">@color/grey_50</item>
+        <item name="colorOnSurface">@android:color/black</item>
+        <item name="colorOnSurfaceVariant">@android:color/darker_gray</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
@@ -45,6 +50,11 @@
         <item name="colorSecondary">@color/secondaryColorSet2</item>
         <item name="colorSecondaryVariant">@color/secondaryLightColorSet2</item>
         <item name="colorOnSecondary">@color/secondaryTextColorSet2</item>
+        <!-- Surface color. -->
+        <item name="colorSurface">@android:color/white</item>
+        <item name="colorSurfaceVariant">#f5ded7</item>
+        <item name="colorOnSurface">@android:color/black</item>
+        <item name="colorOnSurfaceVariant">#53433e</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
@@ -74,6 +84,11 @@
         <item name="colorSecondary">@color/secondaryColorSet3</item>
         <item name="colorSecondaryVariant">@color/secondaryLightColorSet3</item>
         <item name="colorOnSecondary">@color/secondaryTextColorSet3</item>
+        <!-- Surface color. -->
+        <item name="colorSurface">@android:color/white</item>
+        <item name="colorSurfaceVariant">@color/grey_50</item>
+        <item name="colorOnSurface">@android:color/black</item>
+        <item name="colorOnSurfaceVariant">@android:color/darker_gray</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
@@ -103,6 +118,11 @@
         <item name="colorSecondary">@color/secondaryColorSet4</item>
         <item name="colorSecondaryVariant">@color/secondaryLightColorSet4</item>
         <item name="colorOnSecondary">@color/secondaryTextColorSet4</item>
+        <!-- Surface color. -->
+        <item name="colorSurface">@android:color/white</item>
+        <item name="colorSurfaceVariant">@color/grey_50</item>
+        <item name="colorOnSurface">@android:color/black</item>
+        <item name="colorOnSurfaceVariant">@android:color/darker_gray</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
@@ -133,6 +153,11 @@
         <item name="colorSecondary">@color/secondaryColorSet5</item>
         <item name="colorSecondaryVariant">@color/secondaryLightColorSet5</item>
         <item name="colorOnSecondary">@color/secondaryTextColorSet5</item>
+        <!-- Surface color. -->
+        <item name="colorSurface">@android:color/white</item>
+        <item name="colorSurfaceVariant">@color/grey_50</item>
+        <item name="colorOnSurface">@android:color/black</item>
+        <item name="colorOnSurfaceVariant">@android:color/darker_gray</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
@@ -162,6 +187,11 @@
         <item name="colorSecondary">@color/secondaryColorSet6</item>
         <item name="colorSecondaryVariant">@color/secondaryLightColorSet6</item>
         <item name="colorOnSecondary">@color/secondaryTextColorSet6</item>
+        <!-- Surface color. -->
+        <item name="colorSurface">@android:color/white</item>
+        <item name="colorSurfaceVariant">@color/grey_50</item>
+        <item name="colorOnSurface">@android:color/black</item>
+        <item name="colorOnSurfaceVariant">@android:color/darker_gray</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->

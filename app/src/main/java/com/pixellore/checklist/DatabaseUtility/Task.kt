@@ -11,6 +11,7 @@ import com.pixellore.checklist.DataClass.CustomStyle
 @Entity(tableName = "task_table")
 data class Task(
     @PrimaryKey var task_id: Int,
+    var task_pos_id: Int,
     var task_title: String?,
     var details_note: String? = "",
     var due_date: String? = "",
@@ -20,7 +21,24 @@ data class Task(
     var parent_checklist_id: Int,
     var task_font: CustomStyle?
 ) : Parcelable {
+
+    // Override the equals method
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Task) return false
+        return (task_id == other.task_id) &&
+                (task_pos_id == other.task_pos_id) &&
+                (task_title == other.task_title) &&
+                (details_note == other.details_note) &&
+                (due_date == other.due_date) &&
+                (priority == other.priority) &&
+                (isExpanded == other.isExpanded) &&
+                (task_isCompleted == other.task_isCompleted) &&
+                (parent_checklist_id == other.parent_checklist_id) &&
+                (task_font == other.task_font)
+    }
     constructor(parcel: Parcel) : this(
+        parcel.readInt(),
         parcel.readInt(),
         parcel.readString(),
         parcel.readString(),
@@ -41,6 +59,7 @@ data class Task(
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(task_id)
+        parcel.writeInt(task_pos_id)
         parcel.writeString(task_title)
         parcel.writeString(details_note)
         parcel.writeString(due_date)
