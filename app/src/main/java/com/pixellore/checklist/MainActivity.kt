@@ -6,7 +6,9 @@ import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuCompat
@@ -18,6 +20,7 @@ import com.pixellore.checklist.DatabaseUtility.*
 import com.pixellore.checklist.utils.BaseActivity
 import com.pixellore.checklist.utils.Constants
 import com.pixellore.checklist.utils.MultipurposeAlertDialogFragment
+import java.time.LocalDate
 import java.util.HashMap
 
 
@@ -36,7 +39,6 @@ class MainActivity : BaseActivity() {
     // colors from current theme
     private lateinit var currentThemeColors: HashMap<String, Int>
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme() // to set theme to the theme saved in SharedPreference
@@ -44,6 +46,16 @@ class MainActivity : BaseActivity() {
 
         // get colors from current theme, so it can applied to the toolbar and popup menu
         currentThemeColors = getColorsFromTheme(TaskApplication.appTheme)
+
+        // Empty view - inflate empty view and make it as invisible
+        val emptyContainer = findViewById<FrameLayout>(R.id.main_activity_empty_container)
+        val emptyView = layoutInflater.inflate(R.layout.empty_checklist, emptyContainer, false)
+        emptyContainer.addView(emptyView)
+        emptyView.visibility = View.GONE
+        val emptyViewTitle = emptyView.findViewById<TextView>(R.id.empty_title_text)
+        val emptyViewExplain = emptyView.findViewById<TextView>(R.id.empty_explanation_text)
+        emptyViewTitle.text = getText(R.string.empty_checklists)
+        emptyViewExplain.text = getText(R.string.empty_checklists_explain)
 
         // set up Toolbar as action bar for the activity
         val toolbar: Toolbar = findViewById(R.id.main_activity_toolbar)
@@ -62,9 +74,17 @@ class MainActivity : BaseActivity() {
         checklistRecyclerView.layoutManager = LinearLayoutManager(this)
 
         actionPlanViewModel.allChecklists.observe(this) { checklists ->
-            // Update the cached copy of the tasks in the adapter.
-            checklists.let {
-                checklistAdapter.submitList(it)
+            if (checklists.isNotEmpty()){
+                emptyView.visibility = View.GONE
+                checklistRecyclerView.visibility = View.VISIBLE
+                // Update the cached copy of the tasks in the adapter.
+                checklists.let {
+                    checklistAdapter.submitList(it)
+                }
+            } else {
+                // Show empty view
+                emptyView.visibility = View.VISIBLE
+                checklistRecyclerView.visibility = View.GONE
             }
         }
 
@@ -130,10 +150,12 @@ class MainActivity : BaseActivity() {
                     // get position id (where to place the new checklist)
                     val checklistPositionId = findNextPositionId(checklistIds)
 
-                    // todo add created on date
+                    // set created date (of Checklist) as today's  date
+                    val today = LocalDate.now().toString()
+
                     val newChecklist = Checklist(
                         checklistId, checklistPositionId, checklistTitle,
-                        null, false, null, false,
+                        today, false, null, false,
                         CustomStyle(null, null,
                             null, null)
                     )
@@ -234,11 +256,18 @@ class MainActivity : BaseActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
 
         R.id.action_delete_all -> {
-            // User chose "Delete all", delete database
+            // confirm delete action
+            val myDialog = MultipurposeAlertDialogFragment.newInstance(
+                headline = "Delete all checklists?",
+                text = "",
+                posButtonText = "Delete",
+                negButtonText = "Cancel"
+            ) {
+                actionPlanViewModel.deleteAllChecklists()
+            }
+            myDialog.setBaseActivityListener(this)
+            myDialog.show(supportFragmentManager, "dialog")
 
-            //todo alert dialog requesting confirmation to DELETE (warn app will restart)
-            this.deleteDatabase("action_plan_database")
-            // todo implement restart app
             true
         }
 

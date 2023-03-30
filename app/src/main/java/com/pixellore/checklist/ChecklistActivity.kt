@@ -9,12 +9,16 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.View
+import android.widget.FrameLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuCompat
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.dhaval2404.colorpicker.ColorPickerDialog
@@ -24,11 +28,11 @@ import com.pixellore.checklist.AdapterUtility.TaskRecycleAdapter
 import com.pixellore.checklist.DataClass.CustomStyle
 import com.pixellore.checklist.DataClass.TextFont
 import com.pixellore.checklist.DatabaseUtility.*
-import com.pixellore.checklist.utils.BaseActivity
-import com.pixellore.checklist.utils.Constants
-import com.pixellore.checklist.utils.MultipurposeAlertDialogFragment
-import com.pixellore.checklist.utils.StyleSelectionDialogFragment
-import java.util.HashMap
+import com.pixellore.checklist.utils.*
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ChecklistActivity : BaseActivity() {
 
@@ -48,6 +52,8 @@ class ChecklistActivity : BaseActivity() {
     private var taskIds: List<Int> = emptyList()
     private var subtaskIds: List<Int> = emptyList()
 
+    // list of task_id of tasks in this checklist
+    private var taskIdsInChecklist:  MutableList<Int> = mutableListOf()
 
     // checklist object; clicking on this object opens this activity
     private var checklistToDisplay: Checklist? = null
@@ -134,7 +140,7 @@ class ChecklistActivity : BaseActivity() {
 
 
                         // get position of the new task
-                        val taskPosId = findNextPositionId(taskIds)
+                        val taskPosId = findNextPositionId(taskIdsInChecklist)
 
                         // IMPORTANT STEP
                         // Add correct values for IDs
@@ -423,6 +429,17 @@ class ChecklistActivity : BaseActivity() {
         // get colors from current theme, so it can applied to the toolbar and popup menu
         currentThemeColors = getColorsFromTheme(TaskApplication.appTheme)
 
+        // Empty view - inflate empty view and make it as invisible
+        val emptyContainer = findViewById<FrameLayout>(R.id.empty_container)
+        val emptyView = layoutInflater.inflate(R.layout.empty_checklist, emptyContainer, false)
+        emptyContainer.addView(emptyView)
+        emptyView.visibility = View.GONE
+        val emptyViewTitle = emptyView.findViewById<TextView>(R.id.empty_title_text)
+        val emptyViewExplain = emptyView.findViewById<TextView>(R.id.empty_explanation_text)
+        emptyViewTitle.text = getText(R.string.empty_tasks)
+        emptyViewExplain.text = getText(R.string.empty_tasks_explain)
+
+
         // set up Toolbar as action bar for the activity
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -460,10 +477,16 @@ class ChecklistActivity : BaseActivity() {
         actionListRecyclerView.itemAnimator?.changeDuration = 0
 
 
-
-
-        actionListRecyclerView.adapter = adapter
+        // Set the LayoutManager for the RecyclerView
         actionListRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        // Set the adapter for the RecyclerView
+        actionListRecyclerView.adapter = adapter
+
+        // Attach the ItemTouchHelper to the RecyclerView
+        val itemTouchHelper = ItemTouchHelper(ItemTouchHelperCallback(adapter))
+        itemTouchHelper.attachToRecyclerView(actionListRecyclerView)
+
 
         // get only TasksWithSubtasks belongs to this checklist
         // to display only TasksWithSubtasks belonging to this checklist, when the user opens the checklist
@@ -471,10 +494,35 @@ class ChecklistActivity : BaseActivity() {
             actionPlanViewModel.allTasksWithSubtasksByChecklistId(checklistToDisplay!!.checklist_id)
                 .observe(this) { tasks ->
                     taskWithSubtasksList = tasks
-                    // Update the cached copy of the tasks in the adapter.
-                    tasks.let {
-                        adapter.submitList(it)
+
+                    // debug
+                    tasks.forEach {
+                        it.task.due_date?.let { it1 ->
+                            val dueDateStatus = compareDates(it1)
+                            Log.v(Constants.TAG, "duedate $it1, status $dueDateStatus")
+                        }
                     }
+
+                    // extract and store the latest list of task ids in this checklist
+                    taskIdsInChecklist.clear()
+                    taskWithSubtasksList.forEach {
+                        taskIdsInChecklist.add(it.task.task_id)
+                    }
+
+                    if (tasks.isNotEmpty()) {
+                        emptyView.visibility = View.GONE
+                        actionListRecyclerView.visibility = View.VISIBLE
+
+                        // Update the cached copy of the tasks in the adapter.
+                        tasks.let {
+                            adapter.submitList(it)
+                        }
+                    } else {
+                        // Show empty view
+                        emptyView.visibility = View.VISIBLE
+                        actionListRecyclerView.visibility = View.GONE
+                    }
+
                 }
         }
         else{
@@ -530,6 +578,7 @@ class ChecklistActivity : BaseActivity() {
             val intent = Intent(this@ChecklistActivity, TaskEditorActivity::class.java)
             getItemAddActivityResult.launch(intent)
         }
+
 
     }
 
@@ -609,6 +658,71 @@ class ChecklistActivity : BaseActivity() {
             myDialog.setBaseActivityListener(this)
 
             myDialog.show(supportFragmentManager, "dialog")
+        } else if (actionRequested == Constants.REARRANGE) {
+
+            val oldPos = taskWithSubtasks.task.task_pos_id
+            val newPos = position
+            Log.v(Constants.TAG, "old $oldPos, new $newPos")
+
+
+            var movementDir: String = ""
+            var itemsWithPosChange = mutableListOf<Int>()
+
+            // movement UP or DOWN
+            if (newPos < oldPos) {
+                // Moved UP
+                movementDir = "UP"
+
+                // increment position id of items in these positions
+                itemsWithPosChange = (newPos until oldPos).toMutableList()
+            } else if (newPos > oldPos) {
+                // Moved DOWN
+                movementDir = "DOWN"
+
+                // decrement position id of items in these positions
+                itemsWithPosChange = (oldPos + 1 ..newPos).toMutableList()
+            }
+
+            Log.v(Constants.TAG, "itemsWithPosChange $itemsWithPosChange \n movementDir $movementDir")
+
+            val newPosMap = hashMapOf<Int, Int>()
+
+            for (i in taskWithSubtasksList.indices){
+                val eachItem = taskWithSubtasksList[i]
+
+                if (eachItem.task == taskWithSubtasks.task){
+                    // this is the task that was moved
+                    // this need to be placed in new location 'position'
+
+                    // assign new position to map
+                    newPosMap[eachItem.task.task_id] = newPos
+                }
+
+                if (eachItem.task.task_pos_id in itemsWithPosChange){
+                    // change
+                    if (movementDir == "UP"){
+                        newPosMap[eachItem.task.task_id] = eachItem.task.task_pos_id + 1
+                    } else if (movementDir == "DOWN") {
+                        newPosMap[eachItem.task.task_id] = eachItem.task.task_pos_id - 1
+                    } else {
+                        Log.e(Constants.TAG, "Error: wrong value for local var 'movementDir'")
+                    }
+                }
+            }
+
+            Log.v(Constants.TAG, "$newPosMap")
+
+            for (i in taskWithSubtasksList.indices){
+                val eachItem = taskWithSubtasksList[i]
+
+                if (eachItem.task.task_id in newPosMap.keys){
+                    eachItem.task.task_pos_id = newPosMap[eachItem.task.task_id]!!
+
+                    actionPlanViewModel.updateTask(eachItem.task)
+
+                    Log.v(Constants.TAG, "${eachItem.task.task_title} - ${eachItem.task.task_pos_id}")
+                }
+            }
         }
     }
 
@@ -644,14 +758,14 @@ class ChecklistActivity : BaseActivity() {
 
             true
         }
-        R.id.action_rearrange_list -> {
-            // todo implement "Rearrange items"
-            true
-        }
-        R.id.action_delete_all -> {
+        R.id.action_delete_all_tasks -> {
             // User chose "Delete all", delete all the tasks and subtasks in the checklist
-            actionPlanViewModel.deleteAllTasks()
-            actionPlanViewModel.deleteAllSubtasks()
+            taskWithSubtasksList.forEach {taskWithSubtask ->
+                actionPlanViewModel.deleteTask(taskWithSubtask.task)
+                taskWithSubtask.subtaskList.forEach { subtask ->
+                    actionPlanViewModel.deleteSubtask(subtask)
+                }
+            }
             true
         }
         R.id.action_change_background -> {
@@ -853,87 +967,9 @@ class ChecklistActivity : BaseActivity() {
     }
 
     private fun printDbTables() {
-        val tag = Constants.TAG
-        var count: Int
-
-        actionPlanViewModel.allChecklistTasks.observe(this) { tasks ->
-            val numberOfTaskItems = tasks.size
-            Log.v(tag, "There are $numberOfTaskItems tasks")
-            tasks.let {
-                count = 1
-                it.forEach {
-                    if (count == 1) {
-                        Log.v(
-                            tag,
-                            "\n\n-----------------------------------------------------------------------"
-                        )
-                    }
-                    Log.v(tag, "${it.task_id} - ${it.task_title}")
-                    Log.v(tag, "Due Date: ${it.due_date}")
-                    Log.v(tag, "Details: ${it.details_note}")
-                    Log.v(tag, "Priority: ${it.priority}")
-                    Log.v(tag, "Expanded: ${it.isExpanded}, Completed: ${it.task_isCompleted}")
-                    Log.v(tag, "CustomStyle: ${it.task_font}")
-                    Log.v(
-                        tag,
-                        "-----------------------------------------------------------------------"
-                    )
-                    count++
-                }
-            }
+        taskWithSubtasksList.forEach {
+            Log.v(Constants.TAG, it.task.toString())
         }
-
-        actionPlanViewModel.allChecklistSubtasks.observe(this) { subtasks ->
-            val numberOfSubtaskItems = subtasks.size
-            Log.v(tag, "There are $numberOfSubtaskItems subtasks")
-            subtasks.let {
-                count = 1
-                it.forEach {
-                    if (count == 1) {
-                        Log.v(
-                            tag,
-                            "\n\n-----------------------------------------------------------------------"
-                        )
-                    }
-                    Log.v(tag, "${it.subtask_id} - ${it.subtask_title}")
-                    Log.v(tag, "Parent ID: ${it.parent_task_id}")
-                    Log.v(tag, "Completed: ${it.subtask_isCompleted}")
-                    Log.v(tag, "CustomStyle: ${it.subtask_font}")
-                    Log.v(
-                        tag,
-                        "-----------------------------------------------------------------------"
-                    )
-                    count++
-                }
-            }
-        }
-
-
-        actionPlanViewModel.allTasksWithSubtasks.observe(this) { tasks ->
-            tasks.let {
-                count = 1
-                it.forEach {
-                    if (count == 1) {
-                        Log.v(
-                            tag,
-                            "\n\n-----------------------------------------------------------------------"
-                        )
-                    }
-                    Log.v(tag, "${it.task.task_id} - ${it.task.task_title}")
-                    Log.v(tag, "Number of subtasks: ${it.subtaskList.size}")
-                    it.subtaskList.forEach {
-                        Log.v(tag, "${it.subtask_id} - ${it.subtask_title}")
-                    }
-
-                    Log.v(
-                        tag,
-                        "-----------------------------------------------------------------------"
-                    )
-                    count++
-                }
-            }
-        }
-
     }
 
 }

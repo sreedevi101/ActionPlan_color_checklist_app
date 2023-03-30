@@ -10,7 +10,10 @@ import com.pixellore.checklist.DataClass.TextFont
 import com.pixellore.checklist.DataClass.Theme
 import com.pixellore.checklist.DatabaseUtility.TaskApplication
 import com.pixellore.checklist.R
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.HashMap
+import kotlin.math.abs
 
 /*
 * This activity class is part of the feature "Theme Selection by User"
@@ -306,6 +309,52 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityListener {
             return nextItemPosition
         }
     }
+
+    /**
+     * Compare the dates to determine the due date is Overdue/Today/# days to go
+     * */
+    fun compareDates(dueDateString: String): Long{
+
+        val daysBetween: Long
+        val dueDateStringSplit = dueDateString.split("[ ,]".toRegex())
+        val month = Constants.MONTHS.indexOf(dueDateStringSplit[1]) + 1
+
+        try {
+            val year = dueDateStringSplit[3].toInt()
+            val day = dueDateStringSplit[0].toInt()
+
+            val dueDate = LocalDate.of(year, month, day)
+            val today = LocalDate.now()
+
+            if (dueDate.isEqual(today)){
+                daysBetween = 0
+            } else {
+                daysBetween = ChronoUnit.DAYS.between(today, dueDate)
+            }
+            return daysBetween
+        } catch (e: NumberFormatException) {
+            // Handle the exception
+            Log.e(Constants.TAG, "Unable to calculate number of days remaining to due date!")
+        }
+        return 0
+    }
+
+    fun compareDatesDisplay(dueDateString: String, toGoDateThreshold: Int): String {
+        val daysBetween = compareDates(dueDateString)
+
+        if (daysBetween == 0L){
+            return "Today"
+        } else if (daysBetween < 0){
+            return "${abs(daysBetween)} days Overdue"
+        } else {
+            if (daysBetween <= toGoDateThreshold){
+                return "${abs(daysBetween)} days to go"
+            } else{
+                return dueDateString
+            }
+        }
+    }
+
 
     private fun getFontAssets() : MutableList<String>{
         val assetManager = this.assets

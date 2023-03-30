@@ -9,13 +9,6 @@
         android:title="@string/share_list"
         app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/action_rearrange_list"
-        android:icon="@drawable/baseline_drag_handle_24"
-        android:title="@string/rearrange_tasks"
-        app:showAsAction="ifRoom" />
-
-
     <group
         android:id="@+id/deleting">
 
@@ -23,7 +16,8 @@
         <item
             android:id="@+id/action_delete_all_tasks"
             android:title="@string/delete_all_tasks"
-            app:showAsAction="never" />
+            android:icon="@drawable/ic_baseline_delete_sweep_24"
+            app:showAsAction="ifRoom" />
 
     </group>
 

@@ -3,9 +3,11 @@ package com.pixellore.checklist.DatabaseUtility
 import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
+import android.util.Log
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.pixellore.checklist.DataClass.CustomStyle
+import com.pixellore.checklist.utils.Constants
 
 
 @Entity(tableName = "task_table")

@@ -6,18 +6,18 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TaskDao {
 
-    @Query("SELECT * FROM task_table ORDER BY task_id ASC")
+    @Query("SELECT * FROM task_table ORDER BY task_pos_id ASC")
     fun getTasks(): Flow<List<Task>>
 
-    @Query("SELECT * FROM subtask_table ORDER BY subtask_id ASC")
+    @Query("SELECT * FROM subtask_table ORDER BY subtask_pos_id ASC")
     fun getSubtasks(): Flow<List<Subtask>>
 
     @Transaction
-    @Query("SELECT * FROM task_table ORDER BY task_id ASC")
+    @Query("SELECT * FROM task_table ORDER BY task_pos_id ASC")
     fun getTasksWithSubtasks(): Flow<List<TaskWithSubtasks>>
 
     @Transaction
-    @Query("SELECT * FROM task_table WHERE parent_checklist_id = :checklistId ORDER BY task_id ASC")
+    @Query("SELECT * FROM task_table WHERE parent_checklist_id = :checklistId ORDER BY task_pos_id ASC")
     fun getTasksWithSubtasksByChecklistId(checklistId: Int): Flow<List<TaskWithSubtasks>>
 
     //----------------------Task----------------------------
@@ -46,6 +46,8 @@ interface TaskDao {
             "parent_checklist_id = :oldParentChecklistId AND task_id = :oldId")
     suspend fun updateTaskParentChecklistId(oldId: Int, oldParentChecklistId: Int, newParentChecklistId: Int)
 
+    @Query("UPDATE task_table SET task_pos_id = :newPosId WHERE task_id = :uniqueId")
+    suspend fun updateTaskOrder(uniqueId: Int, newPosId: Int)
 
     @Delete
     suspend fun deleteTask(task: Task)
@@ -82,6 +84,10 @@ interface TaskDao {
             "parent_task_id = :oldParentTaskId AND subtask_id = :oldId")
     suspend fun updateSubtaskParentTaskId(oldId: Int, oldParentTaskId: Int, newParentTaskId: Int)
 
+
+    @Query("UPDATE subtask_table SET subtask_pos_id = :newPosId WHERE subtask_id = :uniqueId")
+    suspend fun updateSubtaskOrder(uniqueId: Int, newPosId: Int)
+
     @Delete
     suspend fun deleteSubtask(subtask: Subtask)
 
@@ -109,6 +115,10 @@ interface TaskDao {
     @Query("UPDATE checklist_table SET checklist_id = :newId WHERE checklist_id = :oldId  AND" +
             " NOT EXISTS (SELECT 1 FROM subtask_table WHERE subtask_id = :newId)")
     suspend fun updateChecklistId(oldId: Int, newId: Int)
+
+
+    @Query("UPDATE checklist_table SET checklist_pos_id = :newPosId WHERE checklist_id = :uniqueId")
+    suspend fun updateChecklistOrder(uniqueId: Int, newPosId: Int)
 
     @Delete
     suspend fun deleteChecklist(checklist: Checklist)
