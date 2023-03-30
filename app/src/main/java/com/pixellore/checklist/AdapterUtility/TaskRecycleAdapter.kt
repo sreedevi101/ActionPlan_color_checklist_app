@@ -2,11 +2,13 @@ package com.pixellore.checklist.AdapterUtility
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.Typeface
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
@@ -16,10 +18,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.MenuCompat
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import com.github.dhaval2404.colorpicker.ColorPickerDialog
 import com.github.dhaval2404.colorpicker.model.ColorShape
 import com.pixellore.checklist.DataClass.CustomStyle
@@ -40,7 +39,7 @@ class TaskRecycleAdapter(
     private val clickListenerSubtask: (position: Int, subtask: Subtask) -> Unit,
     private val activity: BaseActivity
 ) :
-    ListAdapter<TaskWithSubtasks, TaskRecycleAdapter.TaskRecycleViewHolder>(ActionItemComparator()){
+    ListAdapter<TaskWithSubtasks, TaskRecycleAdapter.TaskRecycleViewHolder>(ActionItemComparator()), ItemTouchHelperAdapter{
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskRecycleViewHolder {
         return TaskRecycleViewHolder.create(parent, activity)
@@ -53,7 +52,31 @@ class TaskRecycleAdapter(
     }
 
 
-    class TaskRecycleViewHolder(itemView: View, activity: BaseActivity) : RecyclerView.ViewHolder(itemView) {
+    override fun onItemMove(fromPosition: Int, toPosition: Int) {
+
+        val currentTask = getItem(fromPosition)
+        Log.v(Constants.TAG, "currentTask ${currentTask.task.task_title}, " +
+                "current position ${currentTask.task.task_pos_id}")
+        Log.v(Constants.TAG, "onItemMove ${fromPosition+1} to ${toPosition+1}")
+        Log.v(Constants.TAG, "toPosition $toPosition")
+        //currentTask.task.task_pos_id = toPosition
+
+        // Update in database
+        // move currentTask to toPosition, rearrange rest of the tasks in the checklist
+       clickListener(toPosition+1, currentTask, Constants.REARRANGE)
+
+        //notifyDataSetChanged()
+
+    }
+
+    class TaskRecycleViewHolder(itemView: View, activity: BaseActivity) :
+        RecyclerView.ViewHolder(itemView),
+        ItemTouchHelperViewHolder,
+        View.OnTouchListener{
+
+        init {
+            itemView.setOnTouchListener(this)
+        }
 
 
         val baseActivity: BaseActivity = activity
@@ -95,7 +118,11 @@ class TaskRecycleAdapter(
                 }
                 // Due date
                 if (!currentTask.task.due_date.equals("")){
-                    taskDueDate.text = currentTask.task.due_date
+                    val dueDateStatus = currentTask.task.due_date?.let {
+                        baseActivity.compareDatesDisplay(it, 5)
+                    }
+
+                    taskDueDate.text = dueDateStatus
                     taskDueDate.visibility = View.VISIBLE
                 } else {
                     taskDueDate.visibility = View.GONE
@@ -470,6 +497,32 @@ class TaskRecycleAdapter(
             }
         }
 
+        // Override onTouch() method to implement touch listener
+        override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+            // Handle touch events here
+            // Return true to indicate that touch event is handled
+            Log.v(Constants.TAG, "onTouch")
+            if (event != null) {
+                if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                    Log.v(Constants.TAG, "ViewHolder has touch listener set")
+                }
+            }
+            return false
+        }
+
+        // Implement other required methods of ItemTouchHelperViewHolder
+        override fun onItemSelected() {
+            // Provide feedback to user when item is being dragged
+            itemView.setBackgroundColor(Color.LTGRAY)
+            Log.v(Constants.TAG, "onItemSelected")
+        }
+
+        override fun onItemClear() {
+            // Provide feedback to user when item is released after being dragged
+            itemView.setBackgroundColor(Color.WHITE)
+            Log.v(Constants.TAG, "onItemClear")
+        }
+
 
     }
 
@@ -500,4 +553,6 @@ class TaskRecycleAdapter(
             return oldItem == newItem
         }
     }
+
+
 }

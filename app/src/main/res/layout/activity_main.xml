@@ -15,6 +15,13 @@
         app:popupTheme="@style/toolbarPopupMenu"
         android:layout_alignParentTop="true"/>
 
+    <FrameLayout
+        android:id="@+id/main_activity_empty_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/main_activity_toolbar"
+        android:layout_above="@id/quick_add_layout_outside"/>
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/checklist_recycler_view_scroller"
         android:layout_width="match_parent"

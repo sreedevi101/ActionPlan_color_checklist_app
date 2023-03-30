@@ -7,7 +7,7 @@
     <string name="empty_not_saved">Task not saved because it is empty.</string>
     <string name="add_word">Add Task</string>
     <string name="priority">Priority</string>
-    <string name="due_date">Enter due date (Optional)</string>
+    <string name="due_date">Due Date (Optional)</string>
     <string name="add_subtask">Add Subtask</string>
     <string name="delete_all">Delete all</string>
     <string name="delete_all_tasks">Delete all tasks</string>
@@ -41,5 +41,10 @@
     <string name="task_title_text_color">Task title Text color</string>
     <string name="task_details_text_color">Task details Text color</string>
     <string name="font_style">Font style</string>
+    <string name="empty_tasks">No tasks!</string>
+    <string name="empty_tasks_explain">Add a new task by clicking \'+\' at the bottom of this page.</string>
+    <string name="empty_checklists">No Checklists!</string>
+    <string name="empty_checklists_explain">Add a new checklist. Once the checklist is added it will be displayed here.</string>
+    <string name="pick_due_date">Pick Due date</string>
 
 </resources>

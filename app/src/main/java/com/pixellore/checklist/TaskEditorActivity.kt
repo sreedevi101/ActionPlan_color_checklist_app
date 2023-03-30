@@ -13,13 +13,18 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import com.pixellore.checklist.DataClass.CustomStyle
 import com.pixellore.checklist.DatabaseUtility.Subtask
 import com.pixellore.checklist.DatabaseUtility.Task
 import com.pixellore.checklist.DatabaseUtility.TaskApplication
 import com.pixellore.checklist.utils.BaseActivity
 import com.pixellore.checklist.utils.Constants
+import com.pixellore.checklist.utils.DatePickerFragment
 import com.pixellore.checklist.utils.MultipurposeAlertDialogFragment
 import java.util.HashMap
 
@@ -30,7 +35,9 @@ class TaskEditorActivity : BaseActivity() {
 
     private lateinit var editTaskTitleView: EditText
     private lateinit var editTaskDetailsView: EditText
-    private lateinit var addDueDateView: EditText
+    private lateinit var addDueDateView: TextView
+    private lateinit var addDueDateViewBtn: ImageButton
+    private lateinit var dateSelector: ConstraintLayout
 
     private lateinit var subtaskLayout: LinearLayout
     private lateinit var addSubtaskButton: Button
@@ -58,6 +65,8 @@ class TaskEditorActivity : BaseActivity() {
         editTaskTitleView = findViewById(R.id.edit_task_title)
         editTaskDetailsView = findViewById(R.id.edit_task_details)
         addDueDateView = findViewById(R.id.add_due_date)
+        addDueDateViewBtn = findViewById(R.id.add_due_date_button)
+        dateSelector = findViewById(R.id.date_selector)
 
         editorLayout = findViewById(R.id.editor_activity_layout)
         secondaryColorStrip = findViewById(R.id.secondary_color_design)
@@ -105,6 +114,20 @@ class TaskEditorActivity : BaseActivity() {
             // call function to create, and style the edit text view, delete button and associated layout
             val subtaskLayoutGroup = addSubtaskViewGroup()
             subtaskLayout.addView(subtaskLayoutGroup, subtaskLayout.childCount)
+        }
+
+        // Open Date Picker
+        addDueDateViewBtn.setOnClickListener {
+            val newFragment = DatePickerFragment(){ date ->
+                addDueDateView.text = date
+            }
+            newFragment.show(supportFragmentManager, "datePicker")
+        }
+        addDueDateView.setOnClickListener {
+            val newFragment = DatePickerFragment() { date ->
+                addDueDateView.text = date
+            }
+            newFragment.show(supportFragmentManager, "datePicker")
         }
 
         /**

@@ -109,6 +109,18 @@ class TaskRepository(private val actionItemDao: TaskDao) {
         actionItemDao.updateChecklistId(oldId, newId)
     }
 
+    suspend fun updateChecklistOrder(uniqueId: Int, newPosId: Int){
+        actionItemDao.updateChecklistOrder(uniqueId, newPosId)
+    }
+
+    suspend fun updateTaskOrder(uniqueId: Int, newPosId: Int){
+        actionItemDao.updateTaskOrder(uniqueId, newPosId)
+    }
+
+    suspend fun updateSubtaskOrder(uniqueId: Int, newPosId: Int){
+        actionItemDao.updateSubtaskOrder(uniqueId, newPosId)
+    }
+
     // Delete
     suspend fun deleteTask(task: Task) {
         actionItemDao.deleteTask(task)

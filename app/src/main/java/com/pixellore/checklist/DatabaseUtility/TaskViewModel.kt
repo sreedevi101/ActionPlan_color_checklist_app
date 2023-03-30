@@ -107,6 +107,19 @@ class ActionPlanViewModel(private val repository: TaskRepository) : ViewModel() 
     }
 
 
+    fun updateChecklistOrder(uniqueId: Int, newPosId: Int) = viewModelScope.launch(){
+        repository.updateChecklistOrder(uniqueId, newPosId)
+    }
+
+    fun updateTaskOrder(uniqueId: Int, newPosId: Int) = viewModelScope.launch(){
+        repository.updateTaskOrder(uniqueId, newPosId)
+    }
+
+    fun updateSubtaskOrder(uniqueId: Int, newPosId: Int) = viewModelScope.launch(){
+        repository.updateSubtaskOrder(uniqueId, newPosId)
+    }
+
+
 
     // Delete
     fun deleteTask(task: Task) = viewModelScope.launch() {
