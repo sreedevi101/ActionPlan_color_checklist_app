@@ -20,11 +20,12 @@ import com.pixellore.checklist.DatabaseUtility.*
 import com.pixellore.checklist.utils.BaseActivity
 import com.pixellore.checklist.utils.Constants
 import com.pixellore.checklist.utils.MultipurposeAlertDialogFragment
+import com.pixellore.checklist.utils.ThemePickerDialogFragment
 import java.time.LocalDate
 import java.util.HashMap
 
 
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity(), ThemePickerDialogFragment.ThemeSelectedListener {
 
     private val actionPlanViewModel: ActionPlanViewModel by viewModels {
         ActionPlanViewModelFactory((application as TaskApplication).repository)
@@ -271,14 +272,21 @@ class MainActivity : BaseActivity() {
             true
         }
 
-        R.id.action_settings -> {
-            // User chose the "Settings" item, show the settings UI for the checklist
+        R.id.action_about -> {
+            //Show the About page of the app
 
-            val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+            val intent = Intent(this@MainActivity, AboutActivity::class.java)
             startActivity(intent)
             true
         }
-
+        R.id.action_change_theme -> {
+            // Open DialogFragment
+            val themeSelector: ThemePickerDialogFragment = ThemePickerDialogFragment()
+            themeSelector.setThemeSelectedListener(this)
+            themeSelector.setBaseActivityListener(this)
+            themeSelector.show(supportFragmentManager, "theme_select")
+            true
+        }
         R.id.action_print_database -> {
 
             printDbChecklistTable()
@@ -291,6 +299,18 @@ class MainActivity : BaseActivity() {
             super.onOptionsItemSelected(item)
         }
 
+    }
+
+    override fun switchToNewTheme(selectedTheme: Int) {
+        // call method in BaseActivity to switch theme to new theme selected
+        switchTheme(selectedTheme)
+        setTheme()
+        recreate()
+
+        // Set flag to recreate other activities
+        TaskApplication.recreateMainActivity = true
+        TaskApplication.recreateChecklistActivity = true
+        TaskApplication.recreateTaskEditor = true
     }
 
 

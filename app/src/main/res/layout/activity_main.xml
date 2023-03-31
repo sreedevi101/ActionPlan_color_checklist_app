@@ -23,7 +23,6 @@
         android:layout_above="@id/quick_add_layout_outside"/>
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/checklist_recycler_view_scroller"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fillViewport="true"

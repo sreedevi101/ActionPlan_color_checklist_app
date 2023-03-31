@@ -9,8 +9,7 @@
         android:title="@string/share_list"
         app:showAsAction="ifRoom" />
 
-    <group
-        android:id="@+id/deleting">
+    <group>
 
         <!-- "Delete all", should appear as action button if possible -->
         <item
@@ -22,8 +21,7 @@
     </group>
 
 
-    <group
-        android:id="@+id/formatting">
+    <group>
 
         <item
             android:id="@+id/action_change_background"
