@@ -9,8 +9,7 @@
         android:title="@string/rename_list"
         app:showAsAction="never" />
 
-    <group
-        android:id="@+id/formatting">
+    <group>
 
         <item
             android:id="@+id/popup_change_background"
