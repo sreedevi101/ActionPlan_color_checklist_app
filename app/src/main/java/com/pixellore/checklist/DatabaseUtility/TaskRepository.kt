@@ -28,6 +28,8 @@ class TaskRepository(private val actionItemDao: TaskDao) {
 
     val allChecklists: Flow<List<Checklist>> = actionItemDao.getChecklists()
 
+    val allChecklistsByPinned: Flow<List<Checklist>> = actionItemDao.getChecklistsByPinned()
+
     fun getAllTaskIds(): Flow<List<Int>> {
         return actionItemDao.getAllTaskIds()
     }
@@ -38,6 +40,10 @@ class TaskRepository(private val actionItemDao: TaskDao) {
 
     fun getAllChecklistIds(): Flow<List<Int>> {
         return actionItemDao.getAllChecklistIds()
+    }
+
+    fun getAllChecklistIdsSortedByPinned(): Flow<List<Int>> {
+        return actionItemDao.getAllChecklistIdsSortedByPinned()
     }
 
     fun getSubtaskIdsByTaskId(taskId: Int): Flow<List<Int>>{
