@@ -962,7 +962,7 @@ class ChecklistActivity : BaseActivity() {
         }
         stringOutput += "-".repeat(30)
         stringOutput += "\nSend from " + Constants.APP_NAME
-        // todo add "website name" of the app
+
         return stringOutput
     }
 

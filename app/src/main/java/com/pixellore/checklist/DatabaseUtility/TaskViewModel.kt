@@ -27,6 +27,8 @@ class ActionPlanViewModel(private val repository: TaskRepository) : ViewModel() 
 
     val allChecklists: LiveData<List<Checklist>> = repository.allChecklists.asLiveData()
 
+    val allChecklistsByPinned: LiveData<List<Checklist>> = repository.allChecklistsByPinned.asLiveData()
+
     fun getAllTaskIds(): LiveData<List<Int>> {
         return repository.getAllTaskIds().asLiveData()
     }
@@ -37,6 +39,10 @@ class ActionPlanViewModel(private val repository: TaskRepository) : ViewModel() 
 
     fun getAllChecklistIds(): LiveData<List<Int>> {
         return repository.getAllChecklistIds().asLiveData()
+    }
+
+    fun getAllChecklistIdsSortedByPinned(): LiveData<List<Int>> {
+        return repository.getAllChecklistIdsSortedByPinned().asLiveData()
     }
 
     fun getTaskIdsByChecklistId(checklistId: Int): Flow<List<Int>> {

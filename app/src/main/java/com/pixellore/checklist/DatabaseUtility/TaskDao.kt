@@ -102,9 +102,14 @@ interface TaskDao {
     @Query("SELECT * FROM checklist_table ORDER BY checklist_id ASC")
     fun getChecklists(): Flow<List<Checklist>>
 
+    @Query("SELECT * FROM checklist_table ORDER BY CASE WHEN isPinned = 1 THEN 0 ELSE 1 END, checklist_id ASC")
+    fun getChecklistsByPinned(): Flow<List<Checklist>>
+
     @Query("SELECT checklist_id FROM checklist_table ORDER BY checklist_id ASC")
     fun getAllChecklistIds(): Flow<List<Int>>
 
+    @Query("SELECT checklist_id FROM checklist_table ORDER BY CASE WHEN isPinned = 1 THEN 0 ELSE 1 END, checklist_id ASC")
+    fun getAllChecklistIdsSortedByPinned(): Flow<List<Int>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertChecklist(checklist: Checklist)

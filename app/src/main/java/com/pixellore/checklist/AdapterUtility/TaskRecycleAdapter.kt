@@ -117,10 +117,13 @@ class TaskRecycleAdapter(
                     taskTitleView.setTextColor(it)
                 }
                 // Due date
-                if (!currentTask.task.due_date.equals("")){
-                    val dueDateStatus = currentTask.task.due_date?.let {
+                var dueDateStatus: String = ""
+                if (!currentTask.task.due_date.equals("")) {
+                    dueDateStatus = currentTask.task.due_date?.let {
                         baseActivity.compareDatesDisplay(it, 5)
-                    }
+                    }.toString()
+                }
+                if (!dueDateStatus.equals("")){
 
                     taskDueDate.text = dueDateStatus
                     taskDueDate.visibility = View.VISIBLE

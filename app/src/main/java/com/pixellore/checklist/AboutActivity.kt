@@ -63,10 +63,10 @@ class AboutActivity : BaseActivity() {
         // User Notes
 
         val userNotesTextView = findViewById<View>(R.id.about_user_manual) as TextView
-        // todo change links to github pages
+
         userNotesTextView.setOnClickListener { // open tutorial slides
             val userManualLink =
-                "https://github.com/sreedevi101/gallery-search-app/blob/main/User%20Guide.md"
+                "https://github.com/sreedevi101/ActionPlan_color_checklist_app/blob/main/User%20Guide.md"
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(userManualLink))
             startActivity(browserIntent)
         }
@@ -77,7 +77,7 @@ class AboutActivity : BaseActivity() {
 
         privacyPolicyTextView.setOnClickListener { // open link
             val privacyPolicyLink =
-                "https://github.com/sreedevi101/gallery-search-app/blob/main/Privacy%20Policy.md"
+                "https://github.com/sreedevi101/ActionPlan_color_checklist_app/blob/main/Privacy%20Policy.md"
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(privacyPolicyLink))
             startActivity(browserIntent)
         }
@@ -87,19 +87,9 @@ class AboutActivity : BaseActivity() {
 
         termsTextView.setOnClickListener { // open link
             val termsConditionsLink =
-                "https://github.com/sreedevi101/gallery-search-app/blob/main/Terms%20%26%20Conditions.md"
+                "https://github.com/sreedevi101/ActionPlan_color_checklist_app/blob/main/Terms%20%26%20Conditions.md"
             val browserIntent =
                 Intent(Intent.ACTION_VIEW, Uri.parse(termsConditionsLink))
-            startActivity(browserIntent)
-        }
-
-
-        val thirdPartyTextView = findViewById<View>(R.id.about_page_third_parties) as TextView
-
-        thirdPartyTextView.setOnClickListener { // open link
-            val thirdPartiesLink =
-                "https://github.com/sreedevi101/gallery-search-app/blob/main/Third%20Parties.md"
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(thirdPartiesLink))
             startActivity(browserIntent)
         }
 
@@ -108,7 +98,7 @@ class AboutActivity : BaseActivity() {
 
         contactTextView.setOnClickListener { // send email
             val developerEmailId = "sreedevi.appdev@gmail.com"
-            val subject = "GallerySearch"
+            val subject = "ActionPlan Color Checklist"
             val i = Intent(Intent.ACTION_SENDTO)
             //i.setType("text/plain"); // or:
             i.data = Uri.parse("mailto:") // only email apps should handle this

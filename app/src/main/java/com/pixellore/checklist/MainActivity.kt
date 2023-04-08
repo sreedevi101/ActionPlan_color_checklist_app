@@ -37,6 +37,8 @@ class MainActivity : BaseActivity(), ThemePickerDialogFragment.ThemeSelectedList
     * */
     private var checklistIds: List<Int> = emptyList()
 
+    private lateinit var checklistAdapter: ChecklistRecycleAdapter
+
     // colors from current theme
     private lateinit var currentThemeColors: HashMap<String, Int>
 
@@ -64,7 +66,7 @@ class MainActivity : BaseActivity(), ThemePickerDialogFragment.ThemeSelectedList
 
         // Setup the recycler view to display the checklists in database
         val checklistRecyclerView = findViewById<RecyclerView>(R.id.checklist_recycler_view)
-        val checklistAdapter = ChecklistRecycleAdapter ({ position, checklist, actionRequested ->
+        checklistAdapter = ChecklistRecycleAdapter({ position, checklist, actionRequested ->
             onListChecklistClick(
                 position,
                 checklist,
@@ -74,8 +76,9 @@ class MainActivity : BaseActivity(), ThemePickerDialogFragment.ThemeSelectedList
         checklistRecyclerView.adapter = checklistAdapter
         checklistRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        actionPlanViewModel.allChecklists.observe(this) { checklists ->
-            if (checklists.isNotEmpty()){
+        // returns checklists in the ascending order of 'checklist_id' with checklists with 'isPinned' = true first
+        actionPlanViewModel.allChecklistsByPinned.observe(this) { checklists ->
+            if (checklists.isNotEmpty()) {
                 emptyView.visibility = View.GONE
                 checklistRecyclerView.visibility = View.VISIBLE
                 // Update the cached copy of the tasks in the adapter.
@@ -96,7 +99,6 @@ class MainActivity : BaseActivity(), ThemePickerDialogFragment.ThemeSelectedList
 
             //runBlocking { sequence(checklistIds, taskWithSubtasksList, subtaskIdList) }
         }
-
 
 
         // set toolbar background color to colorPrimary of the current theme
@@ -130,7 +132,7 @@ class MainActivity : BaseActivity(), ThemePickerDialogFragment.ThemeSelectedList
 
                 // insert the checklist with the user entered title
                 val checklistId = findNextId(checklistIds)
-                if (checklistId == -1){ // unique ids reached max limit of Int
+                if (checklistId == -1) { // unique ids reached max limit of Int
 
                     // alert dialog saying reached max limit
                     val myDialog = MultipurposeAlertDialogFragment.newInstance(
@@ -145,7 +147,7 @@ class MainActivity : BaseActivity(), ThemePickerDialogFragment.ThemeSelectedList
                     myDialog.setBaseActivityListener(this)
                     myDialog.show(supportFragmentManager, "dialog")
 
-                } else{
+                } else {
                     val checklistTitle = checklistTitleEditText.text.toString()
 
                     // get position id (where to place the new checklist)
@@ -157,8 +159,10 @@ class MainActivity : BaseActivity(), ThemePickerDialogFragment.ThemeSelectedList
                     val newChecklist = Checklist(
                         checklistId, checklistPositionId, checklistTitle,
                         today, false, null, false,
-                        CustomStyle(null, null,
-                            null, null)
+                        CustomStyle(
+                            null, null,
+                            null, null
+                        )
                     )
 
                     Log.v(Constants.TAG, "inserting new checklist")
@@ -186,6 +190,7 @@ class MainActivity : BaseActivity(), ThemePickerDialogFragment.ThemeSelectedList
 
         if (actionRequested == Constants.UPDATE_DB) {
             actionPlanViewModel.updateChecklist(checklist)
+            checklistAdapter.notifyItemChanged(position)
         } else if (actionRequested == Constants.OPEN_EDITOR) {
             // open ChecklistActivity
             val intent = Intent(this, ChecklistActivity::class.java)

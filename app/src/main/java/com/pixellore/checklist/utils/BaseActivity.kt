@@ -313,15 +313,21 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityListener {
     /**
      * Compare the dates to determine the due date is Overdue/Today/# days to go
      * */
-    fun compareDates(dueDateString: String): Long{
+    fun compareDates(dueDateString: String): Long?{
 
         val daysBetween: Long
+        Log.v(Constants.TAG, "dueDateString $dueDateString")
+        if (dueDateString.equals("")){
+            //Log.v(Constants.TAG, "Input is empty string")
+            return null
+        }
+
         val dueDateStringSplit = dueDateString.split("[ ,]".toRegex())
-        val month = Constants.MONTHS.indexOf(dueDateStringSplit[1]) + 1
 
         try {
             val year = dueDateStringSplit[3].toInt()
             val day = dueDateStringSplit[0].toInt()
+            val month = Constants.MONTHS.indexOf(dueDateStringSplit[1]) + 1
 
             val dueDate = LocalDate.of(year, month, day)
             val today = LocalDate.now()
@@ -336,22 +342,28 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityListener {
             // Handle the exception
             Log.e(Constants.TAG, "Unable to calculate number of days remaining to due date!")
         }
-        return 0
+        return null
     }
 
     fun compareDatesDisplay(dueDateString: String, toGoDateThreshold: Int): String {
         val daysBetween = compareDates(dueDateString)
 
-        if (daysBetween == 0L){
-            return "Today"
-        } else if (daysBetween < 0){
-            return "${abs(daysBetween)} days Overdue"
-        } else {
-            if (daysBetween <= toGoDateThreshold){
-                return "${abs(daysBetween)} days to go"
-            } else{
-                return dueDateString
+        if (daysBetween != null){
+            if (daysBetween == 0L){
+                return "Today"
+            } else  {
+                if (daysBetween < 0){
+                    return "${abs(daysBetween)} days Overdue"
+                } else {
+                    if (daysBetween <= toGoDateThreshold){
+                        return "${abs(daysBetween)} days to go"
+                    } else{
+                        return dueDateString
+                    }
+                }
             }
+        } else{
+            return ""
         }
     }
 

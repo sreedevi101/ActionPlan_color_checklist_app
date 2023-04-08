@@ -28,7 +28,7 @@
     <string name="change_title_text_color">Change Title Text color</string>
     <string name="change_other_text_color">Change Other Text color</string>
     <string name="change_to_default_format">Change to default format</string>
-    <string name="rename_list">Rename list</string>
+    <string name="rename_list">Rename</string>
     <string name="style_list_items">Apply Style to all tasks</string>
     <string name="share_list">Share list</string>
     <string name="change_task_style">Change task style?</string>
@@ -48,5 +48,8 @@
     <string name="done">Done</string>
     <string name="learn_more">Learn more</string>
     <string name="tutorial_icon">tutorial icon</string>
+    <string name="rename_checklist">Rename Checklist?</string>
+    <string name="save">Save</string>
+    <string name="enter_new_name">Enter new name</string>
 
 </resources>

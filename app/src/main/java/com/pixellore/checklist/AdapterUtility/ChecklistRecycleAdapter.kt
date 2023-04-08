@@ -18,10 +18,7 @@ import com.github.dhaval2404.colorpicker.model.ColorShape
 import com.pixellore.checklist.DataClass.CustomStyle
 import com.pixellore.checklist.DatabaseUtility.Checklist
 import com.pixellore.checklist.R
-import com.pixellore.checklist.utils.BaseActivity
-import com.pixellore.checklist.utils.Constants
-import com.pixellore.checklist.utils.FontPickerDialogFragment
-import com.pixellore.checklist.utils.MultipurposeAlertDialogFragment
+import com.pixellore.checklist.utils.*
 
 /**
  * Adapter for the recycler view in Main Activity
@@ -67,7 +64,19 @@ class ChecklistRecycleAdapter(
                 moreEditMenu.setOnMenuItemClickListener {
                     when(it.itemId){
                         R.id.popup_rename->{
-                            //todo rename checklist
+                            // rename checklist
+                            val currentName = currentChecklist.checklist_title
+
+                            val renameDialog = EditTextDialogFragment(currentName){newName ->
+
+                                currentChecklist.checklist_title = newName
+
+                                // update in database
+                                clickListenerChecklist(adapterPosition, currentChecklist, Constants.UPDATE_DB)
+                            }
+
+                            renameDialog.show(baseActivity.supportFragmentManager, "rename checklist")
+
                             return@setOnMenuItemClickListener true
                         }
                         R.id.popup_change_background ->
@@ -220,7 +229,6 @@ class ChecklistRecycleAdapter(
                     clickListenerChecklist(adapterPosition, currentChecklist, Constants.OPEN_EDITOR)
                 }
 
-                //todo move pinned to another recycler view
                 checklistPinnedButton.setOnClickListener {
                     if (currentChecklist.isPinned){
                         // if pinned, unpin
