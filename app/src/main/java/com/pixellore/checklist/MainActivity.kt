@@ -47,6 +47,16 @@ class MainActivity : BaseActivity(), ThemePickerDialogFragment.ThemeSelectedList
         setTheme() // to set theme to the theme saved in SharedPreference
         setContentView(R.layout.activity_main)
 
+        // Check if this is the first run or run after an app update or just a regular run
+        val runType = checkAppRunType()
+        if (runType == resources.getString(R.string.app_run_type_first)){
+            // open Tutorial activity
+            val move = Intent(this, TutorialActivity::class.java)
+            startActivity(move)
+        } else if (runType == resources.getString(R.string.app_run_type_updated)){
+            // Show a list of updates here
+        }
+
         // get colors from current theme, so it can applied to the toolbar and popup menu
         currentThemeColors = getColorsFromTheme(TaskApplication.appTheme)
 
@@ -292,11 +302,6 @@ class MainActivity : BaseActivity(), ThemePickerDialogFragment.ThemeSelectedList
             themeSelector.show(supportFragmentManager, "theme_select")
             true
         }
-        R.id.action_print_database -> {
-
-            printDbChecklistTable()
-            true
-        }
 
         else -> {
             // If we got here, the user's action was not recognized.
@@ -337,62 +342,4 @@ class MainActivity : BaseActivity(), ThemePickerDialogFragment.ThemeSelectedList
         }
     }
 
-    private fun printDbChecklistTable() {
-
-        var count: Int
-
-        actionPlanViewModel.allChecklists.observe(this) { checklists ->
-            val numberOfChecklistItems = checklists.size
-            Log.v(Constants.TAG, "There are $numberOfChecklistItems checklists")
-
-            checklists.let {
-                count = 1
-                it.forEach {
-                    if (count == 1) {
-                        Log.v(
-                            Constants.TAG,
-                            "\n\n-----------------------------------------------------------------------"
-                        )
-                    }
-                    Log.v(Constants.TAG, "${it.checklist_id}")
-                    if (it.checklist_title != null) {
-                        Log.v(Constants.TAG, "${it.checklist_title}")
-                    } else {
-                        Log.v(Constants.TAG, "title is null")
-                    }
-
-                    if (it.created_on != null) {
-                        Log.v(Constants.TAG, "Created Date: ${it.created_on}")
-                    } else {
-                        Log.v(Constants.TAG, "created date is null")
-                    }
-
-                    Log.v(Constants.TAG, "Is closed: ${it.checklist_isClosed}")
-
-                    if (it.closed_on != null) {
-                        Log.v(Constants.TAG, "Closed date: ${it.closed_on}")
-                    } else {
-                        Log.v(Constants.TAG, "closed date is null")
-                    }
-
-                    Log.v(Constants.TAG, "Is pinned: ${it.isPinned}")
-
-                    if (it.font != null) {
-                        Log.v(
-                            Constants.TAG,
-                            "CustomStyle: ${it.font!!}"
-                        )
-                    } else {
-                        Log.v(Constants.TAG, "CustomStyle is null")
-                    }
-
-                    Log.v(
-                        Constants.TAG,
-                        "-----------------------------------------------------------------------"
-                    )
-                    count++
-                }
-            }
-        }
-    }
 }

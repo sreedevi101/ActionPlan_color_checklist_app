@@ -812,11 +812,6 @@ class ChecklistActivity : BaseActivity() {
             selectStyle.show(supportFragmentManager, "style_selector")
             true
         }
-        R.id.action_print_database -> {
-
-            printDbTables()
-            true
-        }
         android.R.id.home -> {
             // Navigate back to parent activity
             onBackPressed()

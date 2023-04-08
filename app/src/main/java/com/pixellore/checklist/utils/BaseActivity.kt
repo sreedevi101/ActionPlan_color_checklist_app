@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.pixellore.checklist.BuildConfig
 import com.pixellore.checklist.DataClass.TextFont
 import com.pixellore.checklist.DataClass.Theme
 import com.pixellore.checklist.DatabaseUtility.TaskApplication
@@ -64,14 +65,14 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityListener {
         if (newTheme != TaskApplication.appTheme) {
             TaskApplication.appTheme = newTheme
 
-            writeToSharedPref()
+            writeAppThemeToSharedPref()
 
         } else {
             Log.v(Constants.TAG, "New theme selected is same as current theme")
         }
     }
 
-    private fun writeToSharedPref() {
+    private fun writeAppThemeToSharedPref() {
         // Write New theme to Shared Preferences file
         val sharedPrefToWrite = this.getSharedPreferences(
             resources.getString(R.string.shared_preference_file),
@@ -427,4 +428,56 @@ abstract class BaseActivity : AppCompatActivity(), BaseActivityListener {
 
         return fontsList
     }
+
+
+    /**
+     * Check if this is
+     * - a first run after new app install (or data cleared by user)
+     *          - saved version code would be not available and will be equal to the set default value
+     * - a first run after an update
+     *          - saved version code would be less than the current version code of the app
+     * - a normal run
+     *          - saved version code would be equal to current version code of the app
+     * */
+    fun checkAppRunType(): String {
+
+        var outputString = ""
+
+        if (TaskApplication.appVersion == BuildConfig.VERSION_CODE){
+            // This is a normal run, thus no action required
+            outputString = resources.getString(R.string.app_run_type_normal)
+        } else {
+            // If not a normal run
+
+            // If not a normal run
+            if (TaskApplication.appVersion == TaskApplication.versionKeyMissing) {
+                // This is the first run of the app after new installation (or the user cleared the
+                // shared preferences)
+                outputString = resources.getString(R.string.app_run_type_first)
+            } else if (BuildConfig.VERSION_CODE > TaskApplication.appVersion) {
+                // The app been updated. This is the first run after update
+                outputString = resources.getString(R.string.app_run_type_updated)
+            }
+        }
+
+        // write the version code back to shared pref file
+        writeAppVersionToSharedPref()
+
+        return outputString
+    }
+
+
+    private fun writeAppVersionToSharedPref() {
+        // Write App version code to Shared Preferences file
+        val sharedPrefToWrite = this.getSharedPreferences(
+            resources.getString(R.string.shared_preference_file),
+            Context.MODE_PRIVATE
+        )
+        with(sharedPrefToWrite.edit()) {
+            putInt(getString(R.string.shared_pref_app_version_code_key), BuildConfig.VERSION_CODE)
+            apply()
+        }
+        //Log.v(Constants.TAG, "wrote app version code to shared pref")
+    }
+
 }
