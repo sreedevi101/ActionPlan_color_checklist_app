@@ -35,11 +35,5 @@
 
     </group>
 
-    <!-- [DEBUG] Print the database tables in the Log -->
-    <item
-        android:id="@+id/action_print_database"
-        android:title="[DEBUG] Print Database"
-        app:showAsAction="never"
-        tools:ignore="HardcodedText" />
 
 </menu>

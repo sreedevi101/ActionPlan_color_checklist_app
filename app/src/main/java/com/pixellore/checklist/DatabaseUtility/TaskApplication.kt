@@ -3,6 +3,7 @@ package com.pixellore.checklist.DatabaseUtility
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import com.pixellore.checklist.BuildConfig
 import com.pixellore.checklist.R
 import com.pixellore.checklist.utils.Constants
 import kotlinx.coroutines.CoroutineScope
@@ -43,18 +44,22 @@ class TaskApplication : Application() {
         var recreateMainActivity: Boolean = false
         var recreateChecklistActivity: Boolean = false
         var recreateTaskEditor: Boolean = false
+
+        // app version
+        var appVersion: Int = -1
+        const val versionKeyMissing = -1
     }
 
 
     override fun onCreate() {
         super.onCreate()
-        readAppTheme()
+        readSharedPrefFile()
     }
 
     /**
      * Read the app theme from the Shared Pref file
      * */
-    fun readAppTheme() {
+    private fun readSharedPrefFile() {
         Log.v(Constants.TAG, "Reading from shared pref")
 
         val sharedPref = this.getSharedPreferences(
@@ -65,5 +70,12 @@ class TaskApplication : Application() {
             resources.getString(R.string.shared_pref_app_theme_key),
             R.style.Theme_Checklist_Professional
         )
+
+        appVersion = sharedPref.getInt(
+            resources.getString(R.string.shared_pref_app_version_code_key),
+            versionKeyMissing
+        )
     }
+
+
 }
